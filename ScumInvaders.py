@@ -22,7 +22,7 @@ class ScumInvaders:
 
         self.clock = pygame.time.Clock()
         self.state = "menu"
-        self.mainMenu = Main_Menu(self.screen)
+        self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites)
 
         self.fontsize = 10
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
@@ -34,8 +34,8 @@ class ScumInvaders:
                             self.running = False
 
             if (self.state == "menu"):
-                main_menu.draw()
-                output = main_menu.update()
+                self.mainMenu.draw()
+                output = self.mainMenu.update()
 
                 if output == "Exit":
                     self.running = False

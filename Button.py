@@ -5,10 +5,14 @@ class Button():
         self.screen = screen
         self.image = image
         self.sImage = sImage
+        self.current = self.image
+        self.posx = posx
+        self.posy = posy
+        
         self.rect = pygame.Rect(posx, posy, imagew, imageh)
 
 
-    def update(self, mousepos, click = False):
+    def check(self, mousepos, click = False):
         if self.rect.collidepoint(mousepos) and click:
             pass
         
@@ -16,4 +20,4 @@ class Button():
             pass
 
     def draw(self):
-        pass
+        self.screen.blit(self.current, (self.posx, self.posy))
