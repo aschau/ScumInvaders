@@ -1,7 +1,8 @@
 import os, sys
 import pygame
 from pygame.locals import *
-import resources
+from main_menu import Main_Menu
+from Sprite_Manager import SpriteSheets
 
 if not pygame.font:
     print('Warning, fonts disabled')
@@ -12,24 +13,35 @@ if not pygame.mixer:
 class ScumInvaders:
     def __init__(self):
         pygame.init()
-        self.width = resources.width
-        self.height = resources.height
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        
+        self.width = 1024
+        self.height = 768
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
+        self.running = True
+
+        AllSprites = SpriteSheets("Sprites").loadAll()
+
         self.clock = pygame.time.Clock()
+        self.state = "menu"
+        self.mainMenu = Main_Menu(self.screen)
 
         self.fontsize = 10
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
 
     def game_loop(self):
-        while resources.running:
+        while self.running:
             for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                            resources.running = False
+                            self.running = False
+
+            if (self.state == "menu"):
+                main_menu.draw()
+                output = main_menu.update()
+
+                if output == "Exit":
+                    self.running = False
             
-            self.screen.fill((0, 0, 0))
+            #self.screen.blit(resources.AllSprites["octo.png"], (100, 500))		
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
-            self.screen.blit(resources.AllSprites["octo.png"], (100, 500))		
             pygame.display.update()
             self.clock.tick_busy_loop(60)
         
