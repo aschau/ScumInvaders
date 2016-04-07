@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 from main_menu import Main_Menu
 from Sprite_Manager import SpriteSheets
+from soundManager import soundManager
 
 if not pygame.font:
     print('Warning, fonts disabled')
@@ -22,7 +23,8 @@ class ScumInvaders:
 
         self.clock = pygame.time.Clock()
         self.state = "Menu"
-        self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites)
+        self.sounds = soundManager("Sound")
+        self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites, self.sounds)
 
         self.fontsize = 10
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)

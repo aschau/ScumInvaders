@@ -29,6 +29,9 @@
     </Compile>
     <Compile Include="resources.py" />
     <Compile Include="ScumInvaders.py" />
+    <Compile Include="soundManager.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Sprite_Manager.py" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />

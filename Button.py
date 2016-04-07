@@ -1,7 +1,7 @@
 import pygame
 
 class Button():
-    def __init__(self, screen, image, sImage, posx, posy, imagew, imageh, function):
+    def __init__(self, screen, image, sImage, posx, posy, imagew, imageh, function, sound, soundManager):
         self.screen = screen
         self.image = image
         self.sImage = sImage
@@ -9,6 +9,8 @@ class Button():
         self.current = self.image
         self.posx = posx
         self.posy = posy
+        self.sound = sound
+        self.soundManager = soundManager
         self.selected = False
         self.rect = pygame.Rect(posx, posy, imagew, imageh)
 
@@ -27,6 +29,7 @@ class Button():
                 self.flip_image()
 
     def flip_image(self):
+        self.soundManager.playSound("Button.ogg")
         if self.current == self.image:
             self.current = self.sImage
             
@@ -34,6 +37,7 @@ class Button():
             self.current = self.image
 
     def click(self):
+        self.soundManager.playSound(self.sound)
         return self.function
 
     def draw(self):
