@@ -8,10 +8,10 @@ class Main_Menu():
             self.screen = screen
             self.screenw = screenw
             self.screenh = screenh
-            self.state = None
+            self.state = "Menu"
             self.buttons = []
-            self.buttons.append(Button(self.screen, self.sprites["start.png"], self.sprites["start.png"], 368, 442, 281, 68, "Start"))
-            self.buttons.append(Button(self.screen, self.sprites["exit.png"], self.sprites["exit.png"], 368, 534, 281, 68, "Exit"))
+            self.buttons.append(Button(self.screen, self.sprites["start.png"], self.sprites["exit.png"], 368, 442, 281, 68, "Start"))
+            self.buttons.append(Button(self.screen, self.sprites["exit.png"], self.sprites["start.png"], 368, 534, 281, 68, "Exit"))
 
         def draw(self):
             self.screen.fill((0, 0, 0, 0))
@@ -21,12 +21,13 @@ class Main_Menu():
         def mouseUpdate(self):
             if pygame.mouse.get_pressed()[0]:
                 for button in self.buttons:
-                    output = button.check(pygame.mouse.get_pos(), True)
+                    if button.checkClicked(pygame.mouse.get_pos()):
+                        return button.click()
+            
+            return "Menu"
 
         def update(self):
             for button in self.buttons:
-                button.check(pygame.mouse.get_pos())
+                button.checkHover(pygame.mouse.get_pos())
 
-            self.state = mouseUpdate()
-
-            return self.state
+            return self.mouseUpdate()

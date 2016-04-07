@@ -9,7 +9,7 @@ class Button():
         self.current = self.image
         self.posx = posx
         self.posy = posy
-        
+        self.selected = False
         self.rect = pygame.Rect(posx, posy, imagew, imageh)
 
 
@@ -17,11 +17,24 @@ class Button():
         return self.rect.collidepoint(mousepos)
     
     def checkHover(self, mousepos):
-        if self.rect.collidepoint(mousepos):
+        if not self.selected:
+            if self.rect.collidepoint(mousepos):
+                self.selected = True
+                self.flip_image()
+        else:
+            if not self.rect.collidepoint(mousepos):
+                self.selected = False
+                self.flip_image()
+
+    def flip_image(self):
+        if self.current == self.image:
             self.current = self.sImage
+            
+        elif self.current == self.sImage:
+            self.current = self.image
 
     def click(self):
-        pass
+        return self.function
 
     def draw(self):
         self.screen.blit(self.current, (self.posx, self.posy))

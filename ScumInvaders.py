@@ -21,7 +21,7 @@ class ScumInvaders:
         AllSprites = SpriteSheets("Sprites").loadAll()
 
         self.clock = pygame.time.Clock()
-        self.state = "menu"
+        self.state = "Menu"
         self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites)
 
         self.fontsize = 10
@@ -33,14 +33,13 @@ class ScumInvaders:
                     if event.type == pygame.QUIT:
                             self.running = False
 
-            if (self.state == "menu"):
+            if (self.state == "Menu"):
                 self.mainMenu.draw()
                 output = self.mainMenu.update()
 
                 if output == "Exit":
                     self.running = False
             
-            #self.screen.blit(resources.AllSprites["octo.png"], (100, 500))		
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
             self.clock.tick_busy_loop(60)
