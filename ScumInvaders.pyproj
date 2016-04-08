@@ -21,8 +21,25 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="resources.py" />
+    <Compile Include="button.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="enemy.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="game.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="main_menu.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="player.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ScumInvaders.py" />
+    <Compile Include="soundManager.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Sprite_Manager.py" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />

@@ -2,8 +2,9 @@ import os, sys
 import pygame
 
 #Class to load spritesheet or parts of the spritesheet
-class SpriteSheets():
+class sprites():
     def __init__(self, folder):
+        self.all = {}
         try:
             self.folder = folder
             os.path.isdir(self.folder)
@@ -16,11 +17,15 @@ class SpriteSheets():
         self.sheet = pygame.image.load(os.path.join(self.folder, image))
 
     def loadAll(self):
-        self.all = {}
         for root, dirs, files in os.walk(self.folder):
            for image in files:
                if image[-3:] == "png":
                    self.all[image] = pygame.image.load(os.path.join(self.folder, image))
+    
+    def getSprite(self, spriteName):
+        return self.all[spriteName + ".png"]
+
+    def getAll(self):
         return self.all
 
 #animate sprites
