@@ -1,7 +1,8 @@
 import pygame
 
 class Missle:
-    def __init__(self, image, pos, imagew, imageh):
+    def __init__(self, owner, image, pos, imagew, imageh):
+        self.owner = owner
         self.image = image
         self.posx = pos[0]
         self.posy = pos[1]
@@ -10,7 +11,7 @@ class Missle:
         self.speed = 10
 
     def update(self):
-        self.posy += self.speed
+        self.posy -= self.speed
 
     def getPos(self):
         return (self.posx, self.posy)

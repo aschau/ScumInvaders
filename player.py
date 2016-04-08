@@ -2,15 +2,17 @@ import pygame
 from missle import Missle
 
 class Player:
-    def __init__(self, image, missleImage, pos, imagew, imageh):
+    def __init__(self, playerNum, image, missleImage, pos, imagew, imageh):
         self.image = image
         self.imagew = imagew
         self.imageh = imageh
         self.missleImage = missleImage
+        self.playerNum = playerNum
         self.speed = 10
         self.posx = pos[0]
         self.posy = pos[1]
         self.score = 0
+        self.missleCount = 0
 
     def moveLeft(self):
         self.posx -= self.speed
@@ -22,4 +24,5 @@ class Player:
         return (self.posx, self.posy)
 
     def fire(self):
-        return Missle(self.missleImage, self.posx, self.posy + self.imageh)
+        self.missleCount += 1
+        return Missle(self.playerNum, self.missleImage, (self.posx + (self.imagew - 18), self.posy - (self.imageh)), 8, 32)
