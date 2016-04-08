@@ -1,5 +1,5 @@
 import pygame
-from Button import Button
+from button import Button
 
 class Main_Menu():
         def __init__(self, screen, screenw, screenh, spriteList, soundManager):
@@ -10,7 +10,7 @@ class Main_Menu():
             self.screenh = screenh
             self.state = "Menu"
             self.buttons = []
-            self.buttons.append(Button(self.screen, self.sprites["start.png"], self.sprites["exit.png"], 368, 442, 281, 68, "Start", 'Start Button.ogg', soundManager))
+            self.buttons.append(Button(self.screen, self.sprites["start.png"], self.sprites["exit.png"], 368, 442, 281, 68, "Game", 'Start Button.ogg', soundManager))
             self.buttons.append(Button(self.screen, self.sprites["exit.png"], self.sprites["start.png"], 368, 534, 281, 68, "Exit", 'Exit.ogg', soundManager))
 
         def draw(self):

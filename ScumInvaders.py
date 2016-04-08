@@ -4,6 +4,7 @@ from pygame.locals import *
 from main_menu import Main_Menu
 from Sprite_Manager import SpriteSheets
 from soundManager import soundManager
+from game import game
 
 if not pygame.font:
     print('Warning, fonts disabled')
@@ -25,6 +26,7 @@ class ScumInvaders:
         self.state = "Menu"
         self.sounds = soundManager("Sound")
         self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites, self.sounds)
+        self.game = game(self.screen, self.width, self.height, AllSprites, self.sounds)
 
         self.fontsize = 10
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
@@ -42,6 +44,19 @@ class ScumInvaders:
                 if output == "Exit":
                     self.running = False
             
+                else:
+                    self.state = output
+
+            elif (self.state == "Game"):
+                self.game.draw()
+                output = self.game.update()
+
+                if output == "Exit":
+                    self.running = False
+            
+                else:
+                    self.state = output
+
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
             self.clock.tick_busy_loop(60)
