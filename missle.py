@@ -1,5 +1,3 @@
-import pygame
-
 class Missle:
     def __init__(self, owner, image, pos, imagew, imageh):
         self.owner = owner
@@ -8,7 +6,7 @@ class Missle:
         self.posy = pos[1]
         self.imagew = imagew
         self.imageh = imageh
-        self.speed = 10
+        self.speed = 8
 
     def update(self):
         self.posy -= self.speed
