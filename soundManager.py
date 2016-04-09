@@ -15,8 +15,8 @@ class soundManager:
         self.loadAll()
 
         pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
-        self.music = pygame.mixer.music.load(os.path.join(self.folder, 'Space Invaders Main Menu.ogg'))
-        pygame.mixer.music.set_volume(.3)
+        self.music = pygame.mixer.music.load(os.path.join(self.folder, 'mainMenu.ogg'))
+        pygame.mixer.music.set_volume(1)
         pygame.mixer.music.play(-1)
 
     def loadAll(self):

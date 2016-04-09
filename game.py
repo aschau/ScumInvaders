@@ -43,7 +43,8 @@ class game:
      
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
-                self.screen.blit(self.sprites.getSprite(self.enemyGrid[row][column].image), self.enemyGrid[row][column].getPos())
+                if self.enemyGrid[row][column].health != 0:
+                    self.screen.blit(self.sprites.getSprite(self.enemyGrid[row][column].image), self.enemyGrid[row][column].getPos())
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -72,6 +73,7 @@ class game:
             rNum = random.randint(1, 5)
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
+                    if self.enemyGrid[row][column].health != 0:
                         if rNum >= 3:
                             self.enemyGrid[row][column].lastMove = "Down"
                             self.enemyGrid[row][column].moveDown() 
@@ -93,6 +95,22 @@ class game:
                 attacker = self.missles.pop(numMissles).owner
                 if attacker == 1:
                     self.player.missleCount -= 1
-
+            
             numMissles += 1
+        
+        for row in range(self.enemyRowCount):
+            for column in range(self.enemyColumnCount):
+                if self.enemyGrid[row][column].health != 0:
+                    numMissles = 0
+                    while numMissles < len(self.missles):
+                        if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
+                            attacker = self.missles.pop(numMissles).owner
+                            self.enemyGrid[row][column].health -= 1
+                            if attacker == 1:
+                                self.player.missleCount -= 1
+
+                        numMissles += 1
+                             
+        
+
         return "Game"

@@ -10,11 +10,11 @@ class Main_Menu():
             self.screenh = screenh
             self.state = "Menu"
             self.buttons = []
-            self.buttons.append(Button(self.screen, self.sprites.getSprite("start"), self.sprites.getSprite("exit"), 368, 442, 281, 68, "Game", 'Start Button.ogg', soundManager))
-            self.buttons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("start"), 368, 534, 281, 68, "Exit", 'Exit.ogg', soundManager))
+            self.buttons.append(Button(self.screen, self.sprites.getSprite("start"), self.sprites.getSprite("startHighlighted"), 368, 442, 281, 68, "Game", 'Start Button.ogg', soundManager))
+            self.buttons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Exit", 'Exit.ogg', soundManager))
 
         def draw(self):
-            self.screen.fill((0, 0, 0, 0))
+            self.screen.blit(self.sprites.getSprite("titlescreen"), (0, 0))
             for button in self.buttons:
                 button.draw()
 

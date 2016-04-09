@@ -6,7 +6,8 @@ class Enemy:
         self.image = image
         #self.oPosX = pos[0]
         #self.oPosY = pos[1]
-        self.posx= pos[0]
+        self.health = 2
+        self.posx = pos[0]
         self.posy = pos[1]
         self.imagew = imagew
         self.imageh = imageh

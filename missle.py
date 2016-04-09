@@ -14,8 +14,10 @@ class Missle:
     def update(self):
         if self.owner > 0:
             self.posy -= self.speed
+            self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
         else:
             self.posy += self.speed
+            self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
 
     def getPos(self):
         return (self.posx, self.posy)
