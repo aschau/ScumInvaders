@@ -1,3 +1,4 @@
+import pygame
 from missle import Missle
 
 class Player:
@@ -7,18 +8,22 @@ class Player:
         self.imageh = imageh
         self.missleImage = missleImage
         self.playerNum = playerNum
-        self.speed = 5
+        self.speed = 8
         self.posx = pos[0]
         self.posy = pos[1]
+        self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
         self.score = 0
         self.missleCount = 0
+        self.missleCap = 2
         self.lives = 3
 
     def moveLeft(self):
         self.posx -= self.speed
+        self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
 
     def moveRight(self):
         self.posx += self.speed
+        self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
 
     def getPos(self):
         return (self.posx, self.posy)

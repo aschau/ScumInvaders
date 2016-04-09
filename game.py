@@ -21,16 +21,18 @@ class game:
         for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
-                rnum = random.randrange(1, 2)
+                rnum = random.randint(1, 2)
                 enemySprite = "alien1"
                 if rnum == 1:
                     enemySprite = "alien2"
-                self.enemyGrid[row].append(Enemy(enemySprite, (column * 32, row * 32), 32, 32))
+                self.enemyGrid[row].append(Enemy(enemySprite, (32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32))
         
         self.missles = []
 
-        self.delay = 100
-        self.next = pygame.time.get_ticks() + self.delay
+        self.missleDelay = 100
+        self.enemyDelay = 1000
+        self.nextMissle = pygame.time.get_ticks() + self.missleDelay
+        self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
     def draw(self):
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, 0))
@@ -57,12 +59,32 @@ class game:
         if keys[pygame.K_ESCAPE]:
             return "Exit"
 
-        if pygame.time.get_ticks() > self.next:
-            self.next = pygame.time.get_ticks() + self.delay
+        if pygame.time.get_ticks() > self.nextMissle:
+            self.nextMissle = pygame.time.get_ticks() + self.missleDelay
 
             if keys[pygame.K_SPACE]:
-                if self.player.missleCount < 5:
+                if self.player.missleCount < self.player.missleCap:
                     self.missles.append(self.player.fire())
+
+        if pygame.time.get_ticks() > self.nextEnemyMove:
+            self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
+            
+            rNum = random.randint(1, 5)
+            for row in range(self.enemyRowCount):
+                for column in range(self.enemyColumnCount):
+                        if rNum >= 3:
+                            self.enemyGrid[row][column].lastMove = "Down"
+                            self.enemyGrid[row][column].moveDown() 
+
+                        elif rNum == 1:
+                            if (self.enemyGrid[row][column].posx - 16 >= 0) and self.enemyGrid[row][column].lastMove != "Left":
+                                self.enemyGrid[row][column].lastMove = "Left"
+                                self.enemyGrid[row][column].moveLeft()
+                        
+                        elif rNum == 2:
+                            if ((self.enemyGrid[row][column].posx + 16 + self.enemyGrid[row][column].imagew) <= self.screenw) and self.enemyGrid[row][column].lastMove != "Right":
+                                self.enemyGrid[row][column].lastMove = "Right"
+                                self.enemyGrid[row][column].moveRight() 
 
         numMissles = 0
         while numMissles < len(self.missles):
@@ -73,5 +95,4 @@ class game:
                     self.player.missleCount -= 1
 
             numMissles += 1
-
         return "Game"
