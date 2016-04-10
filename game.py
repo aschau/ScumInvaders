@@ -2,6 +2,7 @@
 from player import Player
 from enemy import Enemy
 from Button import Button
+from Sprite_Manager import Animate
 from collections import deque
 import random
 
@@ -39,10 +40,10 @@ class game:
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
                 rnum = random.randint(1, 2)
-                enemySprite = "alien1"
+                enemySprite = "Alien1SpriteSheet"
                 if rnum == 1:
-                    enemySprite = "alien2"
-                self.enemyGrid[row].append(Enemy(enemySprite, (32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32))
+                    enemySprite = "Alien2SpriteSheet"
+                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10)))
 
     def draw(self):
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, 0))
@@ -54,7 +55,7 @@ class game:
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
                 if self.enemyGrid[row][column].health != 0:
-                    self.screen.blit(self.sprites.getSprite(self.enemyGrid[row][column].image), self.enemyGrid[row][column].getPos())
+                    self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -115,6 +116,7 @@ class game:
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
                 if self.enemyGrid[row][column].health != 0:
+                    self.enemyGrid[row][column].anim.update()
                     numMissles = 0
                     while numMissles < len(self.missles):
                         if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):

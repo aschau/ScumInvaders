@@ -2,8 +2,9 @@
 from missle import Missle
 
 class Enemy:
-    def __init__(self, image, pos, imagew, imageh):
-        self.image = image
+    def __init__(self, pos, imagew, imageh, animation):
+        #self.image = image
+        self.anim = animation
         #self.oPosX = pos[0]
         #self.oPosY = pos[1]
         self.health = 2
