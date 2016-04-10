@@ -1,4 +1,4 @@
-import pygame
+﻿import pygame
 from missle import Missle
 
 class Enemy:
@@ -26,7 +26,7 @@ class Enemy:
     def moveRight(self):
         self.posx += self.speed
         self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
-        
+        #added a Position function
     def moveDown(self):
         self.posy += self.speed
         self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)

@@ -1,7 +1,7 @@
-import pygame
+﻿import pygame
 from player import Player
 from enemy import Enemy
-from button import Button
+from Button import Button
 from collections import deque
 import random
 
@@ -17,6 +17,7 @@ class game:
         self.enemyGrid = []
         self.enemyRowCount = 5
         self.enemyColumnCount = 11
+        self.enemyCount = 55
 
         for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
@@ -73,6 +74,9 @@ class game:
             rNum = random.randint(1, 5)
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
+                    #checks if enemies have reached the bottom of the screen
+                    if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
+                        return "Menu"
                     if self.enemyGrid[row][column].health != 0:
                         if rNum >= 3:
                             self.enemyGrid[row][column].lastMove = "Down"
@@ -106,11 +110,14 @@ class game:
                         if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
                             attacker = self.missles.pop(numMissles).owner
                             self.enemyGrid[row][column].health -= 1
+                            #checks if no more enemies 
+                            if self.enemyGrid[row][column].health == 0: 
+                                self.enemyCount -= 1
                             if attacker == 1:
                                 self.player.missleCount -= 1
 
                         numMissles += 1
                              
-        
-
+        if self.enemyCount == 0:
+            return "Menu"
         return "Game"
