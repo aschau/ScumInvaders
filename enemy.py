@@ -28,7 +28,7 @@ class Enemy:
         self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
         #added a Position function
     def moveDown(self):
-        self.posy += self.speed
+        self.posy += 32
         self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
 
     def getPos(self):

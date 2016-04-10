@@ -16,8 +16,8 @@ class game:
 
         self.enemyGrid = []
         self.enemyRowCount = 5
-        self.enemyColumnCount = 11
-        self.enemyCount = 55
+        self.enemyColumnCount = 10
+        self.enemyCount = 50
 
         for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
@@ -31,7 +31,7 @@ class game:
         self.missles = []
 
         self.missleDelay = 100
-        self.enemyDelay = 1000
+        self.enemyDelay = 500
         self.nextMissle = pygame.time.get_ticks() + self.missleDelay
         self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
@@ -70,7 +70,33 @@ class game:
 
         if pygame.time.get_ticks() > self.nextEnemyMove:
             self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
-            
+
+            for row in range(self.enemyRowCount):
+                for column in range(self.enemyColumnCount):
+                    if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
+                        return "Menu"
+                    if self.enemyGrid[row][column].lastMove == None:
+                        self.enemyGrid[row][column].lastMove = "Left"
+                        self.enemyGrid[row][column].moveDown()
+                        self.enemyGrid[row][column].moveDown()
+                        self.enemyGrid[row][column].moveDown()
+                        print("This happened.")
+                    elif self.enemyGrid[row][column].lastMove == "Left":
+                        if self.enemyGrid[row][column].posx <= 0: 
+                            self.enemyGrid[row][column].lastMove = "Right"
+                            self.enemyGrid[row][column].moveDown()
+                          #  self.enemyGrid[row][column].moveRight()
+                        else:
+                            self.enemyGrid[row][column].moveLeft()
+                    elif self.enemyGrid[row][column].lastMove == "Right":
+                        if self.enemyGrid[row][column].posx + 64 >= 1024:
+                            self.enemyGrid[row][column].lastMove = "Left"
+                            self.enemyGrid[row][column].moveDown()
+                           # self.enemyGrid[row][column].moveLeft()
+                        else:
+                            self.enemyGrid[row][column].moveRight()
+
+            '''
             rNum = random.randint(1, 5)
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
@@ -91,7 +117,7 @@ class game:
                             if ((self.enemyGrid[row][column].posx + 16 + self.enemyGrid[row][column].imagew) <= self.screenw) and self.enemyGrid[row][column].lastMove != "Right":
                                 self.enemyGrid[row][column].lastMove = "Right"
                                 self.enemyGrid[row][column].moveRight() 
-
+                '''
         numMissles = 0
         while numMissles < len(self.missles):
             self.missles[numMissles].update()
