@@ -27,7 +27,7 @@ class game:
 
         self.missleDelay = 100
 
-        self.enemyDelay = 500
+        self.enemyDelay = 1000
         self.nextMissle = pygame.time.get_ticks() + self.missleDelay
         self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
@@ -46,7 +46,7 @@ class game:
                 enemySprite = "Alien1SpriteSheet"
                 if rnum == 1:
                     enemySprite = "Alien2SpriteSheet"
-                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10)))
+                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), 1))
 
     def draw(self):
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, 0))
@@ -98,7 +98,7 @@ class game:
                         self.enemyGrid[row][column].moveDown()
                         self.enemyGrid[row][column].moveDown()
                         self.enemyGrid[row][column].moveDown()
-                        print("This happened.")
+                        #print("This happened.")
                     elif self.enemyGrid[row][column].lastMove == "Left":
                         if self.enemyGrid[row][column].posx <= 0: 
                             self.enemyGrid[row][column].lastMove = "Right"
@@ -114,7 +114,7 @@ class game:
                         else:
                             self.enemyGrid[row][column].moveRight()
 
-            '''
+            
             rNum = random.randint(1, 5)
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
