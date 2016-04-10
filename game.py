@@ -19,7 +19,23 @@ class game:
         self.enemyColumnCount = 11
         self.enemyCount = 55
 
-        for row in range(self.enemyRowCount):
+        self.setGrid()       
+        self.missles = []
+
+        self.missleDelay = 100
+        self.enemyDelay = 1000
+        self.nextMissle = pygame.time.get_ticks() + self.missleDelay
+        self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
+
+    def reset(self):
+        self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
+        self.enemyGrid = []
+        self.missles = []
+        self.enemyCount = 55
+        self.setGrid()
+
+    def setGrid(self):
+         for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
                 rnum = random.randint(1, 2)
@@ -27,13 +43,6 @@ class game:
                 if rnum == 1:
                     enemySprite = "alien2"
                 self.enemyGrid[row].append(Enemy(enemySprite, (32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32))
-        
-        self.missles = []
-
-        self.missleDelay = 100
-        self.enemyDelay = 1000
-        self.nextMissle = pygame.time.get_ticks() + self.missleDelay
-        self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
     def draw(self):
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, 0))
@@ -76,6 +85,7 @@ class game:
                 for column in range(self.enemyColumnCount):
                     #checks if enemies have reached the bottom of the screen
                     if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
+                        self.reset()
                         return "Menu"
                     if self.enemyGrid[row][column].health != 0:
                         if rNum >= 3:
@@ -119,5 +129,6 @@ class game:
                         numMissles += 1
                              
         if self.enemyCount == 0:
+            self.reset()
             return "Menu"
         return "Game"
