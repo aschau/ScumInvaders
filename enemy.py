@@ -14,11 +14,13 @@ class Enemy:
         self.imageh = imageh
         self.lastMove = None
         self.speed = 16
+        self.missleCount = 0
+        self.missleCap = 100
         self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
 
     def fire(self):
-        pass
-        #return Missle(0, "missle1", (self.posx + (self.imagew - 18), self.posy - (self.imageh)), 8, 32)
+        self.missleCount += 1
+        return Missle(0, "missle1", (self.posx + (self.imagew + 18), self.posy + (self.imageh)), 8, 32)
    
     def moveLeft(self):
         self.posx -= self.speed

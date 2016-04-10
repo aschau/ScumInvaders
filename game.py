@@ -58,6 +58,9 @@ class game:
                     self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
     def update(self):
+        if (self.player.lives <= 0):
+            return "Menu"
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
@@ -102,15 +105,31 @@ class game:
                             if ((self.enemyGrid[row][column].posx + 16 + self.enemyGrid[row][column].imagew) <= self.screenw) and self.enemyGrid[row][column].lastMove != "Right":
                                 self.enemyGrid[row][column].lastMove = "Right"
                                 self.enemyGrid[row][column].moveRight() 
+                        
+                        rNum2 = random.randint(1,20)
+                        if rNum2 == 1:
+                            if (self.enemyGrid[row][column].missleCount < self.enemyGrid[row][column].missleCap):
+                                self.missles.append(self.enemyGrid[row][column].fire())
 
         numMissles = 0
         while numMissles < len(self.missles):
             self.missles[numMissles].update()
-            if ((self.missles[numMissles].posy - self.missles[numMissles].imageh) <= 0):
-                attacker = self.missles.pop(numMissles).owner
-                if attacker == 1:
+            attacker = self.missles[numMissles].owner
+            if attacker == 1:
+                if ((self.missles[numMissles].posy - self.missles[numMissles].imageh) <= 0):
+                    self.missles.pop(numMissles)
                     self.player.missleCount -= 1
             
+            if attacker == 0:
+                if (self.missles[numMissles].collider.colliderect(self.player.collider)):
+                    self.player.lives -= 1
+                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
+                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
+
+                elif ((self.missles[numMissles].posy + self.missles[numMissles].imageh) >= self.screenh):
+                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
+                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
+
             numMissles += 1
         
         for row in range(self.enemyRowCount):
