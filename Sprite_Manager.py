@@ -20,7 +20,7 @@ class sprites():
         for root, dirs, files in os.walk(self.folder):
            for image in files:
                if image[-3:] == "png":
-                   self.all[image] = pygame.image.load(os.path.join(self.folder, image))
+                   self.all[image] = pygame.image.load(os.path.join(self.folder, image)).convert_alpha()
     
     def getSprite(self, spriteName):
         return self.all[spriteName + ".png"]

@@ -60,7 +60,7 @@ class ScumInvaders:
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
-            self.clock.tick(30)
+            self.clock.tick(60)
         
         pygame.quit()
 
