@@ -22,6 +22,7 @@ class game:
         self.enemyColumnCount = 10
         self.enemyCount = 50
 
+        self.score = 0
 
         self.setGrid()       
         self.missles = []
@@ -75,8 +76,9 @@ class game:
                 if self.enemyGrid[row][column].health != 0:
                     self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
-        self.screen.blit(self.font.render("Lives: " + str(self.player.lives), True, pygame.Color(255,255,255)), (0, self.screenh/2))
-        self.screen.blit(self.font.render("Ammo: " + str(self.player.missleCap - self.player.missleCount), True, pygame.Color(255,255,255)), (0, self.screenh/2 + self.fontsize))
+        self.screen.blit(self.font.render("Lives: " + str(self.player.lives), True, pygame.Color(255,255,255)), (0, 670))
+        self.screen.blit(self.font.render("Ammo: " + str(self.player.missleCap - self.player.missleCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
+        self.screen.blit(self.font.render("Score: " + str(self.score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
 
     def update(self):
         self.keyUpdate()
@@ -160,6 +162,7 @@ class game:
                                         #checks if no more enemies 
                                         if self.enemyGrid[row][column].health == 0: 
                                             self.enemyCount -= 1
+                                            self.score += 100
                                 #except:
                                 #    print("Num:", numMissles)
                                 #    print("Length:", len(self.missles))
@@ -193,7 +196,10 @@ class game:
                     
                     self.enemyGrid[row][column].anim.update()
                     if self.enemyGrid[row][column].lastMove == None:
-                        self.enemyGrid[row][column].lastMove = "Left"
+                        if row % 2 == 0:
+                            self.enemyGrid[row][column].lastMove = "Left"
+                        else: 
+                            self.enemyGrid[row][column].lastMove = "Right"
                         self.enemyGrid[row][column].moveDown()
                         self.enemyGrid[row][column].moveDown()
                         self.enemyGrid[row][column].moveDown()
