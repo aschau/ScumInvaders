@@ -35,13 +35,16 @@ class game:
         self.currentBG1Height = 0
         self.currentBG2Height = -self.bgHeight
 
+        self.state = "Game"
+
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
         self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
         self.enemyGrid = []
         self.missles = []
-        self.enemyCount = 55
+        self.enemyCount = 50
         self.setGrid()
+        self.state = "Game"
 
     def setGrid(self):
          for row in range(self.enemyRowCount):
@@ -68,11 +71,39 @@ class game:
                     self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
     def update(self):
-        if (self.player.lives <= 0):
-            #self.reset()
-            return "Menu"
-
+        
         self.backgroundUpdate()
+        self.keyUpdate()
+        self.state = self.enemyUpdate()
+        
+        if self.checkState():
+            return self.state
+        
+        self.checkMissleHit()
+        self.checkMissleMiss()
+
+        self.state = self.checkPlayerLives()
+        if self.checkState():
+            return self.state
+        
+        self.state = self.checkEnemyCount()
+
+        return self.state
+    
+    def checkState(self):
+        return self.state != "Game"
+
+    def checkPlayerLives(self):
+        if (self.player.lives <= 0):
+            return "Menu"
+        return "Game"
+
+    def checkEnemyCount(self):
+        if self.enemyCount == 0:
+            return "Menu"
+        return "Game"
+
+    def keyUpdate(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
@@ -83,16 +114,55 @@ class game:
             if not ((self.player.posx + self.player.speed + self.player.imagew) >= self.screenw):
                 self.player.moveRight()
 
-        if keys[pygame.K_ESCAPE]:
-            return "Exit"
-
         if pygame.time.get_ticks() > self.nextMissle:
             self.nextMissle = pygame.time.get_ticks() + self.missleDelay
 
             if keys[pygame.K_SPACE]:
                 if self.player.missleCount < self.player.missleCap:
                     self.missles.append(self.player.fire())
+    
+    def checkMissleHit(self):
+        for row in range(self.enemyRowCount):
+            for column in range(self.enemyColumnCount):
+                if self.enemyGrid[row][column].health != 0:
+                    self.enemyGrid[row][column].anim.update()
+                    numMissles = 0
+                    while numMissles < len(self.missles):
+                        if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
+                            attacker = self.missles.pop(numMissles).owner
+                            self.enemyGrid[row][column].health -= 1
+                            #checks if no more enemies 
+                            if self.enemyGrid[row][column].health == 0: 
+                                self.enemyCount -= 1
+                            if attacker == 1:
+                                self.player.missleCount -= 1
 
+                        numMissles += 1
+
+    def checkMissleMiss(self):
+        numMissles = 0
+        while numMissles < len(self.missles):
+            self.missles[numMissles].update()
+
+            attacker = self.missles[numMissles].owner
+            if attacker == 1:
+                if ((self.missles[numMissles].posy - self.missles[numMissles].imageh) <= 0):
+                    self.missles.pop(numMissles)
+                    self.player.missleCount -= 1
+            
+            if attacker == 0:
+                if (self.missles[numMissles].collider.colliderect(self.player.collider)):
+                    self.player.lives -= 1
+                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
+                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
+
+                elif ((self.missles[numMissles].posy + self.missles[numMissles].imageh) >= self.screenh):
+                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
+                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
+
+            numMissles += 1
+
+    def enemyUpdate(self):
         if pygame.time.get_ticks() > self.nextEnemyMove:
             self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
@@ -100,8 +170,8 @@ class game:
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
                     if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
-                        #self.reset()
                         return "Menu"
+
                     if self.enemyGrid[row][column].lastMove == None:
                         self.enemyGrid[row][column].lastMove = "Left"
                         self.enemyGrid[row][column].moveDown()
@@ -129,7 +199,6 @@ class game:
                 for column in range(self.enemyColumnCount):
                     #checks if enemies have reached the bottom of the screen
                     if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
-                        #self.reset()
                         return "Menu"
                     if self.enemyGrid[row][column].health != 0:
                         if rNum >= 3:
@@ -150,49 +219,6 @@ class game:
                         if rNum2 == 1:
                             if (self.enemyGrid[row][column].missleCount < self.enemyGrid[row][column].missleCap):
                                 self.missles.append(self.enemyGrid[row][column].fire())
-
-        numMissles = 0
-        while numMissles < len(self.missles):
-            self.missles[numMissles].update()
-
-            attacker = self.missles[numMissles].owner
-            if attacker == 1:
-                if ((self.missles[numMissles].posy - self.missles[numMissles].imageh) <= 0):
-                    self.missles.pop(numMissles)
-                    self.player.missleCount -= 1
-            
-            if attacker == 0:
-                if (self.missles[numMissles].collider.colliderect(self.player.collider)):
-                    self.player.lives -= 1
-                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
-                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
-
-                elif ((self.missles[numMissles].posy + self.missles[numMissles].imageh) >= self.screenh):
-                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
-                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
-
-            numMissles += 1
-        
-        for row in range(self.enemyRowCount):
-            for column in range(self.enemyColumnCount):
-                if self.enemyGrid[row][column].health != 0:
-                    self.enemyGrid[row][column].anim.update()
-                    numMissles = 0
-                    while numMissles < len(self.missles):
-                        if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
-                            attacker = self.missles.pop(numMissles).owner
-                            self.enemyGrid[row][column].health -= 1
-                            #checks if no more enemies 
-                            if self.enemyGrid[row][column].health == 0: 
-                                self.enemyCount -= 1
-                            if attacker == 1:
-                                self.player.missleCount -= 1
-
-                        numMissles += 1
-                             
-        if self.enemyCount == 0:
-            #self.reset()
-            return "Menu"
         return "Game"
 
     def backgroundUpdate(self):
