@@ -31,6 +31,10 @@ class game:
         self.nextMissle = pygame.time.get_ticks() + self.missleDelay
         self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
+        self.bgHeight = 1536
+        self.currentBG1Height = 0
+        self.currentBG2Height = -self.bgHeight
+
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
         self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
@@ -50,7 +54,8 @@ class game:
                 self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), 1))
 
     def draw(self):
-        self.screen.blit(self.sprites.getSprite("GameBackground"), (0, 0))
+        self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG1Height))
+        self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG2Height))
         self.screen.blit(self.sprites.getSprite(self.player.image), self.player.getPos())
         
         for missle in self.missles:
@@ -67,6 +72,7 @@ class game:
             #self.reset()
             return "Menu"
 
+        self.backgroundUpdate()
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
@@ -188,3 +194,12 @@ class game:
             #self.reset()
             return "Menu"
         return "Game"
+
+    def backgroundUpdate(self):
+        self.currentBG1Height += 1
+        self.currentBG2Height += 1
+        
+        if (self.currentBG1Height >= self.bgHeight):
+            self.currentBG1Height = -self.bgHeight
+        elif (self.currentBG2Height >= self.bgHeight):
+            self.currentBG2Height = -self.bgHeight
