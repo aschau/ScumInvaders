@@ -1,4 +1,4 @@
-import pygame
+﻿import pygame
 import os
 
 class soundManager:
@@ -16,7 +16,7 @@ class soundManager:
 
         pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
         self.music = pygame.mixer.music.load(os.path.join(self.folder, 'mainMenu.ogg'))
-        pygame.mixer.music.set_volume(1)
+        pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
 
     def loadAll(self):
@@ -30,7 +30,7 @@ class soundManager:
     def playCurrentMusic(self):
         pygame.mixer.music.play(-1)
 
-    def playNewMusic(self, song, volume = 1):
+    def playNewMusic(self, song, volume = 0.5):
         self.music = pygame.mixer.music.load(os.path.join(self.folder, song))
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.play(-1)

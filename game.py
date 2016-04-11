@@ -157,6 +157,21 @@ class game:
                     if self.player.missileCount < self.player.missileCap:
                         self.missiles.append(self.player.fire())
 
+    def checkHit(self, numMissiles):
+        for row in range(self.enemyRowCount):
+            for column in range(self.enemyColumnCount):
+                if self.enemyGrid[row][column].health != 0:
+                    if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
+                        attacker = self.missiles.pop(numMissiles).owner
+                        self.enemyGrid[row][column].health -= 1
+                        self.player.missileCount -= 1
+                        #checks if no more enemies 
+                        if self.enemyGrid[row][column].health == 0: 
+                            self.enemyCount -= 1
+                            self.score += 100
+                        return
+
+
     def checkMissiles(self):
         numMissiles = 0
         while numMissiles < len(self.missiles):
@@ -169,27 +184,28 @@ class game:
                     self.player.missileCount -= 1
 
                 else:
-                    hit = False
-                    for row in range(self.enemyRowCount):
-                        for column in range(self.enemyColumnCount):
-                            if self.enemyGrid[row][column].health != 0:
-                                #try:
-                                if (numMissiles != len(self.missiles)):
-                                    if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
-                                        hit = True
-                                        attacker = self.missiles.pop(numMissiles).owner
-                                        self.enemyGrid[row][column].health -= 1
-                                        #checks if no more enemies 
-                                        if self.enemyGrid[row][column].health == 0: 
-                                            self.enemyCount -= 1
-                                            self.score += 100
-                                #except:
-                                #    print("Num:", numMissiles)
-                                #    print("Length:", len(self.missiles))
-                                #    print("Row:", row, "column:", column)
+                    self.checkHit(numMissiles)
+                    #hit = False
+                    #for row in range(self.enemyRowCount):
+                    #    for column in range(self.enemyColumnCount):
+                    #        if self.enemyGrid[row][column].health != 0:
+                    #            #try:
+                    #            if (numMissiles != len(self.missiles)):
+                    #                if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
+                    #                    hit = True
+                    #                    attacker = self.missiles.pop(numMissiles).owner
+                    #                    self.enemyGrid[row][column].health -= 1
+                    #                    #checks if no more enemies 
+                    #                    if self.enemyGrid[row][column].health == 0: 
+                    #                        self.enemyCount -= 1
+                    #                        self.score += 100
+                    #            #except:
+                    #            #    print("Num:", numMissiles)
+                    #            #    print("Length:", len(self.missiles))
+                    #            #    print("Row:", row, "column:", column)
                     
-                    if hit:                
-                        self.player.missileCount -= 1
+                    #if hit:                
+                    #    self.player.missileCount -= 1
                                 
             
             elif attacker == 0:
