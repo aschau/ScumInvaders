@@ -80,6 +80,7 @@ class game:
         self.screen.blit(self.font.render("Lives: " + str(self.player.lives), True, pygame.Color(255,255,255)), (0, 670))
         self.screen.blit(self.font.render("Ammo: " + str(self.player.missileCap - self.player.missileCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
         self.screen.blit(self.font.render("Score: " + str(self.score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
+        self.screen.blit(self.font.render("Level: " + str(self.level), True, pygame.Color(255,255,255)), (0, 670 - self.fontsize))
 
     def update(self):
         self.keyUpdate()
