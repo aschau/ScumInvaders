@@ -15,6 +15,7 @@ class game:
         self.soundManager = soundManager
         self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
         self.paused = False
+        self.level = 1
 
         self.enemyGrid = []
         self.enemyRowCount = 5
@@ -53,7 +54,7 @@ class game:
         self.setGrid()
         self.state = "Game"
 
-    def setGrid(self):
+    def setGrid(self, speed = 16, health = 1):
          for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
@@ -61,7 +62,7 @@ class game:
                 enemySprite = "Alien1SpriteSheet"
                 if rnum == 1:
                     enemySprite = "Alien2SpriteSheet"
-                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), 1))
+                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed))
 
     def draw(self):
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG1Height))
@@ -95,7 +96,7 @@ class game:
             if self.checkState():
                 return self.state
         
-            self.state = self.checkEnemyCount()
+            self.checkEnemyCount()
 
         return self.state
     
@@ -112,8 +113,26 @@ class game:
 
     def checkEnemyCount(self):
         if self.enemyCount == 0:
-            return "Menu"
-        return "Game"
+            self.enemyCount = 50
+            self.nextLevel()
+
+    '''Odd levels -> change speed; even levels -> change health'''
+    def nextLevel(self):
+        self.enemyGrid = []
+        self.level += 1
+        if self.level % 2 == 0:
+            self.setGrid(16 + self.level * 5, self.level/2)
+        else: 
+            self.setGrid(16 + (self.level -1) * 5, self.level//2 + 1)
+        #for row in range(self.enemyRowCount):
+        #        for column in range(self.enemyColumnCount):
+        #            if self.level % 2 == 0:
+        #                self.enemyGrid[row][column].speed += self.level * 5
+        #            else: 
+        #                rnum = random.randint(self.level - 1, self.level)
+        #                self.enemyGrid[row][column].health = rnum
+        if self.level %2 == 1:
+            self.player.missleCap += 1 
 
     def keyUpdate(self):
         keys = pygame.key.get_pressed()
@@ -192,6 +211,8 @@ class game:
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
                     if self.enemyGrid[row][column].health != 0 and (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64)) :
+                        self.togglePause()
+
                         return "Menu"
                     
                     self.enemyGrid[row][column].anim.update()

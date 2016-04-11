@@ -2,7 +2,7 @@
 from missle import Missle
 
 class Enemy:
-    def __init__(self, pos, imagew, imageh, animation, health):
+    def __init__(self, pos, imagew, imageh, animation, health, speed):
         #self.image = image
         self.anim = animation
         #self.oPosX = pos[0]
@@ -13,7 +13,7 @@ class Enemy:
         self.imagew = imagew
         self.imageh = imageh
         self.lastMove = None
-        self.speed = 16
+        self.speed = speed
         self.downSpeed = 48
         self.missleCount = 0
         self.missleCap = 100
