@@ -14,6 +14,7 @@ class game:
         self.screenh = screenh
         self.soundManager = soundManager
         self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
+        self.paused = False
 
         self.enemyGrid = []
         self.enemyRowCount = 5
@@ -27,7 +28,7 @@ class game:
 
         self.missleDelay = 100
 
-        self.enemyDelay = 1000
+        self.enemyDelay = 100
         self.nextMissle = pygame.time.get_ticks() + self.missleDelay
         self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
@@ -36,6 +37,8 @@ class game:
         self.currentBG2Height = -self.bgHeight
 
         self.state = "Game"
+        self.keyDelay = 10
+        self.nextKeyInput = pygame.time.get_ticks() + self.keyDelay
 
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
@@ -67,29 +70,30 @@ class game:
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
                 if self.enemyGrid[row][column].health != 0:
-
                     self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
     def update(self):
-        
-        self.backgroundUpdate()
         self.keyUpdate()
-        self.state = self.enemyUpdate()
+        if not self.paused:
+            self.backgroundUpdate()
+            self.state = self.enemyUpdate()
         
-        if self.checkState():
-            return self.state
+            if self.checkState():
+                return self.state
         
-        self.checkMissleHit()
-        self.checkMissleMiss()
+            self.checkMissles()
 
-        self.state = self.checkPlayerLives()
-        if self.checkState():
-            return self.state
+            self.state = self.checkPlayerLives()
+            if self.checkState():
+                return self.state
         
-        self.state = self.checkEnemyCount()
+            self.state = self.checkEnemyCount()
 
         return self.state
     
+    def togglePause(self):
+        self.paused = not self.paused
+
     def checkState(self):
         return self.state != "Game"
 
@@ -105,41 +109,27 @@ class game:
 
     def keyUpdate(self):
         keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_ESCAPE]:
+            self.togglePause()
 
-        if keys[pygame.K_a]:
-                if not ((self.player.posx - self.player.speed) <= 0):
-                    self.player.moveLeft()
+        if not self.paused:
+            if keys[pygame.K_a]:
+                    if not ((self.player.posx - self.player.speed) <= 0):
+                        self.player.moveLeft()
 
-        if keys[pygame.K_d]:
-            if not ((self.player.posx + self.player.speed + self.player.imagew) >= self.screenw):
-                self.player.moveRight()
+            if keys[pygame.K_d]:
+                if not ((self.player.posx + self.player.speed + self.player.imagew) >= self.screenw):
+                    self.player.moveRight()
 
-        if pygame.time.get_ticks() > self.nextMissle:
-            self.nextMissle = pygame.time.get_ticks() + self.missleDelay
+            if pygame.time.get_ticks() > self.nextMissle:
+                self.nextMissle = pygame.time.get_ticks() + self.missleDelay
 
-            if keys[pygame.K_SPACE]:
-                if self.player.missleCount < self.player.missleCap:
-                    self.missles.append(self.player.fire())
-    
-    def checkMissleHit(self):
-        for row in range(self.enemyRowCount):
-            for column in range(self.enemyColumnCount):
-                if self.enemyGrid[row][column].health != 0:
-                    self.enemyGrid[row][column].anim.update()
-                    numMissles = 0
-                    while numMissles < len(self.missles):
-                        if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
-                            attacker = self.missles.pop(numMissles).owner
-                            self.enemyGrid[row][column].health -= 1
-                            #checks if no more enemies 
-                            if self.enemyGrid[row][column].health == 0: 
-                                self.enemyCount -= 1
-                            if attacker == 1:
-                                self.player.missleCount -= 1
+                if keys[pygame.K_SPACE]:
+                    if self.player.missleCount < self.player.missleCap:
+                        self.missles.append(self.player.fire())
 
-                        numMissles += 1
-
-    def checkMissleMiss(self):
+    def checkMissles(self):
         numMissles = 0
         while numMissles < len(self.missles):
             self.missles[numMissles].update()
@@ -149,8 +139,31 @@ class game:
                 if ((self.missles[numMissles].posy - self.missles[numMissles].imageh) <= 0):
                     self.missles.pop(numMissles)
                     self.player.missleCount -= 1
+
+                else:
+                    hit = False
+                    for row in range(self.enemyRowCount):
+                        for column in range(self.enemyColumnCount):
+                            if self.enemyGrid[row][column].health != 0:
+                                #try:
+                                    #if (numMissles != len(self.missles)):
+                                if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
+                                    hit = True
+                                    attacker = self.missles.pop(numMissles).owner
+                                    self.enemyGrid[row][column].health -= 1
+                                    #checks if no more enemies 
+                                    if self.enemyGrid[row][column].health == 0: 
+                                        self.enemyCount -= 1
+                                #except:
+                                #    print("Num:", numMissles)
+                                #    print("Length:", len(self.missles))
+                                #    print("Row:", row, "column:", column)
+                    
+                    if hit:                
+                        self.player.missleCount -= 1
+                                
             
-            if attacker == 0:
+            elif attacker == 0:
                 if (self.missles[numMissles].collider.colliderect(self.player.collider)):
                     self.player.lives -= 1
                     enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
@@ -169,9 +182,10 @@ class game:
 
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
-                    if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
+                    if self.enemyGrid[row][column].health != 0 and (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64)) :
                         return "Menu"
-
+                    
+                    self.enemyGrid[row][column].anim.update()
                     if self.enemyGrid[row][column].lastMove == None:
                         self.enemyGrid[row][column].lastMove = "Left"
                         self.enemyGrid[row][column].moveDown()
@@ -192,33 +206,33 @@ class game:
                            # self.enemyGrid[row][column].moveLeft()
                         else:
                             self.enemyGrid[row][column].moveRight()
-
+                    
+                    rNum2 = random.randint(1,100)
+                    if rNum2 == 1:
+                        if (self.enemyGrid[row][column].health != 0 and self.enemyGrid[row][column].missleCount < self.enemyGrid[row][column].missleCap):
+                            self.missles.append(self.enemyGrid[row][column].fire())
             
-            rNum = random.randint(1, 5)
-            for row in range(self.enemyRowCount):
-                for column in range(self.enemyColumnCount):
-                    #checks if enemies have reached the bottom of the screen
-                    if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
-                        return "Menu"
-                    if self.enemyGrid[row][column].health != 0:
-                        if rNum >= 3:
-                            self.enemyGrid[row][column].lastMove = "Down"
-                            self.enemyGrid[row][column].moveDown() 
+            #rNum = random.randint(1, 5)
+            #for row in range(self.enemyRowCount):
+            #    for column in range(self.enemyColumnCount):
+                    ##checks if enemies have reached the bottom of the screen
+                    #if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
+                    #    return "Menu"
+            #        if self.enemyGrid[row][column].health != 0:
+            #            if rNum >= 3:
+            #                self.enemyGrid[row][column].lastMove = "Down"
+            #                self.enemyGrid[row][column].moveDown() 
 
-                        elif rNum == 1:
-                            if (self.enemyGrid[row][column].posx - 16 >= 0) and self.enemyGrid[row][column].lastMove != "Left":
-                                self.enemyGrid[row][column].lastMove = "Left"
-                                self.enemyGrid[row][column].moveLeft()
+            #            elif rNum == 1:
+            #                if (self.enemyGrid[row][column].posx - 16 >= 0) and self.enemyGrid[row][column].lastMove != "Left":
+            #                    self.enemyGrid[row][column].lastMove = "Left"
+            #                    self.enemyGrid[row][column].moveLeft()
                         
-                        elif rNum == 2:
-                            if ((self.enemyGrid[row][column].posx + 16 + self.enemyGrid[row][column].imagew) <= self.screenw) and self.enemyGrid[row][column].lastMove != "Right":
-                                self.enemyGrid[row][column].lastMove = "Right"
-                                self.enemyGrid[row][column].moveRight() 
-                        
-                        rNum2 = random.randint(1,20)
-                        if rNum2 == 1:
-                            if (self.enemyGrid[row][column].missleCount < self.enemyGrid[row][column].missleCap):
-                                self.missles.append(self.enemyGrid[row][column].fire())
+            #            elif rNum == 2:
+            #                if ((self.enemyGrid[row][column].posx + 16 + self.enemyGrid[row][column].imagew) <= self.screenw) and self.enemyGrid[row][column].lastMove != "Right":
+            #                    self.enemyGrid[row][column].lastMove = "Right"
+            #                    self.enemyGrid[row][column].moveRight() 
+                      
         return "Game"
 
     def backgroundUpdate(self):

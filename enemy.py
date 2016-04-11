@@ -14,6 +14,7 @@ class Enemy:
         self.imageh = imageh
         self.lastMove = None
         self.speed = 16
+        self.downSpeed = 48
         self.missleCount = 0
         self.missleCap = 100
         self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
@@ -31,7 +32,7 @@ class Enemy:
         self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
         #added a Position function
     def moveDown(self):
-        self.posy += 32
+        self.posy += self.downSpeed
         self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
 
     def getPos(self):

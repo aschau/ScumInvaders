@@ -14,7 +14,7 @@ class Player:
         self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
         self.score = 0
         self.missleCount = 0
-        self.missleCap = 100
+        self.missleCap = 1
         self.lives = 3
 
     def moveLeft(self):
