@@ -40,6 +40,9 @@ class game:
         self.keyDelay = 10
         self.nextKeyInput = pygame.time.get_ticks() + self.keyDelay
 
+        self.fontsize = 30
+        self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
+
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
         self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
@@ -71,6 +74,9 @@ class game:
             for column in range(self.enemyColumnCount):
                 if self.enemyGrid[row][column].health != 0:
                     self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
+
+        self.screen.blit(self.font.render("Lives: " + str(self.player.lives), True, pygame.Color(255,255,255)), (0, self.screenh/2))
+        self.screen.blit(self.font.render("Ammo: " + str(self.player.missleCap - self.player.missleCount), True, pygame.Color(255,255,255)), (0, self.screenh/2 + self.fontsize))
 
     def update(self):
         self.keyUpdate()
@@ -146,14 +152,14 @@ class game:
                         for column in range(self.enemyColumnCount):
                             if self.enemyGrid[row][column].health != 0:
                                 #try:
-                                    #if (numMissles != len(self.missles)):
-                                if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
-                                    hit = True
-                                    attacker = self.missles.pop(numMissles).owner
-                                    self.enemyGrid[row][column].health -= 1
-                                    #checks if no more enemies 
-                                    if self.enemyGrid[row][column].health == 0: 
-                                        self.enemyCount -= 1
+                                if (numMissles != len(self.missles)):
+                                    if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
+                                        hit = True
+                                        attacker = self.missles.pop(numMissles).owner
+                                        self.enemyGrid[row][column].health -= 1
+                                        #checks if no more enemies 
+                                        if self.enemyGrid[row][column].health == 0: 
+                                            self.enemyCount -= 1
                                 #except:
                                 #    print("Num:", numMissles)
                                 #    print("Length:", len(self.missles))
