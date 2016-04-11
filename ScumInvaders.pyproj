@@ -33,7 +33,7 @@
     <Compile Include="main_menu.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="missle.py">
+    <Compile Include="missile.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="player.py">

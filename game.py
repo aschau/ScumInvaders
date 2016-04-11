@@ -13,7 +13,7 @@ class game:
         self.screenw = screenw
         self.screenh = screenh
         self.soundManager = soundManager
-        self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
+        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
         self.paused = False
         self.level = 1
 
@@ -26,12 +26,12 @@ class game:
         self.score = 0
 
         self.setGrid()       
-        self.missles = []
+        self.missiles = []
 
-        self.missleDelay = 100
+        self.missileDelay = 100
 
         self.enemyDelay = 100
-        self.nextMissle = pygame.time.get_ticks() + self.missleDelay
+        self.nextMissile = pygame.time.get_ticks() + self.missileDelay
         self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
         self.bgHeight = 1536
@@ -47,9 +47,9 @@ class game:
 
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
-        self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
+        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
         self.enemyGrid = []
-        self.missles = []
+        self.missiles = []
         self.enemyCount = 50
         self.setGrid()
         self.state = "Game"
@@ -69,8 +69,8 @@ class game:
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG2Height))
         self.screen.blit(self.sprites.getSprite(self.player.image), self.player.getPos())
         
-        for missle in self.missles:
-            self.screen.blit(self.sprites.getSprite(missle.image), missle.getPos())
+        for missile in self.missiles:
+            self.screen.blit(self.sprites.getSprite(missile.image), missile.getPos())
      
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
@@ -78,7 +78,7 @@ class game:
                     self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
         self.screen.blit(self.font.render("Lives: " + str(self.player.lives), True, pygame.Color(255,255,255)), (0, 670))
-        self.screen.blit(self.font.render("Ammo: " + str(self.player.missleCap - self.player.missleCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
+        self.screen.blit(self.font.render("Ammo: " + str(self.player.missileCap - self.player.missileCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
         self.screen.blit(self.font.render("Score: " + str(self.score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
 
     def update(self):
@@ -90,7 +90,7 @@ class game:
             if self.checkState():
                 return self.state
         
-            self.checkMissles()
+            self.checkMissiles()
 
             self.state = self.checkPlayerLives()
             if self.checkState():
@@ -132,7 +132,7 @@ class game:
         #                rnum = random.randint(self.level - 1, self.level)
         #                self.enemyGrid[row][column].health = rnum
         if self.level %2 == 1:
-            self.player.missleCap += 1 
+            self.player.missileCap += 1 
 
     def keyUpdate(self):
         keys = pygame.key.get_pressed()
@@ -149,23 +149,23 @@ class game:
                 if not ((self.player.posx + self.player.speed + self.player.imagew) >= self.screenw):
                     self.player.moveRight()
 
-            if pygame.time.get_ticks() > self.nextMissle:
-                self.nextMissle = pygame.time.get_ticks() + self.missleDelay
+            if pygame.time.get_ticks() > self.nextMissile:
+                self.nextMissile = pygame.time.get_ticks() + self.missileDelay
 
                 if keys[pygame.K_SPACE]:
-                    if self.player.missleCount < self.player.missleCap:
-                        self.missles.append(self.player.fire())
+                    if self.player.missileCount < self.player.missileCap:
+                        self.missiles.append(self.player.fire())
 
-    def checkMissles(self):
-        numMissles = 0
-        while numMissles < len(self.missles):
-            self.missles[numMissles].update()
+    def checkMissiles(self):
+        numMissiles = 0
+        while numMissiles < len(self.missiles):
+            self.missiles[numMissiles].update()
 
-            attacker = self.missles[numMissles].owner
+            attacker = self.missiles[numMissiles].owner
             if attacker == 1:
-                if ((self.missles[numMissles].posy - self.missles[numMissles].imageh) <= 0):
-                    self.missles.pop(numMissles)
-                    self.player.missleCount -= 1
+                if ((self.missiles[numMissiles].posy - self.missiles[numMissiles].imageh) <= 0):
+                    self.missiles.pop(numMissiles)
+                    self.player.missileCount -= 1
 
                 else:
                     hit = False
@@ -173,35 +173,35 @@ class game:
                         for column in range(self.enemyColumnCount):
                             if self.enemyGrid[row][column].health != 0:
                                 #try:
-                                if (numMissles != len(self.missles)):
-                                    if self.enemyGrid[row][column].collider.colliderect(self.missles[numMissles].collider):
+                                if (numMissiles != len(self.missiles)):
+                                    if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
                                         hit = True
-                                        attacker = self.missles.pop(numMissles).owner
+                                        attacker = self.missiles.pop(numMissiles).owner
                                         self.enemyGrid[row][column].health -= 1
                                         #checks if no more enemies 
                                         if self.enemyGrid[row][column].health == 0: 
                                             self.enemyCount -= 1
                                             self.score += 100
                                 #except:
-                                #    print("Num:", numMissles)
-                                #    print("Length:", len(self.missles))
+                                #    print("Num:", numMissiles)
+                                #    print("Length:", len(self.missiles))
                                 #    print("Row:", row, "column:", column)
                     
                     if hit:                
-                        self.player.missleCount -= 1
+                        self.player.missileCount -= 1
                                 
             
             elif attacker == 0:
-                if (self.missles[numMissles].collider.colliderect(self.player.collider)):
+                if (self.missiles[numMissiles].collider.colliderect(self.player.collider)):
                     self.player.lives -= 1
-                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
-                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
+                    enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
+                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 
-                elif ((self.missles[numMissles].posy + self.missles[numMissles].imageh) >= self.screenh):
-                    enemyGridPos = self.missles.pop(numMissles).getEnemyPos()
-                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missleCount -= 1
+                elif ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) >= self.screenh):
+                    enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
+                    self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 
-            numMissles += 1
+            numMissiles += 1
 
     def enemyUpdate(self):
         if pygame.time.get_ticks() > self.nextEnemyMove:
@@ -242,8 +242,8 @@ class game:
                     
                     rNum2 = random.randint(1,100)
                     if rNum2 == 1:
-                        if (self.enemyGrid[row][column].health != 0 and self.enemyGrid[row][column].missleCount < self.enemyGrid[row][column].missleCap):
-                            self.missles.append(self.enemyGrid[row][column].fire())
+                        if (self.enemyGrid[row][column].health != 0 and self.enemyGrid[row][column].missileCount < self.enemyGrid[row][column].missileCap):
+                            self.missiles.append(self.enemyGrid[row][column].fire())
             
             #rNum = random.randint(1, 5)
             #for row in range(self.enemyRowCount):

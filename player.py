@@ -1,20 +1,20 @@
 ﻿import pygame
-from missle import Missle
+from missile import Missile
 
 class Player:
-    def __init__(self, playerNum, image, missleImage, pos, imagew, imageh):
+    def __init__(self, playerNum, image, missileImage, pos, imagew, imageh):
         self.image = image
         self.imagew = imagew
         self.imageh = imageh
-        self.missleImage = missleImage
+        self.missileImage = missileImage
         self.playerNum = playerNum
         self.speed = 8
         self.posx = pos[0]
         self.posy = pos[1]
         self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
         self.score = 0
-        self.missleCount = 0
-        self.missleCap = 3
+        self.missileCount = 0
+        self.missileCap = 3
         self.lives = 3
 
     def moveLeft(self):
@@ -29,5 +29,5 @@ class Player:
         return (self.posx, self.posy)
 
     def fire(self):
-        self.missleCount += 1
-        return Missle(self.playerNum, self.missleImage, (self.posx + (self.imagew - 18), self.posy - (self.imageh)), 8, 32)
+        self.missileCount += 1
+        return Missile(self.playerNum, self.missileImage, (self.posx + (self.imagew - 18), self.posy - (self.imageh)), 8, 32)

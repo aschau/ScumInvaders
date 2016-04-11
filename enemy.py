@@ -1,5 +1,5 @@
 ﻿import pygame
-from missle import Missle
+from missile import Missile
 
 class Enemy:
     def __init__(self, pos, imagew, imageh, animation, health, speed):
@@ -15,13 +15,13 @@ class Enemy:
         self.lastMove = None
         self.speed = speed
         self.downSpeed = 48
-        self.missleCount = 0
-        self.missleCap = 100
+        self.missileCount = 0
+        self.missileCap = 100
         self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
 
     def fire(self):
-        self.missleCount += 1
-        return Missle(0, "missle1", (self.posx + (self.imagew + 18), self.posy + (self.imageh)), 8, 32)
+        self.missileCount += 1
+        return Missile(0, "missile1", (self.posx + (self.imagew + 18), self.posy + (self.imageh)), 8, 32)
    
     def moveLeft(self):
         self.posx -= self.speed

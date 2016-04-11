@@ -1,6 +1,6 @@
-import pygame
+﻿import pygame
 
-class Missle:
+class Missile:
     def __init__(self, owner, image, pos, imagew, imageh, enemyRow = -1, enemyCol = -1):
         self.owner = owner
         self.image = image
