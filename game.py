@@ -32,6 +32,7 @@ class game:
         self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
     def reset(self):
+        self.soundManager.playNewMusic("Space Invaders Theme.ogg");
         self.player = Player(1, "ship1", "missle2", (500, 700), 32, 32)
         self.enemyGrid = []
         self.missles = []
@@ -63,6 +64,7 @@ class game:
 
     def update(self):
         if (self.player.lives <= 0):
+            #self.reset()
             return "Menu"
 
         keys = pygame.key.get_pressed()
@@ -92,6 +94,7 @@ class game:
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
                     if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
+                        #self.reset()
                         return "Menu"
                     if self.enemyGrid[row][column].lastMove == None:
                         self.enemyGrid[row][column].lastMove = "Left"
@@ -120,7 +123,7 @@ class game:
                 for column in range(self.enemyColumnCount):
                     #checks if enemies have reached the bottom of the screen
                     if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
-                        self.reset()
+                        #self.reset()
                         return "Menu"
                     if self.enemyGrid[row][column].health != 0:
                         if rNum >= 3:
@@ -182,6 +185,6 @@ class game:
                         numMissles += 1
                              
         if self.enemyCount == 0:
-            self.reset()
+            #self.reset()
             return "Menu"
         return "Game"
