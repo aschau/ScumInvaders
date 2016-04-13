@@ -2,6 +2,16 @@
 import os
 
 class soundManager:
+    '''
+    Initializing sound 
+    set_volume(volume = real number from 0-1)
+    play(# of times the track is played) if # == 1 then play indefinitely
+    Functions: 
+        self.loadAll()
+        self.playCurrentMusic()
+        self.playNewMusic()
+        self.playSound()
+    '''
     def __init__(self, folder):
         try:
             self.folder = folder
@@ -18,7 +28,10 @@ class soundManager:
         self.music = pygame.mixer.music.load(os.path.join(self.folder, 'mainMenu.ogg'))
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
-
+    
+    '''
+    loads all files in Sound folder that had .ogg in the filename
+    '''
     def loadAll(self):
         for root, dirs, files in os.walk(self.folder):
             for sound in files:
@@ -26,7 +39,7 @@ class soundManager:
                     new_sound = pygame.mixer.Sound(os.path.join(self.folder, sound))
                     new_sound.set_volume(1)
                     self.all[sound] = new_sound
-    
+
     def playCurrentMusic(self):
         pygame.mixer.music.play(-1)
 

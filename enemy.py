@@ -1,6 +1,14 @@
 ﻿import pygame
 from missile import Missile
 
+'''
+Functions:
+    self.fire()
+    self.moveLeft()
+    self.moveRight()
+    self.moveDown()
+    self.getPos()
+'''
 class Enemy:
     def __init__(self, pos, imagew, imageh, animation, health, speed):
         #self.image = image

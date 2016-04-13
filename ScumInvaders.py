@@ -1,4 +1,4 @@
-import os, sys
+﻿import os, sys
 import pygame
 from pygame.locals import *
 from main_menu import Main_Menu
@@ -12,6 +12,11 @@ if not pygame.font:
 if not pygame.mixer:
     print('Warning, sound disabled')
 
+'''
+initializes the game window and sets the scenes 
+game loop can be found here
+self.clock -> to set frames per seconds so it isn't infinitely fast
+'''
 class ScumInvaders:
     def __init__(self):
         pygame.init()
