@@ -1,5 +1,13 @@
 ﻿import pygame
 
+'''
+self.owner is to see which player owns this missile
+self.collider is the hit box in which other objects would compare to
+Functions: 
+    self.update()
+    self.getEnemyPos()
+    self.getPos()
+'''
 class Missile:
     def __init__(self, owner, image, pos, imagew, imageh, enemyRow = -1, enemyCol = -1):
         self.owner = owner
@@ -14,6 +22,10 @@ class Missile:
         self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
 
     def update(self):
+        '''
+        If owner == 0, owner is enemy
+        any other number greater is players 
+        '''
         if self.owner > 0:
             self.posy -= self.speed
             self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)

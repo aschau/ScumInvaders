@@ -6,6 +6,22 @@ from Sprite_Manager import Animate
 from collections import deque
 import random
 
+'''
+initializes score, enemyCount, enemyGrid, missile count, and level here 
+functions:
+    self.setGrid(speed, health) - sets the grid for Enemy placement and their initialized values
+    self.draw() - draws onto the screen 
+    self.update()
+    self.togglePause() - still needs work but mean to pause the screen
+    self.checkState() - check whether scene has changed (eg. Menu)
+    self.checkPlayerLives() 
+    self.checkEnemyCount()
+    self.nextLevel() - called at the end of every level when checkEnemyCount() == 0
+    self.keyUpdate() - for key presses
+    self.checkMissiles() 
+    self.backgroundUpdate()
+
+'''
 class game:
     def __init__(self, screen, screenw, screenh, spriteList, soundManager):
         self.sprites = spriteList
