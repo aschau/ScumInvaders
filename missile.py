@@ -23,8 +23,8 @@ class Missile:
 
     def update(self):
         '''
-        I actually have no idea what this (owner > 0) is meant to do...
-        It makes the missile go backwards??? lol
+        If owner == 0, owner is enemy
+        any other number greater is players 
         '''
         if self.owner > 0:
             self.posy -= self.speed
