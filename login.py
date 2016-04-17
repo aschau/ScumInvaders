@@ -13,7 +13,7 @@ class login:
         self.username = textInput(self.screen, "Username", (self.screenw/2 - 200, 100), self.fontsize * 8, 50, 8)
         self.password = textInput(self.screen, "Password", (self.screenw/2 - 200, 200), self.fontsize * 8, 50, 8)
         self.buttons = []
-        self.buttons.append(Button(screen, self.spriteList.getSprite("start"), self.spriteList.getSprite("startHighlighted"), 368, 442, 281, 68, "Room", 'Start Button.ogg', soundManager))
+        self.buttons.append(Button(screen, self.spriteList.getSprite("login"), self.spriteList.getSprite("loginHighlighted"), 368, 442, 281, 68, "Room", 'Start Button.ogg', soundManager))
         self.buttons.append(Button(screen, self.spriteList.getSprite("exit"), self.spriteList.getSprite("exitHighlighted"), 368, 534, 281, 68, "Menu", 'Exit.ogg', soundManager))
         self.mouseDelay = 100
         self.mouseNext = pygame.time.get_ticks() + self.mouseDelay

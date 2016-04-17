@@ -52,7 +52,6 @@ class ScumInvaders:
             if (self.state == "Menu"):
                 self.mainMenu.draw()
                 output = self.mainMenu.update()
-                self.clock.tick(60)
 
                 if output == "Exit":
                     self.running = False
@@ -65,7 +64,6 @@ class ScumInvaders:
             elif (self.state == "Game"):
                 self.game.draw()
                 output = self.game.update()
-                self.clock.tick(60)
 
                 if output == "Exit":
                     self.running = False
@@ -87,6 +85,8 @@ class ScumInvaders:
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
+            if (self.state != "Login"):
+                self.clock.tick(60)
         
         pygame.quit()
 
