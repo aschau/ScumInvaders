@@ -1,6 +1,14 @@
 import pygame
 
 class Button():
+    #screen = game scren
+    #image = button image
+    #sImage = Selected image
+    #posx, posy = where it goes on the screen
+    #imagew, imageh = image width and height
+    #function (string) == what it deos ex. exit, game, etc.
+    #sound = sound it makes when pressed
+    #soundManager = sound manager
     def __init__(self, screen, image, sImage, posx, posy, imagew, imageh, function, sound, soundManager):
         self.screen = screen
         self.image = image
@@ -38,6 +46,7 @@ class Button():
 
     def click(self):
         self.soundManager.playSound(self.sound)
+        pygame.time.delay(2000)
         return self.function
 
     def draw(self):

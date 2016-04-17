@@ -5,7 +5,7 @@ class soundManager:
     '''
     Initializing sound 
     set_volume(volume = real number from 0-1)
-    play(# of times the track is played) if # == 1 then play indefinitely
+    play(# of times the track is played) if # == -1 then play indefinitely
     Functions: 
         self.loadAll()
         self.playCurrentMusic()

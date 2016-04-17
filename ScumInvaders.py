@@ -1,11 +1,15 @@
-﻿import os, sys
+﻿#their shit
+import os, sys
 import pygame
 from pygame.locals import *
+
+#our shit
 from main_menu import Main_Menu
 from Sprite_Manager import sprites
 from soundManager import soundManager
 from game import game
 
+#in case gg no has fonts/sound
 if not pygame.font:
     print('Warning, fonts disabled')
 
