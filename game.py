@@ -12,14 +12,14 @@ functions:
     self.setGrid(speed, health) - sets the grid for Enemy placement and their initialized values
     self.draw() - draws onto the screen 
     self.update()
-    self.togglePause() - still needs work but mean to pause the screen
-    self.checkState() - check whether scene has changed (eg. Menu)
+    self.togglePause() - still needs work but means to pause the screen
+    self.checkState() - checks whether scene has changed (eg. Menu)
     self.checkPlayerLives() 
     self.checkEnemyCount()
     self.nextLevel() - called at the end of every level when checkEnemyCount() == 0
     self.keyUpdate() - for key presses
-    self.checkMissiles() 
-    self.backgroundUpdate()
+    self.checkMissiles() - checks to see if hit something/out of screen
+    self.backgroundUpdate() - scrolls background
 
 '''
 class game:
@@ -29,7 +29,7 @@ class game:
         self.screenw = screenw
         self.screenh = screenh
         self.soundManager = soundManager
-        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
+        self.player = Player(1, "shipupgrade1", "missile5", (500, 700), 32, 32)
         self.paused = False
         self.level = 1
 
@@ -60,10 +60,10 @@ class game:
 
         self.fontsize = 30
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
-
+        
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
-        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
+        self.player = Player(1, "shipupgrade1", "missile5", (500, 700), 32, 32)
         self.enemyGrid = []
         self.missiles = []
         self.enemyCount = 50
@@ -78,7 +78,7 @@ class game:
                 enemySprite = "Alien1SpriteSheet"
                 if rnum == 1:
                     enemySprite = "Alien2SpriteSheet"
-                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed))
+                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed, row, column))
 
     def draw(self):
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG1Height))
@@ -201,29 +201,7 @@ class game:
 
                 else:
                     self.checkHit(numMissiles)
-                    #hit = False
-                    #for row in range(self.enemyRowCount):
-                    #    for column in range(self.enemyColumnCount):
-                    #        if self.enemyGrid[row][column].health != 0:
-                    #            #try:
-                    #            if (numMissiles != len(self.missiles)):
-                    #                if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
-                    #                    hit = True
-                    #                    attacker = self.missiles.pop(numMissiles).owner
-                    #                    self.enemyGrid[row][column].health -= 1
-                    #                    #checks if no more enemies 
-                    #                    if self.enemyGrid[row][column].health == 0: 
-                    #                        self.enemyCount -= 1
-                    #                        self.score += 100
-                    #            #except:
-                    #            #    print("Num:", numMissiles)
-                    #            #    print("Length:", len(self.missiles))
-                    #            #    print("Row:", row, "column:", column)
-                    
-                    #if hit:                
-                    #    self.player.missileCount -= 1
                                 
-            
             elif attacker == 0:
                 if (self.missiles[numMissiles].collider.colliderect(self.player.collider)):
                     self.player.lives -= 1
