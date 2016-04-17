@@ -11,21 +11,26 @@ class Main_Menu():
             self.screenh = screenh
             self.state = "Menu"
             self.buttons = []
-            self.test = textInput(self.screen, "Username", (30, 50), 300, 50)
+            self.buttons.append(Button(self.screen, self.sprites.getSprite("start"), self.sprites.getSprite("startHighlighted"), 368, 350, 281, 68, "Login", 'Start Button.ogg', soundManager))
             self.buttons.append(Button(self.screen, self.sprites.getSprite("start"), self.sprites.getSprite("startHighlighted"), 368, 442, 281, 68, "Game", 'Start Button.ogg', soundManager))
             self.buttons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Exit", 'Exit.ogg', soundManager))
 
+            self.mouseDelay = 100
+            self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
+
         def draw(self):
             self.screen.blit(self.sprites.getSprite("titlescreen"), (0, 0))
-            self.test.draw()
             for button in self.buttons:
                 button.draw()
 
         def mouseUpdate(self):
-            if pygame.mouse.get_pressed()[0]:
-                for button in self.buttons:
-                    if button.checkClicked(pygame.mouse.get_pos()):
-                        return button.click()
+            if pygame.time.get_ticks() >= self.mouseNext:
+                if pygame.mouse.get_pressed()[0]:
+                    for button in self.buttons:
+                        if button.checkClicked(pygame.mouse.get_pos()):
+                            return button.click()
+                
+                    self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
             
             return "Menu"
 

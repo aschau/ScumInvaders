@@ -8,6 +8,7 @@ from main_menu import Main_Menu
 from Sprite_Manager import sprites
 from soundManager import soundManager
 from game import game
+from login import login
 
 #in case gg no has fonts/sound
 if not pygame.font:
@@ -37,10 +38,11 @@ class ScumInvaders:
         self.sounds = soundManager("Sound")
         self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites, self.sounds)
         self.game = game(self.screen, self.width, self.height, AllSprites, self.sounds)
+        self.login = login(self.screen, self.width, self.height, AllSprites, self.sounds)
 
         self.fontsize = 10
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
-
+        
     def game_loop(self):
         while self.running:
             for event in pygame.event.get():
@@ -50,10 +52,11 @@ class ScumInvaders:
             if (self.state == "Menu"):
                 self.mainMenu.draw()
                 output = self.mainMenu.update()
+                self.clock.tick(60)
 
                 if output == "Exit":
                     self.running = False
-            
+
                 else:
                     self.state = output
                     if output == "Game":
@@ -62,6 +65,7 @@ class ScumInvaders:
             elif (self.state == "Game"):
                 self.game.draw()
                 output = self.game.update()
+                self.clock.tick(60)
 
                 if output == "Exit":
                     self.running = False
@@ -70,10 +74,19 @@ class ScumInvaders:
                     self.state = output
                     if output == "Menu":
                         self.sounds.playNewMusic('mainMenu.ogg')
+            
+            elif (self.state == "Login"):
+                self.login.draw()
+                output = self.login.update()
+                
+                if output == "Exit":
+                    self.running = False
+            
+                else:
+                    self.state = output
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
-            self.clock.tick(60)
         
         pygame.quit()
 
