@@ -71,21 +71,12 @@ class ScumInvaders:
                 else:
                     self.state = output
                     if output == "Menu":
+                        self.mainMenu.state = "Main"
                         self.sounds.playNewMusic('mainMenu.ogg')
-            
-            elif (self.state == "Login"):
-                self.login.draw()
-                output = self.login.update()
-                
-                if output == "Exit":
-                    self.running = False
-            
-                else:
-                    self.state = output
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
-            if (self.state != "Login"):
+            if (self.state != "Menu"):
                 self.clock.tick(60)
         
         pygame.quit()
