@@ -55,12 +55,18 @@ class game:
         self.currentBG2Height = -self.bgHeight
 
         self.state = "Game"
-        self.keyDelay = 10
-        self.nextKeyInput = pygame.time.get_ticks() + self.keyDelay
+        self.keyDelay = 500
+        self.nextKeyInput = pygame.time.get_ticks()
 
         self.fontsize = 30
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
+
+        self.pauseButtons = []
+        self.pauseButtons.append(Button(screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 330, 281, 68, "Menu", 'Exit.ogg', soundManager))
         
+        self.mouseDelay = 100
+        self.mouseNext = pygame.time.get_ticks()
+
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
         self.player = Player(1, "shipupgrade1", "missile5", (500, 700), 32, 32)
@@ -69,6 +75,7 @@ class game:
         self.enemyCount = 50
         self.setGrid()
         self.state = "Game"
+        self.paused = False
 
     def setGrid(self, speed = 16, health = 1):
          for row in range(self.enemyRowCount):
@@ -98,6 +105,10 @@ class game:
         self.screen.blit(self.font.render("Score: " + str(self.score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
         self.screen.blit(self.font.render("Level: " + str(self.level), True, pygame.Color(255,255,255)), (0, 670 - self.fontsize))
 
+        if self.paused:
+            for button in self.pauseButtons:
+                button.draw()
+
     def update(self):
         self.keyUpdate()
         if not self.paused:
@@ -114,6 +125,9 @@ class game:
                 return self.state
         
             self.checkEnemyCount()
+
+        else:
+            return self.mouseUpdate()
 
         return self.state
     
@@ -152,10 +166,13 @@ class game:
             self.player.missileCap += 1 
 
     def keyUpdate(self):
+        pygame.event.pump()
         keys = pygame.key.get_pressed()
         
-        if keys[pygame.K_ESCAPE]:
-            self.togglePause()
+        if pygame.time.get_ticks() > self.nextKeyInput:
+            if keys[pygame.K_ESCAPE]:
+                self.togglePause()
+                self.nextKeyInput = pygame.time.get_ticks() + self.keyDelay
 
         if not self.paused:
             if keys[pygame.K_a]:
@@ -172,6 +189,20 @@ class game:
                 if keys[pygame.K_SPACE]:
                     if self.player.missileCount < self.player.missileCap:
                         self.missiles.append(self.player.fire())
+    
+    def mouseUpdate(self):
+        for button in self.pauseButtons:
+            button.checkHover(pygame.mouse.get_pos())
+
+        if pygame.time.get_ticks() >= self.mouseNext:
+            if pygame.mouse.get_pressed()[0]:
+                for button in self.pauseButtons:
+                    if button.checkClicked(pygame.mouse.get_pos()):
+                        return button.click()
+                                    
+                self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
+
+        return "Game"
 
     def checkHit(self, numMissiles):
         for row in range(self.enemyRowCount):

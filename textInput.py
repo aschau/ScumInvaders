@@ -24,20 +24,24 @@ class textInput:
     def draw(self):
         self.screen.blit(self.font.render(self.title, True, pygame.Color(255,255,255)), (self.pos[0], self.pos[1]))
         
-        if not self.selected:
-            pygame.draw.rect(self.screen, (255, 255, 255), self.collider)
+        #if not self.selected:
+        pygame.draw.rect(self.screen, (255, 255, 255), self.collider)
 
-        else:
-            pygame.draw.rect(self.screen, (153, 51, 255), self.collider)
+        #else:
+        #    pygame.draw.rect(self.screen, (153, 51, 255), self.collider)
         
         if not self.hidden:
-            self.screen.blit(self.font.render(self.input, True, pygame.Color(0, 0, 0)), (self.pos[0] + (self.fontsize * len(self.title)/1.5 + self.fontsize), self.pos[1]))
-        
+            if not self.selected:
+                self.screen.blit(self.font.render(self.input, True, pygame.Color(0, 0, 0)), (self.pos[0] + (self.fontsize * len(self.title)/1.5 + self.fontsize), self.pos[1]))
+            
+            else:
+                self.screen.blit(self.font.render(self.input + "|", True, pygame.Color(0, 0, 0)), (self.pos[0] + (self.fontsize * len(self.title)/1.5 + self.fontsize), self.pos[1]))
         else:
-            self.screen.blit(self.font.render("*" * len(self.input), True, pygame.Color(0, 0, 0)), (self.pos[0] + (self.fontsize * len(self.title)/1.5 + self.fontsize), self.pos[1]))
-        
-        #if self.selected:
-            #self.screen.blit(self.font.render("|", True, pygame.Color(0, 0, 0)), (self.pos[0] + (self.fontsize * len(self.title)/1.5 + self.fontsize) + (self.fontsize * len(self.input)/1.4), self.pos[1]))
+            if not self.selected:
+                self.screen.blit(self.font.render("*" * len(self.input), True, pygame.Color(0, 0, 0)), (self.pos[0] + (self.fontsize * len(self.title)/1.5 + self.fontsize), self.pos[1]))
+            
+            else:
+                self.screen.blit(self.font.render("*" * len(self.input) + "|", True, pygame.Color(0, 0, 0)), (self.pos[0] + (self.fontsize * len(self.title)/1.5 + self.fontsize), self.pos[1]))        
 
     def checkClicked(self, mousepos):
         if self.collider.collidepoint(mousepos):
@@ -55,7 +59,7 @@ class textInput:
                     self.input = self.input[:-1]
 
                     self.nextKey = pygame.time.get_ticks() + self.keyDelay
-
+            
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.unicode.isalpha():
