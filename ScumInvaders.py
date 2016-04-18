@@ -8,7 +8,6 @@ from main_menu import Main_Menu
 from Sprite_Manager import sprites
 from soundManager import soundManager
 from game import game
-from login import login
 
 #in case gg no has fonts/sound
 if not pygame.font:
@@ -38,7 +37,6 @@ class ScumInvaders:
         self.sounds = soundManager("Sound")
         self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites, self.sounds)
         self.game = game(self.screen, self.width, self.height, AllSprites, self.sounds)
-        self.login = login(self.screen, self.width, self.height, AllSprites, self.sounds)
 
         self.fontsize = 10
         self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)

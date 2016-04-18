@@ -37,7 +37,7 @@ class soundManager:
             for sound in files:
                 if sound[-3:] == "ogg":
                     new_sound = pygame.mixer.Sound(os.path.join(self.folder, sound))
-                    new_sound.set_volume(1)
+                    new_sound.set_volume(.2)
                     self.all[sound] = new_sound
 
     def playCurrentMusic(self):
