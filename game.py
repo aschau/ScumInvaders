@@ -5,6 +5,7 @@ from Button import Button
 from Sprite_Manager import Animate
 from collections import deque
 import random
+from datetime import datetime
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -69,6 +70,8 @@ class game:
         
         self.mouseDelay = 100
         self.mouseNext = pygame.time.get_ticks()
+
+        random.seed(datetime.now())
 
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
