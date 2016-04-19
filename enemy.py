@@ -26,6 +26,7 @@ class Enemy:
         self.missileCount = 0
         self.missileCap = 100
         self.collider = pygame.Rect(self.posx, self.posy, imagew, imageh)
+        self.dead = False
 
     def fire(self):
         self.missileCount += 1

@@ -41,7 +41,7 @@ class game:
         self.enemyColumnCount = 10
         self.enemyCount = 50
 
-        self.score = 0
+        #self.player.score = 0
 
         self.setGrid()       
         self.missiles = []
@@ -77,6 +77,8 @@ class game:
         self.missiles = []
         self.enemyCount = 50
         self.setGrid()
+        self.level = 1
+        self.player.score = 0
         self.state = "Game"
         self.paused = False
 
@@ -89,7 +91,10 @@ class game:
                 if rnum <= 45:
                     enemySprite = "Alien2SpriteSheet"
 
-                elif rnum >= 90:
+                elif rnum >= 90 and rnum < 98:
+                    enemySprite = "Alien3SpriteSheet"
+
+                elif rnum >= 98:
                     enemySprite = "Alien4SpriteSheet"
 
                 self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed, row, column, enemySprite))
@@ -104,12 +109,11 @@ class game:
      
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
-                if self.enemyGrid[row][column].health != 0:
-                    self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
+                self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
         self.screen.blit(self.font.render("Lives: " + str(self.player.lives), True, pygame.Color(255,255,255)), (0, 670))
         self.screen.blit(self.font.render("Ammo: " + str(self.player.missileCap - self.player.missileCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
-        self.screen.blit(self.font.render("Score: " + str(self.score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
+        self.screen.blit(self.font.render("Score: " + str(self.player.score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
         self.screen.blit(self.font.render("Level: " + str(self.level), True, pygame.Color(255,255,255)), (0, 670 - self.fontsize))
 
         if self.paused:
@@ -155,16 +159,7 @@ class game:
             self.nextLevel()
 
     '''Odd levels -> change speed; even levels -> change health'''
-    def nextLevel(self):
-        rnum = random.randint(1,3)
-        
-        if rnum == 1:
-            self.background2 = "GameBackground"
-        elif rnum == 2:
-            self.background2 = "GameBackground2"
-        else:
-            self.background2 = "GameBackground3"
-        
+    def nextLevel(self):        
         self.enemyGrid = []
         self.level += 1
         if self.level % 2 == 0:
@@ -232,13 +227,18 @@ class game:
                         attacker = self.missiles.pop(numMissiles).owner
                         self.enemyGrid[row][column].health -= 1
                         self.player.missileCount -= 1
-                        #checks if no more enemies 
-                        if self.enemyGrid[row][column].health == 0: 
+                        if self.enemyGrid[row][column].health == 0 and not self.enemyGrid[row][column].dead:
+                            self.enemyGrid[row][column].dead = True
+                            self.enemyGrid[row][column].anim = Animate(self.sprites.getSprite(self.enemyGrid[row][column].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
                             self.enemyCount -= 1
-                            if self.enemyGrid[row][column].type != "Alien4SpriteSheet":
-                                self.score += (100 * self.level)//2
+                            if self.enemyGrid[row][column].type == "Alien4SpriteSheet":
+                                self.player.score += (100  * self.level) * 10
+                           
+                            elif self.enemyGrid[row][column].type != "Alien3SpriteSheet":
+                                self.player.score += (100  * self.level) * 2
+
                             else:
-                                self.score += 100  * self.level
+                                self.player.score += 100 * self.level
                         return
 
 
@@ -340,6 +340,22 @@ class game:
         
         if (self.currentBG1Height >= self.bgHeight):
             self.currentBG1Height = -self.bgHeight
-            self.background = self.background2
+            rnum = random.randint(1,3)
+        
+            if rnum == 1:
+                self.background = "GameBackground"
+            elif rnum == 2:
+                self.background = "GameBackground2"
+            else:
+                self.background = "GameBackground3"
         elif (self.currentBG2Height >= self.bgHeight):
             self.currentBG2Height = -self.bgHeight
+
+            rnum = random.randint(1,3)
+        
+            if rnum == 1:
+                self.background2 = "GameBackground"
+            elif rnum == 2:
+                self.background2 = "GameBackground2"
+            else:
+                self.background2 = "GameBackground3"
