@@ -33,6 +33,8 @@ class game:
         self.paused = False
         self.level = 1
 
+        self.background = "GameBackground"
+        self.background2 = "GameBackground"
         self.enemyGrid = []
         self.enemyRowCount = 5
 
@@ -93,8 +95,8 @@ class game:
                 self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed, row, column, enemySprite))
 
     def draw(self):
-        self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG1Height))
-        self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG2Height))
+        self.screen.blit(self.sprites.getSprite(self.background), (0, self.currentBG1Height))
+        self.screen.blit(self.sprites.getSprite(self.background2), (0, self.currentBG2Height))
         self.screen.blit(self.sprites.getSprite(self.player.image), self.player.getPos())
         
         for missile in self.missiles:
@@ -154,16 +156,24 @@ class game:
 
     '''Odd levels -> change speed; even levels -> change health'''
     def nextLevel(self):
+        rnum = random.randint(1,3)
+        
+        if rnum == 1:
+            self.background2 = "GameBackground"
+        elif rnum == 2:
+            self.background2 = "GameBackground2"
+        else:
+            self.background2 = "GameBackground3"
+        
         self.enemyGrid = []
         self.level += 1
         if self.level % 2 == 0:
+            if self.enemyFireChance > 20:
+                self.enemyFireChance -= 2;
             self.setGrid(16 + self.level/2, self.level/2)
         else: 
             self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
-
-        if self.level % 4 == 0:
-            if self.enemyFireChance > 1:
-                self.enemyFireChance -= 1;
+            
 
         #for row in range(self.enemyRowCount):
         #        for column in range(self.enemyColumnCount):
@@ -330,5 +340,6 @@ class game:
         
         if (self.currentBG1Height >= self.bgHeight):
             self.currentBG1Height = -self.bgHeight
+            self.background = self.background2
         elif (self.currentBG2Height >= self.bgHeight):
             self.currentBG2Height = -self.bgHeight
