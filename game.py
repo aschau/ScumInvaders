@@ -47,6 +47,7 @@ class game:
         self.missileDelay = 100
 
         self.enemyDelay = 100
+        self.enemyFireChance = 100
         self.nextMissile = pygame.time.get_ticks() + self.missileDelay
         self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
@@ -81,11 +82,15 @@ class game:
          for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
-                rnum = random.randint(1, 2)
+                rnum = random.randint(1, 100)
                 enemySprite = "Alien1SpriteSheet"
-                if rnum == 1:
+                if rnum <= 45:
                     enemySprite = "Alien2SpriteSheet"
-                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed, row, column))
+
+                elif rnum >= 90:
+                    enemySprite = "Alien4SpriteSheet"
+
+                self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed, row, column, enemySprite))
 
     def draw(self):
         self.screen.blit(self.sprites.getSprite("GameBackground"), (0, self.currentBG1Height))
@@ -152,9 +157,14 @@ class game:
         self.enemyGrid = []
         self.level += 1
         if self.level % 2 == 0:
-            self.setGrid(16 + self.level * 5, self.level/2)
+            self.setGrid(16 + self.level/2, self.level/2)
         else: 
-            self.setGrid(16 + (self.level -1) * 5, self.level//2 + 1)
+            self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
+
+        if self.level % 4 == 0:
+            if self.enemyFireChance > 1:
+                self.enemyFireChance -= 1;
+
         #for row in range(self.enemyRowCount):
         #        for column in range(self.enemyColumnCount):
         #            if self.level % 2 == 0:
@@ -215,7 +225,10 @@ class game:
                         #checks if no more enemies 
                         if self.enemyGrid[row][column].health == 0: 
                             self.enemyCount -= 1
-                            self.score += 100
+                            if self.enemyGrid[row][column].type != "Alien4SpriteSheet":
+                                self.score += (100 * self.level)//2
+                            else:
+                                self.score += 100  * self.level
                         return
 
 
@@ -258,6 +271,12 @@ class game:
                         return "Menu"
                     
                     self.enemyGrid[row][column].anim.update()
+                    
+                    rNum2 = random.randint(1,self.enemyFireChance)
+                    if rNum2 == 1:
+                        if (self.enemyGrid[row][column].health != 0 and self.enemyGrid[row][column].missileCount < self.enemyGrid[row][column].missileCap):
+                            self.missiles.append(self.enemyGrid[row][column].fire())
+
                     if self.enemyGrid[row][column].lastMove == None:
                         if row % 2 == 0:
                             self.enemyGrid[row][column].lastMove = "Left"
@@ -275,17 +294,12 @@ class game:
                         else:
                             self.enemyGrid[row][column].moveLeft()
                     elif self.enemyGrid[row][column].lastMove == "Right":
-                        if self.enemyGrid[row][column].posx + 64 >= 1024:
+                        if self.enemyGrid[row][column].posx + self.enemyGrid[row][column].imagew >= 1024:
                             self.enemyGrid[row][column].lastMove = "Left"
                             self.enemyGrid[row][column].moveDown()
                            # self.enemyGrid[row][column].moveLeft()
                         else:
                             self.enemyGrid[row][column].moveRight()
-                    
-                    rNum2 = random.randint(1,100)
-                    if rNum2 == 1:
-                        if (self.enemyGrid[row][column].health != 0 and self.enemyGrid[row][column].missileCount < self.enemyGrid[row][column].missileCap):
-                            self.missiles.append(self.enemyGrid[row][column].fire())
             
             #rNum = random.randint(1, 5)
             #for row in range(self.enemyRowCount):

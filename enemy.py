@@ -10,8 +10,9 @@ Functions:
     self.getPos()
 '''
 class Enemy:
-    def __init__(self, pos, imagew, imageh, animation, health, speed, row, col):
+    def __init__(self, pos, imagew, imageh, animation, health, speed, row, col, type):
         self.anim = animation
+        self.type = type
         self.health = health
         self.row = row
         self.col = col
@@ -28,7 +29,7 @@ class Enemy:
 
     def fire(self):
         self.missileCount += 1
-        return Missile(0, "missile1", (self.posx + (self.imagew + 18), self.posy + (self.imageh)), 8, 32, self.row, self.col)
+        return Missile(0, "missile1", (self.posx + (self.imagew - 18), self.posy + (self.imageh)), 8, 32, self.row, self.col)
    
     def moveLeft(self):
         self.posx -= self.speed
