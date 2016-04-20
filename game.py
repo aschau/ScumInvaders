@@ -1,4 +1,4 @@
-﻿import pygame
+﻿import pygame, os
 from player import Player
 from enemy import Enemy
 from Button import Button
@@ -63,7 +63,7 @@ class game:
         self.nextKeyInput = pygame.time.get_ticks()
 
         self.fontsize = 30
-        self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
+        self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
 
         self.pauseButtons = []
         self.pauseButtons.append(Button(screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 330, 281, 68, "Menu", 'Exit.ogg', soundManager))
