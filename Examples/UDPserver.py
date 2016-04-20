@@ -9,6 +9,7 @@ serverSocket.bind(('localhost', serverPort))
 print('The UDP server is ready to receive')
 while 1:
 #While 1 is an infinite loop. server is always waiting for requests
+        connected = None
         connection = sqlite3.connect("scoreTable.db")
         message, clientAddress = serverSocket.recvfrom(2048)
         #when something is recieved through serverSocket, the data will be stored in message.
@@ -26,17 +27,25 @@ while 1:
         tups = [(indexstring[0], indexstring[1])]
         c.execute("SELECT * FROM scores")
         data = c.fetchall()
-        username = " "
+        username = ""
         for i in data:
                 if i[0] == indexstring[0]:
                         print("This username exists")
                         username = i[0]
-        if username == " ":
+                        if indexstring[1] == i[1]:
+                                connected = 0
+                        else:
+                                connected = 1
+        if username == "":
                 c.executemany("INSERT INTO scores VALUES (?,?)", tups)
-        
+                connected = 2
         
         connection.commit()
-        
-        serverSocket.sendto(modifiedMessage.encode(), clientAddress)
+        if connected == 2:
+                serverSocket.sendto("Your username has been added".encode(), clientAddress)
+        if connected == 0:
+                serverSocket.sendto("You have been connected".encode(), clientAddress)
+        if connected == 1:
+                serverSocket.sendto("Wrong password, you fool".encode(), clientAddress)
         #sends the moddifiedMessage to client with IP and port stored in clientAddress 
 
