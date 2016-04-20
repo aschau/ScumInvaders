@@ -1,5 +1,6 @@
 from socket import *
 import sqlite3
+
 serverPort = 12000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind(('localhost', serverPort))
@@ -51,4 +52,5 @@ while 1:
         if connected == 1: #Password is invalid 
                 serverSocket.sendto("Wrong password, you fool".encode(), clientAddress)
         #sends the moddifiedMessage to client with IP and port stored in clientAddress 
-
+serverSocket.close()
+        
