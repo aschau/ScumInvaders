@@ -39,13 +39,17 @@ class ScumInvaders:
         self.game = game(self.screen, self.width, self.height, AllSprites, self.sounds)
 
         self.fontsize = 10
+
         self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
+
+        pygame.event.set_blocked(pygame.NOEVENT)
         
     def game_loop(self):
         while self.running:
-            for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                            self.running = False
+
+            pygame.event.pump()
+            if pygame.event.peek(pygame.QUIT):
+                    self.running = False
 
             if (self.state == "Menu"):
                 self.mainMenu.draw()
@@ -74,8 +78,7 @@ class ScumInvaders:
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
-            if (self.state != "Menu"):
-                self.clock.tick(60)
+            self.clock.tick(60)
         
         pygame.quit()
 

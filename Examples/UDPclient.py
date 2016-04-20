@@ -7,8 +7,9 @@ clientSocket = socket(AF_INET, SOCK_DGRAM)
 #infinite loops
 while 1:
         #asks for the input to send
-        message = input('input Lowercase sentence:')
-
+        username = input('username: ')
+        password = input('password: ')
+        message = username + ":" + password
         #sends the string message, must be encoded. default utf-8
         clientSocket.sendto(message.encode(),(serverName,serverPort))
 
