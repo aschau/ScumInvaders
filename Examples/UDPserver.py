@@ -25,12 +25,13 @@ while 1:
         c = connection.cursor()
         #executes the SQL statement 
         connection.execute('''CREATE TABLE IF NOT EXISTS scores
-                    (user text, pass text)''')
+                    (user text, pass text, score real, wins real)''')
         indexstring = modifiedMessage.split(':')
         tups = [(indexstring[0], indexstring[1])]
         c.execute("SELECT * FROM scores")
         #returns a list of the results
         data = c.fetchall()
+        print(data)
         username = ""
         for i in data:
                 if i[0] == indexstring[0]:
@@ -41,7 +42,7 @@ while 1:
                         else:
                                 connected = 1
         if username == "":
-                c.executemany("INSERT INTO scores VALUES (?,?)", tups)
+                c.executemany("INSERT INTO scores VALUES (?,?,0,0)", tups)
                 connected = 2
         #commits the action to the database?
         connection.commit()

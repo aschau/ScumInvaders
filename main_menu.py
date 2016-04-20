@@ -16,7 +16,7 @@ class Main_Menu():
             self.mainButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Exit", 'Exit.ogg', soundManager))
 
             self.fontsize = 30
-            self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
+            self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
             self.loginButtons = []
             self.username = textInput(self.screen, "Username", (self.screenw/2 - 200, 100), self.fontsize * 8, 50, 8)
             self.password = textInput(self.screen, "Password", (self.screenw/2 - 200, 200), self.fontsize * 8, 50, 8, True)
@@ -30,6 +30,7 @@ class Main_Menu():
             self.serverName = 'localhost'
             self.port = 12000
             self.clientSocket = socket(AF_INET, SOCK_DGRAM)
+            self.loginStatus = "4"
 
         def draw(self):
             if self.state == "Main":
@@ -41,6 +42,8 @@ class Main_Menu():
                 self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0, 0))
                 self.username.draw()
                 self.password.draw()
+                if self.loginStatus == "1":
+                    self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 for button in self.loginButtons:
                     button.draw()
 
@@ -61,22 +64,11 @@ class Main_Menu():
                                     print(message)
                                     self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
                                     modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
-                                    if modifiedMessage.decode() == "0": 
-                                        print("Login success")
-                                        self.screen.blit(self.font.render("Login is successful.", True, pygame.Color(255,255,255)),(400,self.screenh/2 - 70))
-                                        pygame.time.delay(2000)
-                                        #write on screen that login was successful
-                                    elif modifiedMessage.decode() == "1":
+                                    if modifiedMessage.decode() == "1":
                                         print("Login failed.")
-                                        self.screen.blit(self.font.render("Login is successful.", True, pygame.Color(255,255,255)),(400,self.screenh/2 - 70))
-                                        pygame.time.delay(2000)
+                                        self.loginStatus = "1"
                                         self.state = "Login"
                                         #write on screen that password was incorrect
-                                    elif modifiedMessage.decode() == "2":
-                                        print("New username")
-                                        self.screen.blit(self.font.render("Login is successful.", True, pygame.Color(255,255,255)),(400,self.screenh/2 - 70))
-                                        pygame.time.delay(5000)
-                                        #write that new username was added   
                         
                         self.username.checkClicked(pygame.mouse.get_pos())
                         self.password.checkClicked(pygame.mouse.get_pos())
