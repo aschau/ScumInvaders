@@ -1,4 +1,4 @@
-﻿import pygame
+﻿import pygame, os
 from Button import Button
 from textInput import textInput
 
@@ -18,7 +18,7 @@ class Main_Menu():
             self.loginButtons = []
             self.username = textInput(self.screen, "Username", (self.screenw/2 - 200, 100), self.fontsize * 8, 50, 8)
             self.password = textInput(self.screen, "Password", (self.screenw/2 - 200, 200), self.fontsize * 8, 50, 8, True)
-            self.loginButtons.append(Button(screen, self.sprites.getSprite("login"), self.sprites.getSprite("loginHighlighted"), 368, 442, 281, 68, "Room", 'Start Button.ogg', soundManager))
+            self.loginButtons.append(Button(screen, self.sprites.getSprite("login"), self.sprites.getSprite("loginHighlighted"), 368, 442, 281, 68, "Main", 'Start Button.ogg', soundManager))
             self.loginButtons.append(Button(screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
 
             self.mouseDelay = 100

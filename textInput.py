@@ -1,4 +1,5 @@
 import pygame
+import os
 
 class textInput:
     #self.screen = screen
@@ -16,7 +17,7 @@ class textInput:
         self.pos = pos
         self.boxw = boxw
         self.boxh = boxh
-        self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
+        self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
         self.input = ""
         self.keyDelay = 100
         self.nextKey = pygame.time.get_ticks()

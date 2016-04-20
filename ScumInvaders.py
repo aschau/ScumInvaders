@@ -39,7 +39,7 @@ class ScumInvaders:
         self.game = game(self.screen, self.width, self.height, AllSprites, self.sounds)
 
         self.fontsize = 10
-        self.font = pygame.font.Font(pygame.font.match_font('comicsansms'), self.fontsize)
+        self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
         
     def game_loop(self):
         while self.running:
