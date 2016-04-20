@@ -46,11 +46,11 @@ while 1:
         #commits the action to the database?
         connection.commit()
         if connected == 2: #Username does not exist
-                serverSocket.sendto("Your username has been added".encode(), clientAddress)
+                serverSocket.sendto("2".encode(), clientAddress)
         if connected == 0: #Username exists and password was entered correctly
-                serverSocket.sendto("You have been connected".encode(), clientAddress)
+                serverSocket.sendto("0".encode(), clientAddress)
         if connected == 1: #Password is invalid 
-                serverSocket.sendto("Wrong password, you fool".encode(), clientAddress)
+                serverSocket.sendto("1".encode(), clientAddress)
         #sends the moddifiedMessage to client with IP and port stored in clientAddress 
 serverSocket.close()
         
