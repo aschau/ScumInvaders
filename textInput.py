@@ -60,9 +60,9 @@ class textInput:
 
                     self.nextKey = pygame.time.get_ticks() + self.keyDelay
             
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.unicode.isalpha():
-                        if (len(self.input) < self.maxLength):
-                            self.input += event.unicode
+            event = pygame.event.poll()
+            if event.type == pygame.KEYDOWN:
+                if event.unicode.isalnum():
+                    if (len(self.input) < self.maxLength):
+                        self.input += event.unicode
         
