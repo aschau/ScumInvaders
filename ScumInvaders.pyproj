@@ -39,6 +39,9 @@
     <Compile Include="player.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="scrumServer.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ScumInvaders.py" />
     <Compile Include="soundManager.py">
       <SubType>Code</SubType>
