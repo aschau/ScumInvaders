@@ -30,7 +30,7 @@ class game:
         self.screenw = screenw
         self.screenh = screenh
         self.soundManager = soundManager
-        self.player = Player(1, "shipupgrade1", "missile5", (500, 700), 32, 32)
+        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
         self.paused = False
         self.level = 1
 
@@ -75,7 +75,7 @@ class game:
 
     def reset(self):
         self.soundManager.playNewMusic("Space Invaders Theme.ogg");
-        self.player = Player(1, "shipupgrade1", "missile5", (500, 700), 32, 32)
+        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
         self.enemyGrid = []
         self.missiles = []
         self.enemyCount = 50
@@ -162,7 +162,13 @@ class game:
             self.nextLevel()
 
     '''Odd levels -> change speed; even levels -> change health'''
-    def nextLevel(self):        
+    def nextLevel(self):   
+        if self.level == 5:
+            self.player.image = "lvl2ship1"    
+
+        elif self.level == 10:
+            self.player.image = "shipupgrade1.png"
+
         self.enemyGrid = []
         self.level += 1
         if self.level % 2 == 0:
