@@ -184,7 +184,6 @@ class game:
             self.player.missileCap += 1 
 
     def keyUpdate(self):
-        pygame.event.pump()
         keys = pygame.key.get_pressed()
         
         if pygame.time.get_ticks() > self.nextKeyInput:

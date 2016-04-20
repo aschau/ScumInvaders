@@ -60,6 +60,7 @@ class textInput:
 
                     self.nextKey = pygame.time.get_ticks() + self.keyDelay
             
+            pygame.event.pump() 
             event = pygame.event.poll()
             if event.type == pygame.KEYDOWN:
                 if event.unicode.isalnum():
