@@ -43,7 +43,7 @@ class soundManager:
     def playCurrentMusic(self):
         pygame.mixer.music.play(-1)
 
-    def playNewMusic(self, song, volume = 0.5):
+    def playNewMusic(self, song, volume = 1):
         self.music = pygame.mixer.music.load(os.path.join(self.folder, song))
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.play(-1)

@@ -32,6 +32,7 @@ class game:
         self.soundManager = soundManager
         self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
         self.paused = False
+        self.start = True
         self.level = 1
 
         self.background = "GameBackground"
@@ -72,9 +73,9 @@ class game:
         self.mouseNext = pygame.time.get_ticks()
 
         random.seed(datetime.now())
+        self.startTime = None
 
     def reset(self):
-        self.soundManager.playNewMusic("Space Invaders Theme.ogg");
         self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
         self.enemyGrid = []
         self.missiles = []
@@ -84,6 +85,8 @@ class game:
         self.player.score = 0
         self.state = "Game"
         self.paused = False
+        self.start = True
+        self.startTime = pygame.time.get_ticks()
 
     def setGrid(self, speed = 16, health = 1):
          for row in range(self.enemyRowCount):
@@ -124,11 +127,18 @@ class game:
                 button.draw()
 
     def update(self):
+        if self.start:
+            if pygame.time.get_ticks() >= self.startTime + 100:
+                self.soundManager.playSound("Enemy_entrance.ogg")
+                pygame.time.delay(2000)
+                self.soundManager.playNewMusic("Space Invaders Theme.ogg")
+                self.start = False
+
         self.keyUpdate()
         if not self.paused:
             self.backgroundUpdate()
             self.state = self.enemyUpdate()
-        
+
             if self.checkState():
                 return self.state
         
@@ -163,14 +173,17 @@ class game:
 
     '''Odd levels -> change speed; even levels -> change health'''
     def nextLevel(self):   
+        self.enemyGrid = []
+        self.level += 1
+
         if self.level == 5:
+            self.soundManager.playSound("LevelUp.ogg")
             self.player.image = "lvl2ship1"    
 
         elif self.level == 10:
-            self.player.image = "shipupgrade1.png"
+            self.soundManager.playSound("LevelUp.ogg")
+            self.player.image = "shipupgrade1"
 
-        self.enemyGrid = []
-        self.level += 1
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
                 self.enemyFireChance -= 2;
@@ -212,6 +225,7 @@ class game:
                 if keys[pygame.K_SPACE]:
                     if self.player.missileCount < self.player.missileCap:
                         self.missiles.append(self.player.fire())
+                        self.soundManager.playSound("Player_Shoot.ogg")
     
     def mouseUpdate(self):
         for button in self.pauseButtons:
