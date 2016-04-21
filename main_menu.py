@@ -20,8 +20,13 @@ class Main_Menu():
             self.loginButtons = []
             self.username = textInput(self.screen, "Username", (self.screenw/2 - 200, 100), self.fontsize * 8, 50, 8)
             self.password = textInput(self.screen, "Password", (self.screenw/2 - 200, 200), self.fontsize * 8, 50, 8, True)
-            self.loginButtons.append(Button(screen, self.sprites.getSprite("login"), self.sprites.getSprite("loginHighlighted"), 368, 442, 281, 68, "Main", 'Start Button.ogg', soundManager))
-            self.loginButtons.append(Button(screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
+            self.loginButtons.append(Button(self.screen, self.sprites.getSprite("login"), self.sprites.getSprite("loginHighlighted"), 368, 442, 281, 68, "Lobby", 'Start Button.ogg', soundManager))
+            self.loginButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
+
+            self.lobbyButtons = []
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("start"), self.sprites.getSprite("startHighlighted"), 368, 534, 281,68, "Game", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 635, 281, 68, "Main", 'Exit.ogg', soundManager))
+
 
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
@@ -47,6 +52,11 @@ class Main_Menu():
                 for button in self.loginButtons:
                     button.draw()
 
+            elif self.state == "Lobby":
+                self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
+                for button in self.lobbyButtons:
+                    button.draw()
+
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
                 if pygame.mouse.get_pressed()[0]:
@@ -59,7 +69,7 @@ class Main_Menu():
                         for button in self.loginButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
-                                if self.state == "Main":
+                                if self.state == "Lobby":
                                     message = self.username.input + ":" + self.password.input
                                     print(message)
                                     self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
@@ -72,6 +82,11 @@ class Main_Menu():
                         
                         self.username.checkClicked(pygame.mouse.get_pos())
                         self.password.checkClicked(pygame.mouse.get_pos())
+
+                    elif self.state == "Lobby":
+                        for button in self.lobbyButtons:
+                            if button.checkClicked(pygame.mouse.get_pos()):
+                                self.state = button.click()
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
         
@@ -90,6 +105,10 @@ class Main_Menu():
                 self.username.update()
                 self.password.update()
 
+                return "Menu"
+            elif self.state == "Lobby":
+                for button in self.lobbyButtons:
+                    button.checkHover(pygame.mouse.get_pos())
                 return "Menu"
 
             else:
