@@ -24,8 +24,11 @@ class Main_Menu():
             self.loginButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
 
             self.lobbyButtons = []
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("start"), self.sprites.getSprite("startHighlighted"), 368, 534, 281,68, "Game", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 635, 281, 68, "Main", 'Exit.ogg', soundManager))
+
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyJoinButton"), self.sprites.getSprite("LobbyJoinButton"), self.screenw - 300, 442, 281,68, "Room", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButton"), self.screenw - 300, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
 
 
             self.mouseDelay = 100
@@ -35,7 +38,8 @@ class Main_Menu():
             self.serverName = 'localhost'
             self.port = 12000
             self.clientSocket = socket(AF_INET, SOCK_DGRAM)
-            self.loginStatus = "4"
+
+            self.loginStatus = "IDK"
             self.player = 1
 
         def draw(self):
@@ -48,7 +52,8 @@ class Main_Menu():
                 self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0, 0))
                 self.username.draw()
                 self.password.draw()
-                if self.loginStatus == "1":
+
+                if self.loginStatus == "Invalid Password":
                     self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 for button in self.loginButtons:
                     button.draw()
@@ -75,9 +80,11 @@ class Main_Menu():
                                     print(message)
                                     self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
                                     modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
-                                    if modifiedMessage.decode() == "1":
+
+                                    if modifiedMessage.decode() == "Invalid Password":
                                         print("Login failed.")
-                                        self.loginStatus = "1"
+
+                                        self.loginStatus = "Invalid Password"
                                         self.state = "Login"
                                         #write on screen that password was incorrect
                         
@@ -113,6 +120,5 @@ class Main_Menu():
                 return "Menu"
 
             else:
-
                 return self.state
 

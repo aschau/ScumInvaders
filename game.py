@@ -132,7 +132,7 @@ class game:
             if pygame.time.get_ticks() >= self.startTime + 100:
                 self.soundManager.playSound("Enemy_entrance.ogg")
                 pygame.time.delay(2000)
-                self.soundManager.playNewMusic("Space Invaders Theme.ogg")
+                self.soundManager.playNewMusic("Space Invaders Theme.ogg", .2)
                 self.start = False
 
         self.keyUpdate()
