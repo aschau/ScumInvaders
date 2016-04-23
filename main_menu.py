@@ -55,6 +55,8 @@ class Main_Menu():
 
                 if self.loginStatus == "Invalid Password":
                     self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
+                elif self.loginStatus == "No Server":
+                    self.screen.blit(self.font.render("The server is unavailable.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 for button in self.loginButtons:
                     button.draw()
 
@@ -78,15 +80,19 @@ class Main_Menu():
                                 if self.state == "Lobby":
                                     message = self.username.input + ":" + self.password.input
                                     print(message)
-                                    self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
-                                    modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
-
-                                    if modifiedMessage.decode() == "Invalid Password":
-                                        print("Login failed.")
-
-                                        self.loginStatus = "Invalid Password"
-                                        self.state = "Login"
+                                    try:
+                                        self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
+                                        modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
+                                        if modifiedMessage.decode() == "Invalid Password":
+                                            print("Login failed.")
+                                            self.loginStatus = "Invalid Password"
+                                            self.state = "Login"
                                         #write on screen that password was incorrect
+                                    except:
+                                        self.loginStatus = "No Server"
+                                        self.state = "Login"
+
+                                    
                         
                         self.username.checkClicked(pygame.mouse.get_pos())
                         self.password.checkClicked(pygame.mouse.get_pos())
