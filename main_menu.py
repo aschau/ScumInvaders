@@ -25,10 +25,10 @@ class Main_Menu():
 
             self.lobbyButtons = []
 
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyJoinButton"), self.sprites.getSprite("LobbyJoinButton"), self.screenw - 300, 442, 281,68, "Room", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButton"), self.screenw - 300, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButton"), self.screenw - 300, 175, 280, 68, "Create", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyJoinButton"), self.sprites.getSprite("LobbyJoinButton"), self.screenw - 300, 275, 280, 68, "Room", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButton"), self.screenw - 300, 375, 280,68, "Refresh", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButton"), self.screenw - 300, 475, 280, 68, "Main", 'Exit.ogg', soundManager))
 
 
             self.mouseDelay = 100
@@ -61,7 +61,8 @@ class Main_Menu():
                     button.draw()
 
             elif self.state == "Lobby":
-                self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
+                self.screen.fill((0, 0, 0))
+                self.screen.blit(self.sprites.getSprite("LobbyRoomBackground"), (5, (768 - 704)/1.5))
                 for button in self.lobbyButtons:
                     button.draw()
 
