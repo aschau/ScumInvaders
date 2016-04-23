@@ -9,7 +9,7 @@ serverSocket.listen(1)
 #server listens to TCP connection waiting for client requests.
 #the 1 specifies the max number of queued connections(at least 1)
 
-print 'The TCP server is ready to receive'
+print ('The TCP server is ready to receive')
 while 1:
 #While 1 is an infinite loop. server is always waiting for requests
 

@@ -9,6 +9,9 @@ from Sprite_Manager import sprites
 from soundManager import soundManager
 from game import game
 
+#server stuff
+from socket import *
+
 #in case gg no has fonts/sound
 if not pygame.font:
     print('Warning, fonts disabled')

@@ -36,6 +36,7 @@ class Main_Menu():
             self.port = 12000
             self.clientSocket = socket(AF_INET, SOCK_DGRAM)
             self.loginStatus = "4"
+            self.player = 1
 
         def draw(self):
             if self.state == "Main":
@@ -112,5 +113,6 @@ class Main_Menu():
                 return "Menu"
 
             else:
+
                 return self.state
 
