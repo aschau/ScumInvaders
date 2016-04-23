@@ -3,9 +3,11 @@ import sqlite3
 
 serverPort = 12000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind(('localhost', serverPort))
+serverSocket.bind((gethostbyname(gethostname()), serverPort))
+print(gethostbyname(gethostname()))
 #it binds the serverSocket to port number specified in serverPort variable.
 #then when anybody sends anything to server IP address and serverPort the serverSocket will get it.
+
 
 print('The UDP server is ready to receive')
 while 1:
