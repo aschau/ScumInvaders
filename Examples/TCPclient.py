@@ -14,8 +14,8 @@ clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName,serverPort))
 #initiates the TCP connection between the server and client. 3way handshake is established.
 
-sentence = raw_input('Input lowercase sentence:')
-clientSocket.send(sentence)
+sentence = input("Sentence: ")
+clientSocket.send(sentence.decode())
 #this linse sends the sentence through the client's socket into TCP connection.
 #here we dont have to specify the address explicitly like UDP. 
 #Instead we simply drop the packet to established TCP connection.
@@ -24,5 +24,5 @@ modifiedSentence = clientSocket.recv(1024)
 #then we will put the message in modifiedMessage. 
 #2048 here is the size of the buffer for receiving data
 
-print 'From Server:', modifiedSentence
+print ('From Server:', modifiedSentence)
 clientSocket.close()

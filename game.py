@@ -27,10 +27,11 @@ class game:
     def __init__(self, screen, screenw, screenh, spriteList, soundManager):
         self.sprites = spriteList
         self.screen = screen
-        self.screenw = screenw
+        self.screenw = screenw 
         self.screenh = screenh
         self.soundManager = soundManager
         self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
+        #self.player = Player(player, "ship" + str(player), "missile"+ str(player + 1), (200 * player,700), 32, 32)
         self.paused = False
         self.start = True
         self.level = 1

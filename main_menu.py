@@ -24,6 +24,7 @@ class Main_Menu():
             self.loginButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
 
             self.lobbyButtons = []
+
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyJoinButton"), self.sprites.getSprite("LobbyJoinButton"), self.screenw - 300, 442, 281,68, "Room", 'Start Button.ogg', soundManager))
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
@@ -37,7 +38,9 @@ class Main_Menu():
             self.serverName = 'localhost'
             self.port = 12000
             self.clientSocket = socket(AF_INET, SOCK_DGRAM)
+
             self.loginStatus = "IDK"
+            self.player = 1
 
         def draw(self):
             if self.state == "Main":
@@ -49,6 +52,7 @@ class Main_Menu():
                 self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0, 0))
                 self.username.draw()
                 self.password.draw()
+
                 if self.loginStatus == "Invalid Password":
                     self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 for button in self.loginButtons:
@@ -76,8 +80,10 @@ class Main_Menu():
                                     print(message)
                                     self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
                                     modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
+
                                     if modifiedMessage.decode() == "Invalid Password":
                                         print("Login failed.")
+
                                         self.loginStatus = "Invalid Password"
                                         self.state = "Login"
                                         #write on screen that password was incorrect
