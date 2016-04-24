@@ -25,9 +25,9 @@ class Main_Menu():
 
             self.lobbyButtons = []
 
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButtonHovered"), self.screenw - 300, 275, 280, 68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButtonHovered"), self.screenw - 300, 375, 280,68, "Refresh", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 300, 475, 280, 68, "Main", 'Exit.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButtonHovered"), self.screenw - 300, 225, 280, 68, "Create", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButtonHovered"), self.screenw - 300, 325, 280,68, "Refresh", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 300, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
 
 
             self.mouseDelay = 100
@@ -40,6 +40,7 @@ class Main_Menu():
 
             self.loginStatus = "IDK"
             self.player = 1
+            self.host = False
 
         def draw(self):
             if self.state == "Main":
@@ -67,6 +68,9 @@ class Main_Menu():
                 self.screen.blit(self.sprites.getSprite("LobbyRoomBackgroundOutline"), (5, (768 - 704)/1.5 - 10))
                 for button in self.lobbyButtons:
                     button.draw()
+
+            elif self.state == "Room":
+                pass
 
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
@@ -98,8 +102,10 @@ class Main_Menu():
                                     else:
                                         self.state = "Login"
                                         self.loginStatus = "Invalid Format"
-
-                                    
+                                
+                                elif self.state == "Create":
+                                    self.host = True
+                                    self.state = "Room"
                         
                         self.username.checkClicked(pygame.mouse.get_pos())
                         self.password.checkClicked(pygame.mouse.get_pos())
