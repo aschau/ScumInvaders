@@ -18,7 +18,6 @@ class textInput:
         self.boxw = boxw
         self.boxh = boxh
         self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
-        self.lobbyFont = pygame.font.Font(os.path.join('Fonts', 'BaconFarm.ttf'), self.fontsize)
         self.input = ""
         self.keyDelay = 100
         self.nextKey = pygame.time.get_ticks()

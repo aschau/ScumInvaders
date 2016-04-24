@@ -18,6 +18,8 @@ class Main_Menu():
 
             self.fontsize = 30
             self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
+            self.lobbyFont = pygame.font.Font(os.path.join('Fonts', 'BaconFarm.ttf'), self.fontsize)
+
             self.loginButtons = []
             self.username = textInput(self.screen, "Username", (self.screenw/2 - 200, 100), self.fontsize * 8, 50, 8)
             self.password = textInput(self.screen, "Password", (self.screenw/2 - 200, 200), self.fontsize * 8, 50, 8, True)
@@ -32,6 +34,8 @@ class Main_Menu():
 
             self.roomButtons = []
             self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 20, self.screenh - 150, 290, 134, "Ready", 'Start Button.ogg', soundManager))
+
+            self.players = {}
 
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
@@ -73,9 +77,18 @@ class Main_Menu():
                     button.draw()
 
             elif self.state == "Room":
-                self.screen.fill((0, 0, 0))
+                self.screen.blit(self.sprites.getSprite("GameRoomBackground"), (0, 0))
                 for button in self.roomButtons:
                     button.draw()
+
+                playerNumber = 0
+                for player, status in self.players.items():
+                    self.screen.blit(self.lobbyFont.render(player, True, pygame.Color(255,255,255)),(0, self.fontsize * playerNumber))
+                    if status == True:
+                        self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/3, self.fontsize * playerNumber))
+                    else:
+                        self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/3, self.fontsize * playerNumber))
+                    playerNumber += 1
 
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
@@ -119,12 +132,14 @@ class Main_Menu():
                                     self.host = True
                                     self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 20 + 225 + 50, self.screenh - 150, 290, 134, "Game", 'Start Button.ogg', self.soundManager))
                                     self.state = "Room"
+                                    self.players[self.username.input] = False
                     
                     elif self.state == "Room":
                         for button in self.roomButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Ready":
+                                    self.players[self.username.input] = True
                                     self.state = "Room"
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
