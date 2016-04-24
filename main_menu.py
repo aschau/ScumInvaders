@@ -25,10 +25,9 @@ class Main_Menu():
 
             self.lobbyButtons = []
 
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyJoinButton"), self.sprites.getSprite("LobbyJoinButton"), self.screenw - 300, 442, 281,68, "Room", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButton"), self.screenw - 300, 442, 281,68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButton"), self.screenw - 300, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButtonHovered"), self.screenw - 300, 275, 280, 68, "Create", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButtonHovered"), self.screenw - 300, 375, 280,68, "Refresh", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 300, 475, 280, 68, "Main", 'Exit.ogg', soundManager))
 
 
             self.mouseDelay = 100
@@ -57,11 +56,15 @@ class Main_Menu():
                     self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 elif self.loginStatus == "No Server":
                     self.screen.blit(self.font.render("The server is unavailable.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
+                elif self.loginStatus == "Invalid Format":
+                    self.screen.blit(self.font.render("Invalid Format.", True, pygame.Color(255,255,255)),(self.screenw/2 - (len("Invalid Format.") * 30)/4,self.screenh/2 - 100))
+                
                 for button in self.loginButtons:
                     button.draw()
 
             elif self.state == "Lobby":
-                self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
+                self.screen.fill((0, 0, 0))
+                self.screen.blit(self.sprites.getSprite("LobbyRoomBackgroundOutline"), (5, (768 - 704)/1.5 - 10))
                 for button in self.lobbyButtons:
                     button.draw()
 
@@ -78,19 +81,23 @@ class Main_Menu():
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Lobby":
-                                    message = self.username.input + ":" + self.password.input
-                                    print(message)
-                                    try:
-                                        self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
-                                        modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
-                                        if modifiedMessage.decode() == "Invalid Password":
-                                            print("Login failed.")
-                                            self.loginStatus = "Invalid Password"
+                                    if self.username.input != "" and self.password.input != "":
+                                        message = self.username.input + ":" + self.password.input
+                                        print(message)
+                                        try:
+                                            self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
+                                            modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
+                                            if modifiedMessage.decode() == "Invalid Password":
+                                                print("Login failed.")
+                                                self.loginStatus = "Invalid Password"
+                                                self.state = "Login"
+                                            #write on screen that password was incorrect
+                                        except:
+                                            self.loginStatus = "No Server"
                                             self.state = "Login"
-                                        #write on screen that password was incorrect
-                                    except:
-                                        self.loginStatus = "No Server"
+                                    else:
                                         self.state = "Login"
+                                        self.loginStatus = "Invalid Format"
 
                                     
                         
