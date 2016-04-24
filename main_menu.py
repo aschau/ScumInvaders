@@ -9,6 +9,7 @@ class Main_Menu():
             self.screen = screen
             self.screenw = screenw
             self.screenh = screenh
+            self.soundManager = soundManager
             self.state = "Main"
             self.mainButtons = []
             self.mainButtons.append(Button(self.screen, self.sprites.getSprite("login"), self.sprites.getSprite("loginHighlighted"), 368, 350, 281, 68, "Login", 'Start Button.ogg', soundManager))
@@ -30,8 +31,7 @@ class Main_Menu():
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 283, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
 
             self.roomButtons = []
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ReadyButton"), self.sprites.getSprite("ReadyButtonHovered"), self.screenw - 283, 225, 280, 68, "Ready", 'Start Button.ogg', soundManager))
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("StartButton"), self.sprites.getSprite("StartButtonHovered"), self.screenw - 283, 225, 280, 68, "Game", 'Start Button.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 20, self.screenh - 150, 290, 134, "Ready", 'Start Button.ogg', soundManager))
 
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
@@ -107,10 +107,6 @@ class Main_Menu():
                                     else:
                                         self.state = "Login"
                                         self.loginStatus = "Invalid Format"
-                                
-                                elif self.state == "Create":
-                                    self.host = True
-                                    self.state = "Room"
                         
                         self.username.checkClicked(pygame.mouse.get_pos())
                         self.password.checkClicked(pygame.mouse.get_pos())
@@ -119,13 +115,17 @@ class Main_Menu():
                         for button in self.lobbyButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
+                                if self.state == "Create":
+                                    self.host = True
+                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 20 + 225 + 50, self.screenh - 150, 290, 134, "Game", 'Start Button.ogg', self.soundManager))
+                                    self.state = "Room"
                     
                     elif self.state == "Room":
                         for button in self.roomButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Ready":
-                                    return "Room"
+                                    self.state = "Room"
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
         
