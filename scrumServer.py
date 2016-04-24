@@ -3,7 +3,7 @@ import sqlite3
 
 serverPort = 12000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind((gethostbyname(gethostname()), serverPort))
+serverSocket.bind(('0.0.0.0', serverPort))
 print(gethostbyname(gethostname()))
 #it binds the serverSocket to port number specified in serverPort variable.
 #then when anybody sends anything to server IP address and serverPort the serverSocket will get it.
@@ -16,6 +16,7 @@ while 1:
         #opens connection to SQLite database file database and returns a connection object
         connection = sqlite3.connect("scoreTable.db")
         message, clientAddress = serverSocket.recvfrom(2048)
+        print("Received")
         #when something is recieved through serverSocket, the data will be stored in message.
         #Also the client IP and port will be extracted and stored in variable clientAddress.
 
