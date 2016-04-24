@@ -25,10 +25,13 @@ class Main_Menu():
 
             self.lobbyButtons = []
 
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButtonHovered"), self.screenw - 300, 225, 280, 68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButtonHovered"), self.screenw - 300, 325, 280,68, "Refresh", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 300, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButtonHovered"), self.screenw - 283, 225, 280, 68, "Create", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButtonHovered"), self.screenw - 283, 325, 280,68, "Refresh", 'Start Button.ogg', soundManager))
+            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 283, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
 
+            self.roomButtons = []
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ReadyButton"), self.sprites.getSprite("ReadyButtonHovered"), self.screenw - 283, 225, 280, 68, "Ready", 'Start Button.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("StartButton"), self.sprites.getSprite("StartButtonHovered"), self.screenw - 283, 225, 280, 68, "Game", 'Start Button.ogg', soundManager))
 
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
@@ -70,7 +73,9 @@ class Main_Menu():
                     button.draw()
 
             elif self.state == "Room":
-                pass
+                self.screen.fill((0, 0, 0))
+                for button in self.roomButtons:
+                    button.draw()
 
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
@@ -114,6 +119,13 @@ class Main_Menu():
                         for button in self.lobbyButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
+                    
+                    elif self.state == "Room":
+                        for button in self.roomButtons:
+                            if button.checkClicked(pygame.mouse.get_pos()):
+                                self.state = button.click()
+                                if self.state == "Ready":
+                                    return "Room"
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
         
@@ -133,8 +145,14 @@ class Main_Menu():
                 self.password.update()
 
                 return "Menu"
+            
             elif self.state == "Lobby":
                 for button in self.lobbyButtons:
+                    button.checkHover(pygame.mouse.get_pos())
+                return "Menu"
+
+            elif self.state == "Room":
+                for button in self.roomButtons:
                     button.checkHover(pygame.mouse.get_pos())
                 return "Menu"
 
