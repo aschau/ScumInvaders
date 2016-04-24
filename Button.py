@@ -45,8 +45,7 @@ class Button():
             self.current = self.image
 
     def click(self):
-        self.soundManager.playSound(self.sound)
-        pygame.time.delay(2000)
+        pygame.time.delay(500)
         return self.function
 
     def draw(self):

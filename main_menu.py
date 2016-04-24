@@ -17,8 +17,9 @@ class Main_Menu():
             self.mainButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Exit", 'Exit.ogg', soundManager))
 
             self.fontsize = 30
+            self.lobbyFontSize = 100
             self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
-            self.lobbyFont = pygame.font.Font(os.path.join('Fonts', 'BaconFarm.ttf'), self.fontsize)
+            self.lobbyFont = pygame.font.Font(os.path.join('Fonts', 'BaconFarm.ttf'), self.lobbyFontSize)
 
             self.loginButtons = []
             self.username = textInput(self.screen, "Username", (self.screenw/2 - 200, 100), self.fontsize * 8, 50, 8)
@@ -33,7 +34,8 @@ class Main_Menu():
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 283, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
 
             self.roomButtons = []
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 20, self.screenh - 150, 290, 134, "Ready", 'Start Button.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 0, self.screenh - 105, 230, 110, "Ready", 'Start Button.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 230*2, self.screenh - 105, 230, 110, "Lobby", 'Exit.ogg', soundManager))
 
             self.players = {}
 
@@ -83,11 +85,11 @@ class Main_Menu():
 
                 playerNumber = 0
                 for player, status in self.players.items():
-                    self.screen.blit(self.lobbyFont.render(player, True, pygame.Color(255,255,255)),(0, self.fontsize * playerNumber))
+                    self.screen.blit(self.lobbyFont.render(player, True, pygame.Color(0,0,0)),(20, 100 * (playerNumber + 1) + self.lobbyFontSize * playerNumber))
                     if status == True:
-                        self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/3, self.fontsize * playerNumber))
+                        self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.lobbyFontSize * playerNumber + 10))
                     else:
-                        self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/3, self.fontsize * playerNumber))
+                        self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.lobbyFontSize * playerNumber + 10))
                     playerNumber += 1
 
         def mouseUpdate(self):
@@ -130,7 +132,7 @@ class Main_Menu():
                                 self.state = button.click()
                                 if self.state == "Create":
                                     self.host = True
-                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 20 + 225 + 50, self.screenh - 150, 290, 134, "Game", 'Start Button.ogg', self.soundManager))
+                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 230, self.screenh - 105, 238, 110, "Game", 'Start Button.ogg', self.soundManager))
                                     self.state = "Room"
                                     self.players[self.username.input] = False
                     
@@ -139,7 +141,7 @@ class Main_Menu():
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Ready":
-                                    self.players[self.username.input] = True
+                                    self.players[self.username.input] = not self.players[self.username.input]
                                     self.state = "Room"
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
