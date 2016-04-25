@@ -30,6 +30,8 @@ class ScumInvaders:
         self.width = 1024
         self.height = 768
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
+        self.screen.blit(sprites("Sprites").load("Loading"), (0, 0))
+        pygame.display.update()
         self.running = True
 
         AllSprites = sprites("Sprites")

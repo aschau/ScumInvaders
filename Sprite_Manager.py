@@ -14,7 +14,8 @@ class sprites():
             raise SystemExit
 
     def load(self, image):
-        self.sheet = pygame.image.load(os.path.join(self.folder, image))
+        self.sheet = pygame.image.load(os.path.join(self.folder, image + ".png")).convert_alpha()
+        return self.sheet
 
     def loadAll(self):
         for root, dirs, files in os.walk(self.folder):

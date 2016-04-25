@@ -47,6 +47,7 @@ class Main_Menu():
             self.serverName = 'localhost'
             self.port = 12000
             self.clientSocket = socket(AF_INET, SOCK_DGRAM)
+            self.clientSocket.settimeout(1.0)
 
             self.loginStatus = "IDK"
             self.player = 1
@@ -111,22 +112,22 @@ class Main_Menu():
                                     if self.username.input != "" and self.password.input != "":
                                         message = self.username.input + ":" + self.password.input
 
-                                        #print(message)
+                                        self.clientSocket.sendto(("LOG:" + message).encode(), (self.serverName, self.port))
                                         try:
-
-                                            self.clientSocket.sendto(("LOG:" + message).encode(), (self.serverName, self.port))
                                             modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
+                                            self.loginStatus = ""
                                             if modifiedMessage.decode() == "Invalid Password":
-                                                print("Login failed.")
                                                 self.loginStatus = "Invalid Password"
                                                 self.state = "Login"
-                                            #write on screen that password was incorrect
+                                        #write on screen that password was incorrect
                                         except:
                                             self.loginStatus = "No Server"
                                             self.state = "Login"
                                     else:
                                         self.state = "Login"
                                         self.loginStatus = "Invalid Format"
+                                else:
+                                    self.loginStatus = ""
                         
                         self.username.checkClicked(pygame.mouse.get_pos())
                         self.password.checkClicked(pygame.mouse.get_pos())
