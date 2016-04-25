@@ -34,8 +34,9 @@ class Main_Menu():
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 283, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
 
             self.roomButtons = []
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 20, self.screenh - 103, 184, 85, "Ready", 'Start Button.ogg', soundManager))
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 20 + 184 * 2, self.screenh - 103, 184, 85, "Lobby", 'Exit.ogg', soundManager))
+
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 0, self.screenh - 90, 184, 85, "Ready", 'Start Button.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 220*2, self.screenh - 90, 184, 85, "Lobby", 'Exit.ogg', soundManager))
 
             self.players = {}
 
@@ -85,7 +86,9 @@ class Main_Menu():
 
                 playerNumber = 0
                 for player, status in self.players.items():
-                    self.screen.blit(self.lobbyFont.render(player, True, pygame.Color(0,0,0)),(20, 100 * (playerNumber + 1) + self.lobbyFontSize * playerNumber))
+
+                    self.screen.blit(self.sprites.getSprite("RoomNameBox"), (20, 100 * (playerNumber + 1) + self.lobbyFontSize * playerNumber))
+                    self.screen.blit(self.lobbyFont.render(player, True, pygame.Color(0,0,0)),(40, 100 * (playerNumber + 1) + self.lobbyFontSize * playerNumber))
                     if status == True:
                         self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.lobbyFontSize * playerNumber + 10))
                     else:
@@ -107,8 +110,10 @@ class Main_Menu():
                                 if self.state == "Lobby":
                                     if self.username.input != "" and self.password.input != "":
                                         message = self.username.input + ":" + self.password.input
-                                        print(message)
+
+                                        #print(message)
                                         try:
+
                                             self.clientSocket.sendto(("LOG:" + message).encode(), (self.serverName, self.port))
                                             modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
                                             if modifiedMessage.decode() == "Invalid Password":
@@ -132,7 +137,8 @@ class Main_Menu():
                                 self.state = button.click()
                                 if self.state == "Create":
                                     self.host = True
-                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 20 + 184, self.screenh - 103, 184, 85, "Game", 'Start Button.ogg', self.soundManager))
+
+                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 220, self.screenh - 90, 184, 85, "Game", 'Start Button.ogg', self.soundManager))
                                     self.state = "Room"
                                     self.players[self.username.input] = False
                     
