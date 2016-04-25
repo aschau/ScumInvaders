@@ -6,6 +6,8 @@ from Sprite_Manager import Animate
 from collections import deque
 import random
 from datetime import datetime
+from socket import *
+from Connect import Connect
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -72,6 +74,10 @@ class game:
         
         self.mouseDelay = 100
         self.mouseNext = pygame.time.get_ticks()
+
+        #for server
+        self.socket = Connect()
+        self.socket.serverName = '169.234.45.226'
 
         random.seed(datetime.now())
         self.startTime = None
@@ -215,10 +221,13 @@ class game:
             if keys[pygame.K_a]:
                     if not ((self.player.posx - self.player.speed) <= 0):
                         self.player.moveLeft()
+                        self.socket.send("MOV:" + str(self.player.posx) + ":" + str(self.player.posy))
+
 
             if keys[pygame.K_d]:
                 if not ((self.player.posx + self.player.speed + self.player.imagew) >= self.screenw):
                     self.player.moveRight()
+                    self.socket.send("MOV:" + str(self.player.posx) + ":" + str(self.player.posy))
 
             if pygame.time.get_ticks() > self.nextMissile:
                 self.nextMissile = pygame.time.get_ticks() + self.missileDelay

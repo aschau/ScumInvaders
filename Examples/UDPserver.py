@@ -23,9 +23,9 @@ class Socket:
                         modMessage = message.decode()
                         print(modMessage)
                         read = modMessage.split(":")
-                        if read[0] == "TALK":
-                                for i in self.clientAddress.values():
-                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
+##                        if read[0] == "TALK":
+##                                for i in self.clientAddress.values():
+##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
                         if read[0] == "LOG":
                                 self.players += 1
                                 self.checkLog(read[1], read[2], clientId)

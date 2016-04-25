@@ -2,6 +2,7 @@
 from Button import Button
 from textInput import textInput
 from socket import *
+from Connect import Connect
 
 class Main_Menu():
         def __init__(self, screen, screenw, screenh, spriteList, soundManager):
@@ -44,11 +45,9 @@ class Main_Menu():
             self.mouseNext = pygame.time.get_ticks()
 
             #for server
-            self.serverName = 'localhost'
-            self.port = 12000
-            self.clientSocket = socket(AF_INET, SOCK_DGRAM)
-            self.clientSocket.settimeout(1.0)
-
+            self.socket = Connect()
+            self.socket.serverName = '169.234.45.226'
+            self.socket.clientSocket.settimeout(1.0)
             self.loginStatus = "IDK"
             self.player = 1
             self.host = False
@@ -112,9 +111,9 @@ class Main_Menu():
                                     if self.username.input != "" and self.password.input != "":
                                         message = self.username.input + ":" + self.password.input
 
-                                        self.clientSocket.sendto(("LOG:" + message).encode(), (self.serverName, self.port))
+                                        self.socket.send("LOG:" + message)
                                         try:
-                                            modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
+                                            modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
                                             self.loginStatus = ""
                                             if modifiedMessage.decode() == "Invalid Password":
                                                 self.loginStatus = "Invalid Password"

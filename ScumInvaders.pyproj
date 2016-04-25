@@ -24,6 +24,9 @@
     <Compile Include="Button.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Connect.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="enemy.py">
       <SubType>Code</SubType>
     </Compile>
