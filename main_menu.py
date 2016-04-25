@@ -34,8 +34,8 @@ class Main_Menu():
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 283, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
 
             self.roomButtons = []
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 0, self.screenh - 105, 230, 110, "Ready", 'Start Button.ogg', soundManager))
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 230*2, self.screenh - 105, 230, 110, "Lobby", 'Exit.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 20, self.screenh - 103, 184, 85, "Ready", 'Start Button.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 20 + 184 * 2, self.screenh - 103, 184, 85, "Lobby", 'Exit.ogg', soundManager))
 
             self.players = {}
 
@@ -109,7 +109,7 @@ class Main_Menu():
                                         message = self.username.input + ":" + self.password.input
                                         print(message)
                                         try:
-                                            self.clientSocket.sendto(message.encode(), (self.serverName, self.port))
+                                            self.clientSocket.sendto(("LOG:" + message).encode(), (self.serverName, self.port))
                                             modifiedMessage, serverAddress = self.clientSocket.recvfrom(2048)
                                             if modifiedMessage.decode() == "Invalid Password":
                                                 print("Login failed.")
@@ -132,7 +132,7 @@ class Main_Menu():
                                 self.state = button.click()
                                 if self.state == "Create":
                                     self.host = True
-                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 230, self.screenh - 105, 238, 110, "Game", 'Start Button.ogg', self.soundManager))
+                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 20 + 184, self.screenh - 103, 184, 85, "Game", 'Start Button.ogg', self.soundManager))
                                     self.state = "Room"
                                     self.players[self.username.input] = False
                     
