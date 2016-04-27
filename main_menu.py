@@ -46,7 +46,7 @@ class Main_Menu():
 
             #for server
             self.socket = Connect()
-            self.socket.serverName = '169.234.45.226'
+            self.socket.serverName = gethostbyname(gethostname())
             self.socket.clientSocket.settimeout(1.0)
             self.loginStatus = "IDK"
             self.player = 1
