@@ -33,7 +33,7 @@ class Socket:
                                 break
                         #MOV:playerNumber:playerPosX:playerPosY
                         if read[0] == "MOV":
-                                for i in self.clientAddress:
+                                for i in self.clientAddress.values():
                                         self.serverSocket.sendto(modMessage.encode(),i)
                 #self.serverSocket.close()
         def checkLog(self,username, password, clientAddress):
