@@ -72,7 +72,7 @@ class Socket:
                 connection.commit()
                 if connected == 2: #Username does not exist
                         self.serverSocket.sendto("Username does not exist".encode(), clientAddress)
-                if connected == 0: #Username exists and password was entered correctly
+                if connected == 0: #Successfully logged in 
                         self.serverSocket.sendto("Success".encode(), clientAddress)
                 if connected == 1: #Password is invalid 
                         self.serverSocket.sendto("Invalid Password".encode(), clientAddress)
