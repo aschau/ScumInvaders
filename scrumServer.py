@@ -47,11 +47,11 @@ while 1:
         if username == "":
                 c.executemany("INSERT INTO scores VALUES (?,?,0,0)", tups)
                 connected = 2
-        #commits the action to the database?
+        #commits the action to the database, like github 
         connection.commit()
         if connected == 2: #Username does not exist
                 serverSocket.sendto("Username does not exist".encode(), clientAddress)
-        if connected == 0: #Username exists and password was entered correctly
+        if connected == 0: #Successfully logged in 
                 serverSocket.sendto("Success".encode(), clientAddress)
         if connected == 1: #Password is invalid 
                 serverSocket.sendto("Invalid Password".encode(), clientAddress)

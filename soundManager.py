@@ -15,7 +15,7 @@ class soundManager:
     def __init__(self, folder):
         try:
             self.folder = folder
-            os.path.isdir(self.folder)
+            os.path.isdir(self.folder) #find the folder
 
         except os.error:
             print ('Unable to load sound folder', folder)

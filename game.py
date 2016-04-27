@@ -95,6 +95,7 @@ class game:
         self.start = True
         self.startTime = pygame.time.get_ticks()
 
+    #Creates the grid for the enemies in the game
     def setGrid(self, speed = 16, health = 1):
          for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
@@ -133,6 +134,7 @@ class game:
             for button in self.pauseButtons:
                 button.draw()
 
+    #Handles everything that needs to go on in the game
     def update(self):
         if self.start:
             if pygame.time.get_ticks() >= self.startTime + 100:
@@ -209,6 +211,7 @@ class game:
         if self.level %2 == 1:
             self.player.missileCap += 1 
 
+    #Handles all of the keypresses (Movement, Shooting and pause)
     def keyUpdate(self):
         keys = pygame.key.get_pressed()
         
@@ -236,7 +239,8 @@ class game:
                     if self.player.missileCount < self.player.missileCap:
                         self.missiles.append(self.player.fire())
                         self.soundManager.playSound("Player_Shoot.ogg")
-    
+
+    #Only used in the pause menu, captures the clicks from the mouse on the pause screen 
     def mouseUpdate(self):
         for button in self.pauseButtons:
             button.checkHover(pygame.mouse.get_pos())
@@ -273,13 +277,14 @@ class game:
                                 self.player.score += 100 * self.level
                         return
 
-
+    #Handles the effects of the missles from both players(1) and enemies(0)
     def checkMissiles(self):
         numMissiles = 0
         while numMissiles < len(self.missiles):
             self.missiles[numMissiles].update()
 
             attacker = self.missiles[numMissiles].owner
+            #1 is the player's missle shots
             if attacker == 1:
                 if ((self.missiles[numMissiles].posy - self.missiles[numMissiles].imageh) <= 0):
                     self.missiles.pop(numMissiles)
@@ -287,7 +292,7 @@ class game:
 
                 else:
                     self.checkHit(numMissiles)
-                                
+            #0 is the enemy's missle shots                    
             elif attacker == 0:
                 if (self.missiles[numMissiles].collider.colliderect(self.player.collider)):
                     self.player.lives -= 1
@@ -366,6 +371,7 @@ class game:
                       
         return "Game"
 
+    #scrolls through the background
     def backgroundUpdate(self):
         self.currentBG1Height += 1
         self.currentBG2Height += 1
