@@ -90,32 +90,32 @@ class multiGame:
         self.socket.serverName = '169.234.45.226'
 
         random.seed(datetime.now())
-        self.startTime = None
-
-    def reset(self, numPlayers):
-        self.numPlayers = numPlayers
-        self.playerList = []
-        self.playerList.append(Player(1, "ship1", "missile1", (300, 700), 32, 32))
-
-        if numPlayers > 1:
-            self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
-
-        if numPlayers > 2:
-            self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
-
-        if numPlayers > 3:
-            self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
-
-        self.enemyGrid = []
-        self.missiles = []
-        self.enemyCount = 50
-        self.setGrid()
-        self.level = 1
-        self.player.score = 0
-        self.state = "multiGame"
-        self.paused = False
-        self.start = True
         self.startTime = pygame.time.get_ticks()
+
+    #def reset(self, numPlayers):
+    #    self.numPlayers = numPlayers
+    #    self.playerList = []
+    #    self.playerList.append(Player(1, "ship1", "missile1", (300, 700), 32, 32))
+
+    #    if numPlayers > 1:
+    #        self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
+
+    #    if numPlayers > 2:
+    #        self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
+
+    #    if numPlayers > 3:
+    #        self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
+
+    #    self.enemyGrid = []
+    #    self.missiles = []
+    #    self.enemyCount = 50
+    #    self.setGrid()
+    #    self.level = 1
+    #    self.playerList[0].score = 0
+    #    self.state = "multiGame"
+    #    self.paused = False
+    #    self.start = True
+    #    self.startTime = pygame.time.get_ticks()
 
     #Creates the grid for the enemies in the game
     def setGrid(self, speed = 16, health = 1):
@@ -138,7 +138,8 @@ class multiGame:
     def draw(self):
         self.screen.blit(self.sprites.getSprite(self.background), (0, self.currentBG1Height))
         self.screen.blit(self.sprites.getSprite(self.background2), (0, self.currentBG2Height))
-        self.screen.blit(self.sprites.getSprite(self.player.image), self.player.getPos())
+        for player in self.playerList:
+            self.screen.blit(self.sprites.getSprite(player.image), player.getPos())
         
         for missile in self.missiles:
             self.screen.blit(self.sprites.getSprite(missile.image), missile.getPos())
@@ -147,9 +148,9 @@ class multiGame:
             for column in range(self.enemyColumnCount):
                 self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
-        self.screen.blit(self.font.render("Lives: " + str(self.player.lives), True, pygame.Color(255,255,255)), (0, 670))
-        self.screen.blit(self.font.render("Ammo: " + str(self.player.missileCap - self.player.missileCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
-        self.screen.blit(self.font.render("Score: " + str(self.player.score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
+        self.screen.blit(self.font.render("Lives: " + str(self.playerList[0].lives), True, pygame.Color(255,255,255)), (0, 670))
+        self.screen.blit(self.font.render("Ammo: " + str(self.playerList[0].missileCap - self.playerList[0].missileCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
+        self.screen.blit(self.font.render("Score: " + str(self.playerList[0].score), True, pygame.Color(255,255,255)),(0,670 + (self.fontsize * 2)))
         self.screen.blit(self.font.render("Level: " + str(self.level), True, pygame.Color(255,255,255)), (0, 670 - self.fontsize))
 
         if self.paused:
@@ -193,7 +194,7 @@ class multiGame:
         return self.state != "multiGame"
 
     def checkPlayerLives(self):
-        if (self.player.lives <= 0):
+        if (self.playerList[0].lives <= 0):
             return "Menu"
         return "multiGame"
 
@@ -209,11 +210,11 @@ class multiGame:
 
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
-            self.player.image = "lvl2ship1"    
+            self.playerList[0].image = "ship1upgrade2"    
 
         elif self.level == 10:
             self.soundManager.playSound("LevelUp.ogg")
-            self.player.image = "shipupgrade1"
+            self.playerList[0].image = "ship1upgrade3"
 
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
@@ -231,7 +232,7 @@ class multiGame:
         #                rnum = random.randint(self.level - 1, self.level)
         #                self.enemyGrid[row][column].health = rnum
         if self.level %2 == 1:
-            self.player.missileCap += 1 
+            self.playerList[0].missileCap += 1 
 
     #Handles all of the keypresses (Movement, Shooting and pause)
     def keyUpdate(self):
@@ -244,22 +245,22 @@ class multiGame:
 
         if not self.paused:
             if keys[pygame.K_a]:
-                    if not ((self.player.posx - self.player.speed) <= 0):
-                        self.player.moveLeft()
-                        self.socket.send("MOV:" + str(self.player.posx) + ":" + str(self.player.posy))
+                    if not ((self.playerList[0].posx - self.playerList[0].speed) <= 0):
+                        self.playerList[0].moveLeft()
+                        self.socket.send("MOV:" + str(self.playerList[0].posx) + ":" + str(self.playerList[0].posy))
 
 
             if keys[pygame.K_d]:
-                if not ((self.player.posx + self.player.speed + self.player.imagew) >= self.screenw):
-                    self.player.moveRight()
-                    self.socket.send("MOV:" + str(self.player.posx) + ":" + str(self.player.posy))
+                if not ((self.playerList[0].posx + self.playerList[0].speed + self.playerList[0].imagew) >= self.screenw):
+                    self.playerList[0].moveRight()
+                    self.socket.send("MOV:" + str(self.playerList[0].posx) + ":" + str(self.playerList[0].posy))
 
             if pygame.time.get_ticks() > self.nextMissile:
                 self.nextMissile = pygame.time.get_ticks() + self.missileDelay
 
                 if keys[pygame.K_SPACE]:
-                    if self.player.missileCount < self.player.missileCap:
-                        self.missiles.append(self.player.fire())
+                    if self.playerList[0].missileCount < self.playerList[0].missileCap:
+                        self.missiles.append(self.playerList[0].fire())
                         self.soundManager.playSound("Player_Shoot.ogg")
 
     #Only used in the pause menu, captures the clicks from the mouse on the pause screen 
@@ -284,19 +285,19 @@ class multiGame:
                     if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
                         attacker = self.missiles.pop(numMissiles).owner
                         self.enemyGrid[row][column].health -= 1
-                        self.player.missileCount -= 1
+                        self.playerList[0].missileCount -= 1
                         if self.enemyGrid[row][column].health == 0 and not self.enemyGrid[row][column].dead:
                             self.enemyGrid[row][column].dead = True
                             self.enemyGrid[row][column].anim = Animate(self.sprites.getSprite(self.enemyGrid[row][column].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
                             self.enemyCount -= 1
                             if self.enemyGrid[row][column].type == "Alien4SpriteSheet":
-                                self.player.score += (100  * self.level) * 10
+                                self.playerList[0].score += (100  * self.level) * 10
                            
                             elif self.enemyGrid[row][column].type != "Alien3SpriteSheet":
-                                self.player.score += (100  * self.level) * 2
+                                self.playerList[0].score += (100  * self.level) * 2
 
                             else:
-                                self.player.score += 100 * self.level
+                                self.playerList[0].score += 100 * self.level
                         return
 
     #Handles the effects of the missles from both players(1) and enemies(0)
@@ -310,14 +311,14 @@ class multiGame:
             if attacker == 1:
                 if ((self.missiles[numMissiles].posy - self.missiles[numMissiles].imageh) <= 0):
                     self.missiles.pop(numMissiles)
-                    self.player.missileCount -= 1
+                    self.playerList[0].missileCount -= 1
 
                 else:
                     self.checkHit(numMissiles)
             #0 is the enemy's missle shots                    
             elif attacker == 0:
-                if (self.missiles[numMissiles].collider.colliderect(self.player.collider)):
-                    self.player.lives -= 1
+                if (self.missiles[numMissiles].collider.colliderect(self.playerList[0].collider)):
+                    self.playerList[0].lives -= 1
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 
@@ -334,7 +335,7 @@ class multiGame:
 
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
-                    if self.enemyGrid[row][column].health != 0 and (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64)) :
+                    if self.enemyGrid[row][column].health != 0 and (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.playerList[0].posy and self.playerList[0].posx < self.enemyGrid[row][column].posx < self.playerList[0].posx + 64)) :
                         self.togglePause()
 
                         return "Menu"

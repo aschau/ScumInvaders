@@ -67,7 +67,7 @@ class ScumInvaders:
                     self.state = "multiGame"
                     self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites, self.sounds, int(output[-1]))
 
-                if output == "Exit":
+                elif output == "Exit":
                     self.running = False
 
                 else:
@@ -89,13 +89,13 @@ class ScumInvaders:
                         self.sounds.playNewMusic('mainMenu.ogg')
 
             elif (self.state == "multiGame"):
-                  self.multiGame.draw()
-                  output = self.multiGame.update()
+                self.multiGame.draw()
+                output = self.multiGame.update()
 
-                  if output == "Exit":
+                if output == "Exit":
                     self.running = False
             
-                  else:
+                else:
                     self.state = output
                     if output == "Menu":
                         self.mainMenu.state = "Main"
