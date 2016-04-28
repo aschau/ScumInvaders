@@ -39,6 +39,7 @@
     <Compile Include="missile.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="multiplayer.py" />
     <Compile Include="player.py">
       <SubType>Code</SubType>
     </Compile>

@@ -38,6 +38,7 @@ class Main_Menu():
 
             self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 0, self.screenh - 90, 184, 85, "Ready", 'Start Button.ogg', soundManager))
             self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 220*2, self.screenh - 90, 184, 85, "Lobby", 'Exit.ogg', soundManager))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbuttondisable"), self.sprites.getSprite("startbuttondisable"), 220, self.screenh - 90, 184, 85, "multiGame1", 'Start Button.ogg', self.soundManager, True))
 
             self.players = {}
 
@@ -137,8 +138,6 @@ class Main_Menu():
                                 self.state = button.click()
                                 if self.state == "Create":
                                     self.host = True
-
-                                    self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbutton"), self.sprites.getSprite("startbuttonhover"), 220, self.screenh - 90, 184, 85, "Game", 'Start Button.ogg', self.soundManager))
                                     self.state = "Room"
                                     self.players[self.username.input] = False
                     
@@ -148,6 +147,17 @@ class Main_Menu():
                                 self.state = button.click()
                                 if self.state == "Ready":
                                     self.players[self.username.input] = not self.players[self.username.input]
+                                    if False in self.players.values():
+                                        self.roomButtons[-1].disabled = True
+                                        self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
+                                        self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
+                                        self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+
+                                    else:
+                                        self.roomButtons[-1].disabled = False
+                                        self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
+                                        self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
+                                        self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
                                     self.state = "Room"
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay

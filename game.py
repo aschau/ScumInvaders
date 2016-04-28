@@ -187,11 +187,11 @@ class game:
 
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
-            self.player.image = "lvl2ship1"    
+            self.player.image = "ship1upgrade2"    
 
         elif self.level == 10:
             self.soundManager.playSound("LevelUp.ogg")
-            self.player.image = "shipupgrade1"
+            self.player.image = "ship1upgrade3"
 
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:

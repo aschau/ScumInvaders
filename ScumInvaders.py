@@ -8,6 +8,7 @@ from main_menu import Main_Menu
 from Sprite_Manager import sprites
 from soundManager import soundManager
 from game import game
+from multiplayer import multiGame
 
 #server stuff
 from socket import *
@@ -34,14 +35,15 @@ class ScumInvaders:
         pygame.display.update()
         self.running = True
 
-        AllSprites = sprites("Sprites")
-        AllSprites.loadAll()
+        self.AllSprites = sprites("Sprites")
+        self.AllSprites.loadAll()
 
         self.clock = pygame.time.Clock()
         self.state = "Menu"
         self.sounds = soundManager("Sound")
-        self.mainMenu = Main_Menu(self.screen, self.width, self.height, AllSprites, self.sounds)
-        self.game = game(self.screen, self.width, self.height, AllSprites, self.sounds)
+        self.mainMenu = Main_Menu(self.screen, self.width, self.height, self.AllSprites, self.sounds)
+        self.game = game(self.screen, self.width, self.height, self.AllSprites, self.sounds)
+        self.multiGame = None
 
         self.fontsize = 10
 
@@ -60,6 +62,11 @@ class ScumInvaders:
                 self.mainMenu.draw()
                 output = self.mainMenu.update()
 
+                if "multiGame" in output:
+                    self.screen.blit(self.AllSprites.getSprite("Loading"), (0, 0))
+                    self.state = "multiGame"
+                    self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites, self.sounds, int(output[-1]))
+
                 if output == "Exit":
                     self.running = False
 
@@ -76,6 +83,19 @@ class ScumInvaders:
                     self.running = False
             
                 else:
+                    self.state = output
+                    if output == "Menu":
+                        self.mainMenu.state = "Main"
+                        self.sounds.playNewMusic('mainMenu.ogg')
+
+            elif (self.state == "multiGame"):
+                  self.multiGame.draw()
+                  output = self.multiGame.update()
+
+                  if output == "Exit":
+                    self.running = False
+            
+                  else:
                     self.state = output
                     if output == "Menu":
                         self.mainMenu.state = "Main"

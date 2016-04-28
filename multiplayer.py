@@ -26,14 +26,24 @@ functions:
 
 '''
 class multiGame:
-    def __init__(self, screen, screenw, screenh, spriteList, soundManager):
+    def __init__(self, screen, screenw, screenh, spriteList, soundManager, numPlayers):
         self.sprites = spriteList
+        self.numPlayers = numPlayers
         self.screen = screen
         self.screenw = screenw 
         self.screenh = screenh
         self.soundManager = soundManager
-        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
-        #self.player = Player(player, "ship" + str(player), "missile"+ str(player + 1), (200 * player,700), 32, 32)
+        self.playerList = []
+        self.playerList.append(Player(1, "ship1", "missile1", (300, 700), 32, 32))
+        if numPlayers > 1:
+            self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
+
+        if numPlayers > 2:
+            self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
+
+        if numPlayers > 3:
+            self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
+        
         self.paused = False
         self.start = True
         self.level = 1
@@ -82,8 +92,20 @@ class multiGame:
         random.seed(datetime.now())
         self.startTime = None
 
-    def reset(self):
-        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
+    def reset(self, numPlayers):
+        self.numPlayers = numPlayers
+        self.playerList = []
+        self.playerList.append(Player(1, "ship1", "missile1", (300, 700), 32, 32))
+
+        if numPlayers > 1:
+            self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
+
+        if numPlayers > 2:
+            self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
+
+        if numPlayers > 3:
+            self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
+
         self.enemyGrid = []
         self.missiles = []
         self.enemyCount = 50
