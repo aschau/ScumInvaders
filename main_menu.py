@@ -38,9 +38,10 @@ class Main_Menu():
 
             self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 0, self.screenh - 90, 184, 85, "Ready", 'Start Button.ogg', soundManager))
             self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 220*2, self.screenh - 90, 184, 85, "Lobby", 'Exit.ogg', soundManager))
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbuttondisable"), self.sprites.getSprite("startbuttondisable"), 220, self.screenh - 90, 184, 85, "multiGame1", 'Start Button.ogg', self.soundManager, True))
+            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbuttondisable"), self.sprites.getSprite("startbuttondisable"), 220, self.screenh - 90, 184, 85, "multiGame", 'Start Button.ogg', self.soundManager, True))
 
             self.players = {}
+            self.clientNumber = None
 
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
@@ -139,6 +140,7 @@ class Main_Menu():
                                 if self.state == "Create":
                                     self.host = True
                                     self.state = "Room"
+                                    self.clientNumber = "0"
                                     self.players[self.username.input] = False
                     
                     elif self.state == "Room":
@@ -159,6 +161,9 @@ class Main_Menu():
                                         self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
                                         self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
                                     self.state = "Room"
+
+                                elif self.state == "multiGame":
+                                    self.state = "multiGame" + str(len(self.players)) + self.clientNumber
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
         

@@ -65,7 +65,7 @@ class ScumInvaders:
                 if "multiGame" in output:
                     self.screen.blit(self.AllSprites.getSprite("Loading"), (0, 0))
                     self.state = "multiGame"
-                    self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites, self.sounds, int(output[-1]))
+                    self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites, self.sounds, int(output[-2]), int(output[-1]))
 
                 elif output == "Exit":
                     self.running = False
