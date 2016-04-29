@@ -1,4 +1,4 @@
-import pygame, os
+﻿import pygame, os
 from player import Player
 from enemy import Enemy
 from Button import Button
@@ -88,7 +88,7 @@ class multiGame:
 
         #for server
         self.socket = Connect()
-        self.socket.serverName = '169.234.45.226'
+        self.socket.serverName = gethostbyname(gethostname())
 
         random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
@@ -160,6 +160,10 @@ class multiGame:
 
     #Handles everything that needs to go on in the game
     def update(self):
+        '''
+        should receive all the messages here from server 
+        probably needs to for loop through all the messages
+        '''
         if self.start:
             if pygame.time.get_ticks() >= self.startTime + 100:
                 self.soundManager.playSound("Enemy_entrance.ogg")
@@ -167,6 +171,8 @@ class multiGame:
                 self.soundManager.playNewMusic("Space Invaders Theme.ogg", .2)
                 self.start = False
 
+        modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
+        print(modifiedMessage.decode())
         self.keyUpdate()
         #if not self.paused:
         self.backgroundUpdate()
@@ -286,9 +292,11 @@ class multiGame:
                     if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
                         attacker = self.missiles.pop(numMissiles).owner
                         self.enemyGrid[row][column].health -= 1
+                        self.socket.send("HIT:" + "ENEMY:" + str(row) + ":" + str(column))
                         self.playerList[self.clientPlayerNum].missileCount -= 1
                         if self.enemyGrid[row][column].health == 0 and not self.enemyGrid[row][column].dead:
                             self.enemyGrid[row][column].dead = True
+                            self.socket.send("DEATH:" + "ENEMY:" + str(row) + ":" + str(column))
                             self.enemyGrid[row][column].anim = Animate(self.sprites.getSprite(self.enemyGrid[row][column].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
                             self.enemyCount -= 1
                             if self.enemyGrid[row][column].type == "Alien4SpriteSheet":
@@ -311,6 +319,7 @@ class multiGame:
             #1 is the player's missle shots
             if attacker == 1:
                 if ((self.missiles[numMissiles].posy - self.missiles[numMissiles].imageh) <= 0):
+                    self.socket.send("SHOOT:" + str(self.clientPlayerNum))
                     self.missiles.pop(numMissiles)
                     self.playerList[self.clientPlayerNum].missileCount -= 1
 
@@ -320,6 +329,7 @@ class multiGame:
             elif attacker == 0:
                 if (self.missiles[numMissiles].collider.colliderect(self.playerList[self.clientPlayerNum].collider)):
                     self.playerList[self.clientPlayerNum].lives -= 1
+                    self.socket.send("HIT:" + str(self.clientPlayerNum))
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 
@@ -346,6 +356,7 @@ class multiGame:
                     rNum2 = random.randint(1,self.enemyFireChance)
                     if rNum2 == 1:
                         if (self.enemyGrid[row][column].health != 0 and self.enemyGrid[row][column].missileCount < self.enemyGrid[row][column].missileCap):
+                            self.socket.send("SHOOT:" + "ENEMY:" + str(row) + ":" + str(column))
                             self.missiles.append(self.enemyGrid[row][column].fire())
 
                     if self.enemyGrid[row][column].lastMove == None:

@@ -77,7 +77,7 @@ class game:
 
         #for server
         self.socket = Connect()
-        self.socket.serverName = '169.234.45.226'
+        self.socket.serverName = '169.234.82.138'
 
         random.seed(datetime.now())
         self.startTime = None

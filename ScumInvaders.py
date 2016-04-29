@@ -62,6 +62,8 @@ class ScumInvaders:
                 self.mainMenu.draw()
                 output = self.mainMenu.update()
 
+                #main menu returns multiplayer_number of players_player number
+                #multiGame gets that spliced
                 if "multiGame" in output:
                     self.screen.blit(self.AllSprites.getSprite("Loading"), (0, 0))
                     self.state = "multiGame"
