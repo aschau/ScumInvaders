@@ -1,59 +1,105 @@
 from socket import *
 import sqlite3
+class Socket:
+        def __init__(self, host, port):
+                #self.serverPort = port #can be any number > 1024 cuz otherwise reserved
+                self.serverSocket = socket(AF_INET, SOCK_DGRAM)
+                self.serverSocket.bind((host, port))
+                self.clientAddress = {}
+                self.players = 0
+                self.rooms = []
+                #serverSocket.listen(4) #denotes the number of clients can queue
+                #it binds the serverSocket to port number specified in serverPort variable.
+                #then when anybody sends anything to server IP address and serverPort the serverSocket will get it.
 
-serverPort = 12000
-serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind(('0.0.0.0', serverPort))
-print(gethostbyname(gethostname()))
-#it binds the serverSocket to port number specified in serverPort variable.
-#then when anybody sends anything to server IP address and serverPort the serverSocket will get it.
+        print('The UDP server is ready to receive')
+        print(gethostbyname(gethostname()))
+        def run(self):
+                while 1:
+                        message, clientID = self.serverSocket.recvfrom(2048) #2048 is bytes of data to be received
+                        #when something is recieved through serverSocket, the data will be stored in message.
+                        #Also the client IP and port will be extracted and stored in variable clientAddress.
+                        #recvfrom is specific to D_GRAMS foor UDP
+                        #decodes the message
+                        modMessage = message.decode()
+                        print(modMessage)
+                        read = modMessage.split(":")
+##                        if read[0] == "TALK":
+##                                for i in self.clientAddress.values():
+##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
+                        if read[0] == "LOG":
+                                self.players += 1
+                                self.checkLog(read[1], read[2], clientID)
+##                                self.serverSocket.sendto(("Lobby:"  + str(self.rooms)).encode(), clientID)
+##                                for room in range(len(self.rooms)):
+##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
 
+                        if read[0] == "CREATE":
+                                self.rooms.append({})
+                                self.rooms[-1][clientID] = False
+                                self.rooms[-1]["HOST"] = clientID
 
-print('The UDP server is ready to receive')
-while 1:
-#While 1 is an infinite loop. server is always waiting for requests
-        connected = None
-        #opens connection to SQLite database file database and returns a connection object
-        connection = sqlite3.connect("scoreTable.db")
-        message, clientAddress = serverSocket.recvfrom(2048)
-        print("Received")
-        #when something is recieved through serverSocket, the data will be stored in message.
-        #Also the client IP and port will be extracted and stored in variable clientAddress.
+                        if read[0] == "REFRESH":
+                                print("RAWR")
+                                self.serverSocket.sendto(("Lobby:"  + str(self.rooms)).encode(), clientID)
+##                                for room in range(len(self.rooms)):
+##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
+                                
+                        if read[0] == "END":
+                                break
+                        #MOV:playerNumber:playerPosX:playerPosY
+                        if read[0] == "MOV":
+                                for i in self.clientAddress.values():
+                                        self.serverSocket.sendto(modMessage.encode(),i)
 
-        #decodes the message
-        modifiedMessage = message.decode()
-        print(modifiedMessage)
-
-        #finds the username message from what was received
-        c = connection.cursor()
-        #executes the SQL statement 
-        connection.execute('''CREATE TABLE IF NOT EXISTS scores
-                    (user text, pass text, score real, wins real)''')
-        indexstring = modifiedMessage.split(':')
-        tups = [(indexstring[0], indexstring[1])]
-        c.execute("SELECT * FROM scores")
-        #returns a list of the results
-        data = c.fetchall()
-        print(data)
-        username = ""
-        for i in data:
-                if i[0] == indexstring[0]:
-                        print("This username exists")
-                        username = i[0]
-                        if indexstring[1] == i[1]:
-                                connected = 0
+##                        for clientIP in self.clientAddress.values():
+##                                self.serverSocket.sendto("Still here.".encode(), clientIP)
+                        
+                #self.serverSocket.close()
+        def checkLog(self,username, password, clientAddress):
+                if clientAddress not in self.clientAddress.values():
+                        if self.players < 5:
+                                self.clientAddress[self.players] = clientAddress
                         else:
-                                connected = 1
-        if username == "":
-                c.executemany("INSERT INTO scores VALUES (?,?,0,0)", tups)
-                connected = 2
-        #commits the action to the database, like github 
-        connection.commit()
-        if connected == 2: #Username does not exist
-                serverSocket.sendto("Username does not exist".encode(), clientAddress)
-        if connected == 0: #Successfully logged in 
-                serverSocket.sendto("Success".encode(), clientAddress)
-        if connected == 1: #Password is invalid 
-                serverSocket.sendto("Invalid Password".encode(), clientAddress)
-        #sends the moddifiedMessage to client with IP and port stored in clientAddress 
-serverSocket.close()
+                                print("The server is full. Please leave.")
+                #clientSocket, addr = serverSocket.accept()
+                connected = None
+                #opens connection to SQLite database file database and returns a connection object
+                connection = sqlite3.connect("scoreTable.db")
+                #finds the username message from what was received
+                c = connection.cursor()
+                #executes the SQL statement 
+                connection.execute('''CREATE TABLE IF NOT EXISTS scores
+                            (user text, pass text, score real, wins real)''')
+                tups = [(username, password)]
+                c.execute("SELECT * FROM scores")
+                #returns a list of the results
+                data = c.fetchall()
+                print(data)
+                un = ""
+                for i in data:
+                        if i[0] == username:
+                                print("This username exists")
+                                un = i[0]
+                                if password == i[1]:
+                                        connected = 0
+                                else:
+                                        connected = 1
+                if un == "":
+                        c.executemany("INSERT INTO scores VALUES (?,?,0,0)", tups)
+                        connected = 2
+                #commits the action to the database?
+                connection.commit()
+                if connected == 2: #Username does not exist
+                        self.serverSocket.sendto("Username does not exist".encode(), clientAddress)
+                if connected == 0: #Successfully logged in 
+                        self.serverSocket.sendto("Success".encode(), clientAddress)
+                if connected == 1: #Password is invalid 
+                        self.serverSocket.sendto("Invalid Password".encode(), clientAddress)
+                #sends the moddifiedMessage to client with IP and port stored in clientAddress 
+                
+                
+if __name__ == "__main__":
+        socket = Socket('0.0.0.0', 12000)
+        socket.run()
+        socket.close

@@ -30,7 +30,7 @@ class ScumInvaders:
         pygame.init()
         self.width = 1024
         self.height = 768
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((self.width, self.height))
         self.screen.blit(sprites("Sprites").load("Loading"), (0, 0))
         pygame.display.update()
         self.running = True
@@ -43,10 +43,10 @@ class ScumInvaders:
         self.sounds = soundManager("Sound")
         self.mainMenu = Main_Menu(self.screen, self.width, self.height, self.AllSprites, self.sounds)
         self.game = game(self.screen, self.width, self.height, self.AllSprites, self.sounds)
+        
         self.multiGame = None
 
         self.fontsize = 10
-
         self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
 
         pygame.event.set_blocked(pygame.NOEVENT)
@@ -67,7 +67,7 @@ class ScumInvaders:
                 if "multiGame" in output:
                     self.screen.blit(self.AllSprites.getSprite("Loading"), (0, 0))
                     self.state = "multiGame"
-                    self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites, self.sounds, int(output[-2]), int(output[-1]))
+                    self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites, self.sounds, int(output[-2]), int(output[-1]), self.mainMenu.ip.input)
 
                 elif output == "Exit":
                     self.running = False
@@ -110,5 +110,5 @@ class ScumInvaders:
         pygame.quit()
 
 if __name__ == "__main__":
-	MainWindow = ScumInvaders()
-	MainWindow.game_loop()
+    MainWindow = ScumInvaders()
+    MainWindow.game_loop()
