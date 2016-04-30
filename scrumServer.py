@@ -1,5 +1,7 @@
 from socket import *
 import sqlite3
+import json
+
 class Socket:
         def __init__(self, host, port):
                 #self.serverPort = port #can be any number > 1024 cuz otherwise reserved
@@ -36,12 +38,14 @@ class Socket:
 
                         if read[0] == "CREATE":
                                 self.rooms.append({})
-                                self.rooms[-1][clientID] = False
-                                self.rooms[-1]["HOST"] = clientID
+                                self.rooms[-1][str(clientID[0])] = False
+                                self.rooms[-1]["HOST"] = str(clientID[0])
 
                         if read[0] == "REFRESH":
                                 print("RAWR")
-                                self.serverSocket.sendto(("Lobby:"  + str(self.rooms)).encode(), clientID)
+                                data = json.dumps(self.rooms)
+                                print(data)
+                                self.serverSocket.sendto(("Lobby:"+data).encode(), clientID)
 ##                                for room in range(len(self.rooms)):
 ##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
                                 

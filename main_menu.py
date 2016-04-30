@@ -4,6 +4,7 @@ from textInput import textInput
 from socket import *
 from Connect import Connect
 import select
+import json
 
 class Main_Menu():
         def __init__(self, screen, screenw, screenh, spriteList, soundManager):
@@ -146,6 +147,7 @@ class Main_Menu():
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Create":
+                                    self.socket.send("CREATE")
                                     self.host = True
                                     self.state = "Room"
                                     self.clientNumber = "0"
@@ -158,7 +160,8 @@ class Main_Menu():
                                         message, serverAddress = self.socket.clientSocket.recvfrom(2048)
                                         print("Received")
                                         modifiedMessage = message.decode()
-                                        print(modifiedMessage)
+                                        #print(modifiedMessage[6:])
+                                        self.rooms = json.loads(modifiedMessage[6:])
 
                                     except:
                                         print("didn't get diddly")
