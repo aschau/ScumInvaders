@@ -89,6 +89,7 @@ class multiGame:
         #for server
         self.socket = Connect()
         self.socket.serverName = gethostbyname(gethostname())
+        self.socket.clientSocket.settimeout(1.0)
 
         random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
@@ -170,6 +171,9 @@ class multiGame:
                 pygame.time.delay(2000)
                 self.soundManager.playNewMusic("Space Invaders Theme.ogg", .2)
                 self.start = False
+
+        modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
+        print(modifiedMessage.decode())
         self.keyUpdate()
         #if not self.paused:
         self.backgroundUpdate()

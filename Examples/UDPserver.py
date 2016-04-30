@@ -32,7 +32,7 @@ class Socket:
                         if read[0] == "END":
                                 break
                         #MOV:playerNumber:playerPosX:playerPosY
-                        if read[0] == "MOV":
+                        else:
                                 for i in self.clientAddress.values():
                                         self.serverSocket.sendto(modMessage.encode(),i)
                 #self.serverSocket.close()
