@@ -26,6 +26,7 @@ functions:
 
 '''
 class multiGame:
+
     def __init__(self, screen, screenw, screenh, spriteList, soundManager, numPlayers, clientPlayerNum, ip):
         self.sprites = spriteList
         self.clientPlayerNum = clientPlayerNum
@@ -88,8 +89,10 @@ class multiGame:
 
         #for server
         self.socket = Connect()
+
         self.socket.serverName = ip
         self.socket.clientSocket.setblocking(False)
+        self.socket.clientSocket.settimeout(1.0)
 
         random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
@@ -171,6 +174,7 @@ class multiGame:
                 pygame.time.delay(2000)
                 self.soundManager.playNewMusic("Space Invaders Theme.ogg", .2)
                 self.start = False
+
         self.keyUpdate()
         #if not self.paused:
         self.backgroundUpdate()
