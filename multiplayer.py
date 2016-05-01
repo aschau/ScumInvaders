@@ -90,6 +90,7 @@ class multiGame:
 
         #for server
         self.socket = socket
+        self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
 
         #self.socket.serverName = ip
         #self.socket.clientSocket.setblocking(False)
@@ -124,7 +125,7 @@ class multiGame:
 
     #Creates the grid for the enemies in the game
     def setGrid(self, speed = 16, health = 1):
-         for row in range(self.enemyRowCount):
+        for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
                 rnum = random.randint(1, 100)

@@ -1,6 +1,8 @@
 from socket import *
 import sqlite3
 import json
+import random
+from datetime import datetime
 
 class Socket:
         def __init__(self, host, port):
@@ -11,6 +13,7 @@ class Socket:
                 self.players = 0
                 self.rooms = []
                 self.gameUpdates = {}
+                random.seed(datetime.now())
                 #serverSocket.listen(4) #denotes the number of clients can queue
                 #it binds the serverSocket to port number specified in serverPort variable.
                 #then when anybody sends anything to server IP address and serverPort the serverSocket will get it.
@@ -95,7 +98,19 @@ class Socket:
                                                                         if client == username: #and address != clientID:
 ##                                                                                print(address, clientID)
                                                                                 self.serverSocket.sendto(event.encode(), address)
-                        
+                        if read[0] == "SETGRID":
+                                setRNums = ""
+                                for room in self.rooms:
+                                        if room["HOST"] == read[1]:
+                                                for row in range(int(read[2])):
+                                                        for column in range(int(read[3])):
+                                                                setRNums += str(random.randint(1, 100)) + ":"
+                                        
+                                                for username in room.keys():
+                                                        for address, client in self.clientAddress.items():
+                                                                if client == username: #and address != clientID:
+##                                                                      print(address, clientID)
+                                                                        self.serverSocket.sendto(("SETGRID:"+setRNums).encode(), address)
                         if read[0] == "MOV":
                                 self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
 ##                                for room in self.rooms:
