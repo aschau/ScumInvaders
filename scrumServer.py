@@ -38,16 +38,28 @@ class Socket:
 
                         if read[0] == "CREATE":
                                 self.rooms.append({})
-                                self.rooms[-1][str(clientID[0])] = False
-                                self.rooms[-1]["HOST"] = str(clientID[0])
+                                self.rooms[-1][str(self.clientAddress[clientID])] = False
+                                self.rooms[-1]["HOST"] = self.clientAddress[clientID]
 
+                        if read[0] == "JOIN":
+                            for room in self.rooms:
+                                if room["HOST"] == read[1]:
+                                    room[str(self.clientAddress[clientID])] = False
+                        
                         if read[0] == "REFRESH":
-                                print("RAWR")
                                 data = json.dumps(self.rooms)
                                 print(data)
                                 self.serverSocket.sendto(("Lobby:"+data).encode(), clientID)
 ##                                for room in range(len(self.rooms)):
 ##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
+                        if read[0] == "LEAVE ROOM":
+                                 for room in self.rooms:
+                                         if room["HOST"] == read[1]:
+                                                 del room[self.clientAddress[clientID]]
+##                              deleting rooms with no one left inside                                         
+                                 for room in range(len(self.rooms)):
+                                     if len(self.rooms[room]) == 1:
+                                         self.rooms.pop(room)
                                 
                         if read[0] == "END":
                                 break
@@ -63,7 +75,7 @@ class Socket:
         def checkLog(self,username, password, clientAddress):
                 if clientAddress not in self.clientAddress.values():
                         if self.players < 5:
-                                self.clientAddress[self.players] = clientAddress
+                                self.clientAddress[clientAddress] = username
                         else:
                                 print("The server is full. Please leave.")
                 #clientSocket, addr = serverSocket.accept()
