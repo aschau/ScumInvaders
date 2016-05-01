@@ -27,7 +27,7 @@ functions:
 '''
 class multiGame:
 
-    def __init__(self, screen, screenw, screenh, spriteList, soundManager, numPlayers, clientPlayerNum, ip, hostName):
+    def __init__(self, screen, screenw, screenh, spriteList, soundManager, numPlayers, clientPlayerNum, ip, hostName, socket):
         self.sprites = spriteList
         self.hostName = hostName
         self.clientPlayerNum = clientPlayerNum
@@ -89,10 +89,10 @@ class multiGame:
         self.mouseNext = pygame.time.get_ticks()
 
         #for server
-        self.socket = Connect()
+        self.socket = socket
 
-        self.socket.serverName = ip
-        self.socket.clientSocket.setblocking(False)
+        #self.socket.serverName = ip
+        #self.socket.clientSocket.setblocking(False)
 
         random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
@@ -165,6 +165,7 @@ class multiGame:
     #Handles everything that needs to go on in the game
     def update(self):
         try:
+            #self.socket.send("RECEIVE:"+self.hostName)
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode()
             print(modifiedMessage)

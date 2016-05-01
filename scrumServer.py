@@ -10,6 +10,7 @@ class Socket:
                 self.clientAddress = {}
                 self.players = 0
                 self.rooms = []
+                self.gameUpdates = {}
                 #serverSocket.listen(4) #denotes the number of clients can queue
                 #it binds the serverSocket to port number specified in serverPort variable.
                 #then when anybody sends anything to server IP address and serverPort the serverSocket will get it.
@@ -39,6 +40,7 @@ class Socket:
 
                         if read[0] == "CREATE":
                                 self.rooms.append({})
+                                self.gameUpdates[self.clientAddress[clientID]] = []
                                 self.rooms[-1][str(self.clientAddress[clientID])] = False
                                 self.rooms[-1]["HOST"] = self.clientAddress[clientID]
 
@@ -78,18 +80,31 @@ class Socket:
                                  while roomNum < len(self.rooms):
                                      if len(self.rooms[roomNum]) == 1:
                                          self.rooms.pop(roomNum)
+                                         del self.gameUpdates[read[1]]
                                 
                         if read[0] == "END":
                                 break
                         #MOV:playerNumber:playerPosX:playerPosY
+                        if read[0] == "RECEIVE":
+                                if len(self.gameUpdates[read[1]]) > 0:
+                                        event = self.gameUpdates[read[1]].pop(0)
+                                        for room in self.rooms:
+                                                if room["HOST"] == read[1]:
+                                                        for username in room.keys():
+                                                                for address, client in self.clientAddress.items():
+                                                                        if client == username:# and address != clientID[0]:
+                                                                                print(address, clientID)
+                                                                                self.serverSocket.sendto(event.encode(), address)
+                        
                         if read[0] == "MOV":
-                                for room in self.rooms:
-                                        if room["HOST"] == read[1]:
-                                                for username in room.keys():
-                                                        for address, client in self.clientAddress.items():
-                                                                if client == username: #and address != clientID[0]:
-                                                                        print(read[2] + ":" + read[3])
-                                                                        self.serverSocket.sendto((read[2]+":"+read[3]).encode(), address)
+                                self.gameUpdates[read[1]].append(read[2]+":"+read[3])
+##                                for room in self.rooms:
+##                                        if room["HOST"] == read[1]:
+##                                                for username in room.keys():
+##                                                        for address, client in self.clientAddress.items():
+##                                                                if client == username: #and address != clientID[0]:
+##                                                                        print(read[2] + ":" + read[3])                                                                        
+##                                                                        self.serverSocket.sendto((read[2]+":"+read[3]).encode(), address)
 
 ##                        for clientIP in self.clientAddress.values():
 ##                                self.serverSocket.sendto("Still here.".encode(), clientIP)
