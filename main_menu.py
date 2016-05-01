@@ -157,6 +157,7 @@ class Main_Menu():
                                 self.socket.send("JOIN:" + self.state)
                                 for room in range(len(self.rooms)): 
                                     if self.rooms[room]["HOST"] == self.state:
+                                        self.currentRoom = self.rooms[room]["HOST"]
                                         self.players = self.rooms[room]
                                 self.state = "Room"
 
@@ -239,6 +240,12 @@ class Main_Menu():
                     message, serverAddress = self.socket.clientSocket.recvfrom(2048)
                     modifiedMessage = message.decode()
                     self.rooms = json.loads(modifiedMessage[6:])
+
+                    for room in range(len(self.rooms)): 
+                        if self.rooms[room]["HOST"] == self.state:
+                            self.currentRoom = self.rooms[room]["HOST"]
+                            self.players = self.rooms[room]
+
                     lobbyRoomButtons = []
                     for room in range(len(self.rooms)):
                         lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, self.rooms[room]["HOST"], "Start Button.ogg", self.soundManager))
@@ -261,6 +268,10 @@ class Main_Menu():
                     message, serverAddress = self.socket.clientSocket.recvfrom(2048)
                     modifiedMessage = message.decode()
                     self.rooms = json.loads(modifiedMessage[6:])
+                    for room in range(len(self.rooms)): 
+                        if self.rooms[room]["HOST"] == self.state:
+                            self.currentRoom = self.rooms[room]["HOST"]
+                            self.players = self.rooms[room]
                     lobbyRoomButtons = []
                     for room in range(len(self.rooms)):
                         lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, self.rooms[room]["HOST"], "Start Button.ogg", self.soundManager))
