@@ -92,18 +92,18 @@ class Socket:
                                                 if room["HOST"] == read[1]:
                                                         for username in room.keys():
                                                                 for address, client in self.clientAddress.items():
-                                                                        if client == username:# and address != clientID[0]:
-                                                                                print(address, clientID)
+                                                                        if client == username: #and address != clientID:
+##                                                                                print(address, clientID)
                                                                                 self.serverSocket.sendto(event.encode(), address)
                         
                         if read[0] == "MOV":
-                                self.gameUpdates[read[1]].append(read[2]+":"+read[3])
+                                self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
 ##                                for room in self.rooms:
 ##                                        if room["HOST"] == read[1]:
 ##                                                for username in room.keys():
 ##                                                        for address, client in self.clientAddress.items():
 ##                                                                if client == username: #and address != clientID[0]:
-##                                                                        print(read[2] + ":" + read[3])                                                                        
+####                                                                        print(read[2] + ":" + read[3])                                                                        
 ##                                                                        self.serverSocket.sendto((read[2]+":"+read[3]).encode(), address)
 
 ##                        for clientIP in self.clientAddress.values():

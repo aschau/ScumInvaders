@@ -165,10 +165,14 @@ class multiGame:
     #Handles everything that needs to go on in the game
     def update(self):
         try:
-            #self.socket.send("RECEIVE:"+self.hostName)
+            self.socket.send("RECEIVE:"+self.hostName)
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
-            modifiedMessage = message.decode()
-            print(modifiedMessage)
+            modifiedMessage = message.decode().split(":")
+            #print(modifiedMessage)
+            if modifiedMessage[0]  == "MOV":
+                if int(modifiedMessage[1]) != self.clientPlayerNum:
+                    self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
+                    self.playerList[int(modifiedMessage[1])].posy = int(modifiedMessage[3])
         except:
             pass
 
@@ -250,15 +254,15 @@ class multiGame:
 
         if not self.paused:
             if keys[pygame.K_a]:
-                    if not ((self.playerList[self.clientPlayerNum].posx - self.playerList[self.clientPlayerNum].speed) <= 0):
-                        self.playerList[self.clientPlayerNum].moveLeft()
-                        self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str((self.playerList[self.clientPlayerNum].posx, self.playerList[self.clientPlayerNum].posy)))
+                if not ((self.playerList[self.clientPlayerNum].posx - self.playerList[self.clientPlayerNum].speed) <= 0):
+                    self.playerList[self.clientPlayerNum].moveLeft()
+                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy))
 
 
             if keys[pygame.K_d]:
                 if not ((self.playerList[self.clientPlayerNum].posx + self.playerList[self.clientPlayerNum].speed + self.playerList[self.clientPlayerNum].imagew) >= self.screenw):
                     self.playerList[self.clientPlayerNum].moveRight()
-                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) +  ":" + str((self.playerList[self.clientPlayerNum].posx, self.playerList[self.clientPlayerNum].posy)))
+                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy))
 
             if pygame.time.get_ticks() > self.nextMissile:
                 self.nextMissile = pygame.time.get_ticks() + self.missileDelay
