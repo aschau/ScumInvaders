@@ -52,14 +52,21 @@ class Socket:
                                 self.serverSocket.sendto(("Lobby:"+data).encode(), clientID)
 ##                                for room in range(len(self.rooms)):
 ##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
+
+                        if read[0] == "READY":
+                                for room in self.rooms:
+                                        if room["HOST"] == read[1]:
+                                                room[self.clientAddress[clientID]] = not room[self.clientAddress[clientID]]
+                        
                         if read[0] == "LEAVE ROOM":
                                  for room in self.rooms:
                                          if room["HOST"] == read[1]:
                                                  del room[self.clientAddress[clientID]]
-##                              deleting rooms with no one left inside                                         
-                                 for room in range(len(self.rooms)):
-                                     if len(self.rooms[room]) == 1:
-                                         self.rooms.pop(room)
+##                              deleting rooms with no one left inside
+                                 roomNum = 0
+                                 while roomNum < len(self.rooms):
+                                     if len(self.rooms[roomNum]) == 1:
+                                         self.rooms.pop(roomNum)
                                 
                         if read[0] == "END":
                                 break

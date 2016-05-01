@@ -177,22 +177,24 @@ class Main_Menu():
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Ready":
-                                    for room in self.rooms:
-                                        if room["HOST"] == self.currentRoom:
-                                            if False in room.values():
-                                                self.roomButtons[-1].disabled = True
-                                                self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
-                                                self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
-                                                self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+                                    self.socket.send("READY:"+self.currentRoom)
+                                    self.state = "Room"
+                                    #for room in self.rooms:
+                                    #    if room["HOST"] == self.currentRoom:
+                                    #        if False in room.values():
+                                    #            self.roomButtons[-1].disabled = True
+                                    #            self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
+                                    #            self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
+                                    #            self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
 
-                                            else:
-                                                self.roomButtons[-1].disabled = False
-                                                self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
-                                                self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
-                                                self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
+                                    #        else:
+                                    #            self.roomButtons[-1].disabled = False
+                                    #            self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
+                                    #            self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
+                                    #            self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
                                             
-                                            self.state = "Room"
-                                            break
+                                    #        self.state = "Room"
+                                    #        break
 
                                 elif self.state == "Lobby":
                                     self.socket.send("LEAVE ROOM:" + self.currentRoom)
@@ -252,7 +254,24 @@ class Main_Menu():
                     message, serverAddress = self.socket.clientSocket.recvfrom(2048)
                     modifiedMessage = message.decode()
                     self.rooms = json.loads(modifiedMessage[6:])
-                 
+
+                    if self.host:
+                        for room in self.rooms:
+                            if room["HOST"] == self.currentRoom:
+                                if False in room.values():
+                                    self.roomButtons[-1].disabled = True
+                                    self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
+                                    self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
+                                    self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+
+                                else:
+                                    self.roomButtons[-1].disabled = False
+                                    self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
+                                    self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
+                                    self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
+                                            
+                                break
+
                 except:
                     print("Diddly")
 
