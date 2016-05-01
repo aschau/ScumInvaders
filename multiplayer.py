@@ -27,10 +27,11 @@ functions:
 '''
 class multiGame:
 
-    def __init__(self, screen, screenw, screenh, spriteList, soundManager, numPlayers, clientPlayerNum, ip):
+    def __init__(self, screen, screenw, screenh, spriteList, soundManager, numPlayers, clientPlayerNum, ip, hostName):
         self.sprites = spriteList
-        self.clientPlayerNum = clientPlayerNum
-        self.numPlayers = numPlayers
+        self.hostName = hostName
+        self.clientPlayerNum = int(clientPlayerNum)
+        self.numPlayers = int(numPlayers)
         self.screen = screen
         self.screenw = screenw 
         self.screenh = screenh
@@ -92,7 +93,6 @@ class multiGame:
 
         self.socket.serverName = ip
         self.socket.clientSocket.setblocking(False)
-        self.socket.clientSocket.settimeout(1.0)
 
         random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
@@ -164,10 +164,13 @@ class multiGame:
 
     #Handles everything that needs to go on in the game
     def update(self):
-        '''
-        should receive all the messages here from server 
-        probably needs to for loop through all the messages
-        '''
+        try:
+            message, serverAddress = self.socket.clientSocket.recvfrom(2048)
+            modifiedMessage = message.decode()
+            print(modifiedMessage)
+        except:
+            print("Nada")
+
         if self.start:
             if pygame.time.get_ticks() >= self.startTime + 100:
                 self.soundManager.playSound("Enemy_entrance.ogg")
@@ -203,8 +206,8 @@ class multiGame:
         return self.state != "multiGame"
 
     def checkPlayerLives(self):
-        if (self.playerList[self.clientPlayerNum].lives <= 0):
-            return "Menu"
+        #if (self.playerList[self.clientPlayerNum].lives <= 0):
+        #    return "Room"
         return "multiGame"
 
     def checkEnemyCount(self):
@@ -256,13 +259,13 @@ class multiGame:
             if keys[pygame.K_a]:
                     if not ((self.playerList[self.clientPlayerNum].posx - self.playerList[self.clientPlayerNum].speed) <= 0):
                         self.playerList[self.clientPlayerNum].moveLeft()
-                        self.socket.send("MOV:" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy))
+                        self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str((self.playerList[self.clientPlayerNum].posx, self.playerList[self.clientPlayerNum].posy)))
 
 
             if keys[pygame.K_d]:
                 if not ((self.playerList[self.clientPlayerNum].posx + self.playerList[self.clientPlayerNum].speed + self.playerList[self.clientPlayerNum].imagew) >= self.screenw):
                     self.playerList[self.clientPlayerNum].moveRight()
-                    self.socket.send("MOV:" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy))
+                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) +  ":" + str((self.playerList[self.clientPlayerNum].posx, self.playerList[self.clientPlayerNum].posy)))
 
             if pygame.time.get_ticks() > self.nextMissile:
                 self.nextMissile = pygame.time.get_ticks() + self.missileDelay
@@ -345,7 +348,6 @@ class multiGame:
         if pygame.time.get_ticks() > self.nextEnemyMove:
             self.nextEnemyMove = pygame.time.get_ticks() + self.enemyDelay
 
-
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
                     if self.enemyGrid[row][column].health != 0 and (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.playerList[self.clientPlayerNum].posy and self.playerList[self.clientPlayerNum].posx < self.enemyGrid[row][column].posx < self.playerList[self.clientPlayerNum].posx + 64)) :
@@ -383,29 +385,7 @@ class multiGame:
                             self.enemyGrid[row][column].moveDown()
                            # self.enemyGrid[row][column].moveLeft()
                         else:
-                            self.enemyGrid[row][column].moveRight()
-            
-            #rNum = random.randint(1, 5)
-            #for row in range(self.enemyRowCount):
-            #    for column in range(self.enemyColumnCount):
-                    ##checks if enemies have reached the bottom of the screen
-                    #if self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.player.posy and self.player.posx < self.enemyGrid[row][column].posx < self.player.posx + 64) :
-                    #    return "Menu"
-            #        if self.enemyGrid[row][column].health != 0:
-            #            if rNum >= 3:
-            #                self.enemyGrid[row][column].lastMove = "Down"
-            #                self.enemyGrid[row][column].moveDown() 
-
-            #            elif rNum == 1:
-            #                if (self.enemyGrid[row][column].posx - 16 >= 0) and self.enemyGrid[row][column].lastMove != "Left":
-            #                    self.enemyGrid[row][column].lastMove = "Left"
-            #                    self.enemyGrid[row][column].moveLeft()
-                        
-            #            elif rNum == 2:
-            #                if ((self.enemyGrid[row][column].posx + 16 + self.enemyGrid[row][column].imagew) <= self.screenw) and self.enemyGrid[row][column].lastMove != "Right":
-            #                    self.enemyGrid[row][column].lastMove = "Right"
-            #                    self.enemyGrid[row][column].moveRight() 
-                      
+                            self.enemyGrid[row][column].moveRight() 
         return "multiGame"
 
     #scrolls through the background

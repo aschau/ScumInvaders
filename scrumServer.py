@@ -23,6 +23,7 @@ class Socket:
                         #Also the client IP and port will be extracted and stored in variable clientAddress.
                         #recvfrom is specific to D_GRAMS foor UDP
                         #decodes the message
+                        
                         modMessage = message.decode()
 ##                        print(modMessage)
                         read = modMessage.split(":")
@@ -56,11 +57,20 @@ class Socket:
                         if read[0] == "READY":
                                 for room in self.rooms:
                                         if room["HOST"] == read[1]:
-                                                room[self.clientAddress[clientID]] = not room[self.clientAddress[clientID]]
+                                                room[self.clientAddress[clientID]] = not room[self.clientAddress[clientID]]     
+                        if read[0] == "START":
+                                for room in self.rooms:
+                                        if room["HOST"] == read[1]:
+                                                for username in room.keys():
+                                                        for address, client in self.clientAddress.items():
+                                                                if client == username:
+                                                                        self.serverSocket.sendto("Start".encode(), address)
                         
                         if read[0] == "LEAVE ROOM":
                                  for room in self.rooms:
                                          if room["HOST"] == read[1]:
+                                                 if self.clientAddress[clientID] == room["HOST"]:
+                                                         room["HOST"] = list(room.keys())[0]
                                                  del room[self.clientAddress[clientID]]
 ##                              deleting rooms with no one left inside
                                  roomNum = 0
@@ -72,8 +82,12 @@ class Socket:
                                 break
                         #MOV:playerNumber:playerPosX:playerPosY
                         if read[0] == "MOV":
-                                for i in self.clientAddress.values():
-                                        self.serverSocket.sendto(modMessage.encode(),i)
+                                for room in self.rooms:
+                                        if room["HOST"] == read[1]:
+                                                for username in room.keys():
+                                                        for address, client in self.clientAddress.items():
+                                                                if client == username: #and address != clientID[0]:
+                                                                        self.serverSocket.sendto(read[2].encode(), address)
 
 ##                        for clientIP in self.clientAddress.values():
 ##                                self.serverSocket.sendto("Still here.".encode(), clientIP)
