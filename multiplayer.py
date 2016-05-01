@@ -30,8 +30,8 @@ class multiGame:
     def __init__(self, screen, screenw, screenh, spriteList, soundManager, numPlayers, clientPlayerNum, ip, hostName):
         self.sprites = spriteList
         self.hostName = hostName
-        self.clientPlayerNum = int(clientPlayerNum)
-        self.numPlayers = int(numPlayers)
+        self.clientPlayerNum = clientPlayerNum
+        self.numPlayers = numPlayers
         self.screen = screen
         self.screenw = screenw 
         self.screenh = screenh
@@ -169,7 +169,7 @@ class multiGame:
             modifiedMessage = message.decode()
             print(modifiedMessage)
         except:
-            print("Nada")
+            pass
 
         if self.start:
             if pygame.time.get_ticks() >= self.startTime + 100:
@@ -235,14 +235,6 @@ class multiGame:
         else: 
             self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
             
-
-        #for row in range(self.enemyRowCount):
-        #        for column in range(self.enemyColumnCount):
-        #            if self.level % 2 == 0:
-        #                self.enemyGrid[row][column].speed += self.level * 5
-        #            else: 
-        #                rnum = random.randint(self.level - 1, self.level)
-        #                self.enemyGrid[row][column].health = rnum
         if self.level %2 == 1:
             self.playerList[self.clientPlayerNum].missileCap += 1 
 

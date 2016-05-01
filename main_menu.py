@@ -238,37 +238,38 @@ class Main_Menu():
                     self.socket.send("REFRESH")
                     message, serverAddress = self.socket.clientSocket.recvfrom(2048)
                     modifiedMessage = message.decode()
-                    if modifiedMessage == "Start":
+                    if modifiedMessage.split(":")[0] == "Start":
+                        players = json.loads(modifiedMessage.split(":")[1])
+                        players.pop(players.index("HOST"))
                         for room in self.rooms:
                             if room["HOST"] == self.currentRoom:
-                                players = list(room.keys())
-                                players.pop(players.index("HOST"))
                                 return "multiGame" + str(self.currentRoomLength-1) + str(players.index(self.username.input))
-                    self.rooms = json.loads(modifiedMessage[6:])
+                    else:
+                        self.rooms = json.loads(modifiedMessage[6:])
                     
-                    for room in self.rooms:
-                        if room["HOST"] == self.currentRoom:
-                            self.currentRoomLength = len(room)
-
-                    if self.host:
                         for room in self.rooms:
                             if room["HOST"] == self.currentRoom:
-                                if False in room.values():
-                                    self.roomButtons[-1].disabled = True
-                                    self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
-                                    self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
-                                    self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+                                self.currentRoomLength = len(room)
 
-                                else:
-                                    self.roomButtons[-1].disabled = False
-                                    #if self.roomButtons[-1].checkHover(pygame.mouse.get_pos()):
-                                    #    self.roomButtons[-1].current = self.sprites.getSprite("startbuttonhover")
-                                    #else:
-                                    self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
-                                    self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
-                                    self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
+                        if self.host:
+                            for room in self.rooms:
+                                if room["HOST"] == self.currentRoom:
+                                    if False in room.values():
+                                        self.roomButtons[-1].disabled = True
+                                        self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
+                                        self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
+                                        self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+
+                                    else:
+                                        self.roomButtons[-1].disabled = False
+                                        #if self.roomButtons[-1].checkHover(pygame.mouse.get_pos()):
+                                        #    self.roomButtons[-1].current = self.sprites.getSprite("startbuttonhover")
+                                        #else:
+                                        self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
+                                        self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
+                                        self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
                                                                                 
-                                break
+                                    break
 
                 except:
                     print("Diddly")

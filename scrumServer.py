@@ -64,7 +64,8 @@ class Socket:
                                                 for username in room.keys():
                                                         for address, client in self.clientAddress.items():
                                                                 if client == username:
-                                                                        self.serverSocket.sendto("Start".encode(), address)
+                                                                        data = json.dumps(list(room.keys()))
+                                                                        self.serverSocket.sendto(("Start:" + data).encode(), address)
                         
                         if read[0] == "LEAVE ROOM":
                                  for room in self.rooms:
@@ -87,7 +88,8 @@ class Socket:
                                                 for username in room.keys():
                                                         for address, client in self.clientAddress.items():
                                                                 if client == username: #and address != clientID[0]:
-                                                                        self.serverSocket.sendto(read[2].encode(), address)
+                                                                        print(read[2] + ":" + read[3])
+                                                                        self.serverSocket.sendto((read[2]+":"+read[3]).encode(), address)
 
 ##                        for clientIP in self.clientAddress.values():
 ##                                self.serverSocket.sendto("Still here.".encode(), clientIP)
