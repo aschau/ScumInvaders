@@ -36,7 +36,7 @@ class Main_Menu():
             self.lobbyButtons = []
 
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButtonHovered"), self.screenw - 283, 225, 280, 68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButtonHovered"), self.screenw - 283, 325, 280,68, "Refresh", 'Start Button.ogg', soundManager))
+            #self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRefreshButton"), self.sprites.getSprite("LobbyRefreshButtonHovered"), self.screenw - 283, 325, 280,68, "Refresh", 'Start Button.ogg', soundManager))
             self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 283, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
 
             self.lobbyRoomButtons = []
@@ -135,6 +135,7 @@ class Main_Menu():
                                             if modifiedMessage.decode() == "Invalid Password":
                                                 self.loginStatus = "Invalid Password"
                                                 self.state = "Login"
+                                            self.socket.clientSocket.settimeout(0.0)
                                         #write on screen that password was incorrect
                                         except:
                                             self.loginStatus = "No Server"
@@ -170,22 +171,22 @@ class Main_Menu():
                                     self.clientNumber = "0"
                                     self.players[self.username.input] = False
 
-                                if self.state == "Refresh":
-                                    try:
-                                        self.socket.send("REFRESH")
-                                        message, serverAddress = self.socket.clientSocket.recvfrom(2048)
-                                        modifiedMessage = message.decode()
-                                        #print(modifiedMessage[6:])
-                                        self.rooms = json.loads(modifiedMessage[6:])
-                                        lobbyRoomButtons = []
-                                        for room in range(len(self.rooms)):
-                                            lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, self.rooms[room]["HOST"], "Start Button.ogg", self.soundManager))
+                                #if self.state == "Refresh":
+                                #    try:
+                                #        self.socket.send("REFRESH")
+                                #        message, serverAddress = self.socket.clientSocket.recvfrom(2048)
+                                #        modifiedMessage = message.decode()
+                                #        #print(modifiedMessage[6:])
+                                #        self.rooms = json.loads(modifiedMessage[6:])
+                                #        lobbyRoomButtons = []
+                                #        for room in range(len(self.rooms)):
+                                #            lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, self.rooms[room]["HOST"], "Start Button.ogg", self.soundManager))
 
-                                        self.lobbyRoomButtons = lobbyRoomButtons
-                                    except:
-                                        print("didn't get diddly")
+                                #        self.lobbyRoomButtons = lobbyRoomButtons
+                                #    except:
+                                #        print("didn't get diddly")
 
-                                    self.state = "Lobby"
+                                    #self.state = "Lobby"
                     
                     elif self.state == "Room":
                         for button in self.roomButtons:
@@ -233,6 +234,20 @@ class Main_Menu():
                 return "Menu"
             
             elif self.state == "Lobby":
+                try:
+                    self.socket.send("REFRESH")
+                    message, serverAddress = self.socket.clientSocket.recvfrom(2048)
+                    modifiedMessage = message.decode()
+                    self.rooms = json.loads(modifiedMessage[6:])
+                    lobbyRoomButtons = []
+                    for room in range(len(self.rooms)):
+                        lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, self.rooms[room]["HOST"], "Start Button.ogg", self.soundManager))
+
+                    self.lobbyRoomButtons = lobbyRoomButtons
+                 
+                except:
+                    print("Diddly")
+
                 for button in self.lobbyRoomButtons:
                     button.checkHover(pygame.mouse.get_pos())
 
@@ -241,6 +256,20 @@ class Main_Menu():
                 return "Menu"
 
             elif self.state == "Room":
+                try:
+                    self.socket.send("REFRESH")
+                    message, serverAddress = self.socket.clientSocket.recvfrom(2048)
+                    modifiedMessage = message.decode()
+                    self.rooms = json.loads(modifiedMessage[6:])
+                    lobbyRoomButtons = []
+                    for room in range(len(self.rooms)):
+                        lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, self.rooms[room]["HOST"], "Start Button.ogg", self.soundManager))
+
+                    self.lobbyRoomButtons = lobbyRoomButtons
+                 
+                except:
+                    print("Diddly")
+
                 for button in self.roomButtons:
                     button.checkHover(pygame.mouse.get_pos())
                 return "Menu"

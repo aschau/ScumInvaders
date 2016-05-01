@@ -24,7 +24,7 @@ class Socket:
                         #recvfrom is specific to D_GRAMS foor UDP
                         #decodes the message
                         modMessage = message.decode()
-                        print(modMessage)
+##                        print(modMessage)
                         read = modMessage.split(":")
 ##                        if read[0] == "TALK":
 ##                                for i in self.clientAddress.values():
@@ -48,7 +48,7 @@ class Socket:
                         
                         if read[0] == "REFRESH":
                                 data = json.dumps(self.rooms)
-                                print(data)
+##                                print(data)
                                 self.serverSocket.sendto(("Lobby:"+data).encode(), clientID)
 ##                                for room in range(len(self.rooms)):
 ##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
@@ -91,7 +91,7 @@ class Socket:
                 c.execute("SELECT * FROM scores")
                 #returns a list of the results
                 data = c.fetchall()
-                print(data)
+##                print(data)
                 un = ""
                 for i in data:
                         if i[0] == username:
