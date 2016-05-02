@@ -13,6 +13,7 @@ class Socket:
                 self.players = 0
                 self.rooms = []
                 self.gameUpdates = {}
+                self.gameGrids = {}
                 random.seed(datetime.now())
                 #serverSocket.listen(4) #denotes the number of clients can queue
                 #it binds the serverSocket to port number specified in serverPort variable.
@@ -100,17 +101,15 @@ class Socket:
                                                                                 self.serverSocket.sendto(event.encode(), address)
                         if read[0] == "SETGRID":
                                 setRNums = ""
-                                for room in self.rooms:
-                                        if room["HOST"] == read[1]:
-                                                for row in range(int(read[2])):
-                                                        for column in range(int(read[3])):
-                                                                setRNums += str(random.randint(1, 100)) + ":"
-                                        
-                                                for username in room.keys():
-                                                        for address, client in self.clientAddress.items():
-                                                                if client == username: #and address != clientID:
-##                                                                      print(address, clientID)
-                                                                        self.serverSocket.sendto(("SETGRID:"+setRNums).encode(), address)
+                                for row in range(int(read[2])):
+                                        for column in range(int(read[3])):
+                                                setRNums += str(random.randint(1, 100)) + ":"
+
+                                self.gameGrids[read[1]] = setRNums
+
+                        if read[0] == "GETGRID":
+                                 self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
+                                                
                         if read[0] == "MOV":
                                 self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
 ##                                for room in self.rooms:

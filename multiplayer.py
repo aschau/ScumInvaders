@@ -61,7 +61,6 @@ class multiGame:
 
         #self.player.score = 0
 
-        self.setGrid()       
         self.missiles = []
 
         self.missileDelay = 100
@@ -90,8 +89,21 @@ class multiGame:
 
         #for server
         self.socket = socket
-        self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
-
+        if self.clientPlayerNum == 0:
+            self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
+        
+        tryGrid = True
+        while tryGrid:
+            try:
+                self.socket.send("GETGRID:" + self.hostName)
+                message, address = self.socket.clientSocket.recvfrom(2048)
+                modifiedMessage = message.decode().split(":")
+                if modifiedMessage[0] == "GRID":
+                    self.setGrid(modifiedMessage[1:])
+                    tryGrid = False
+            except:
+                tryGrid = True
+                 
         #self.socket.serverName = ip
         #self.socket.clientSocket.setblocking(False)
 
@@ -124,11 +136,12 @@ class multiGame:
     #    self.startTime = pygame.time.get_ticks()
 
     #Creates the grid for the enemies in the game
-    def setGrid(self, speed = 16, health = 1):
+    def setGrid(self, rNumList, speed = 16, health = 1):
+        rNums = rNumList
         for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
-                rnum = random.randint(1, 100)
+                rnum = int(rNums.pop(0))
                 enemySprite = "Alien1SpriteSheet"
                 if rnum <= 45:
                     enemySprite = "Alien2SpriteSheet"
