@@ -32,7 +32,7 @@ class game:
         self.screenw = screenw 
         self.screenh = screenh
         self.soundManager = soundManager
-        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
+        self.player = Player(1, "ship1", "missile1", (500, 700), 32, 32)
         #self.player = Player(player, "ship" + str(player), "missile"+ str(player + 1), (200 * player,700), 32, 32)
         self.paused = False
         self.start = True
@@ -286,20 +286,20 @@ class game:
             attacker = self.missiles[numMissiles].owner
             #1 is the player's missle shots
             if attacker == 1:
-                if ((self.missiles[numMissiles].posy - self.missiles[numMissiles].imageh) <= 0):
+                if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) < 0):
                     self.missiles.pop(numMissiles)
                     self.player.missileCount -= 1
 
                 else:
                     self.checkHit(numMissiles)
-            #0 is the enemy's missle shots                    
-            elif attacker == 0:
+            #-1 is the enemy's missle shots                    
+            elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.player.collider)):
                     self.player.lives -= 1
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 
-                elif ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) >= self.screenh):
+                elif ((self.missiles[numMissiles].posy) > self.screenh):
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 

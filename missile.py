@@ -23,10 +23,10 @@ class Missile:
 
     def update(self):
         '''
-        If owner == 0, owner is enemy
+        If owner == -1, owner is enemy
         any other number greater is players 
         '''
-        if self.owner > 0:
+        if self.owner >= 0:
             self.posy -= self.speed
             self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
         else:

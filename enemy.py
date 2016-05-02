@@ -30,7 +30,7 @@ class Enemy:
 
     def fire(self):
         self.missileCount += 1
-        return Missile(0, "missile", (self.posx + (self.imagew - 18), self.posy + (self.imageh)), 8, 32, self.row, self.col)
+        return Missile(-1, "missile", (self.posx + (self.imagew - 18), self.posy + (self.imageh)), 8, 32, self.row, self.col)
    
     def moveLeft(self):
         self.posx -= self.speed

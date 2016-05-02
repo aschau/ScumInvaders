@@ -37,15 +37,15 @@ class multiGame:
         self.screenh = screenh
         self.soundManager = soundManager
         self.playerList = []
-        self.playerList.append(Player(1, "ship1", "missile1", (300, 700), 32, 32))
+        self.playerList.append(Player(0, "ship1", "missile1", (300, 700), 32, 32))
         if numPlayers > 1:
-            self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
+            self.playerList.append(Player(1, "ship2", "missile2", (400, 700), 32, 32))
 
         if numPlayers > 2:
-            self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
+            self.playerList.append(Player(2, "ship3", "missle3", (500, 700), 32, 32))
 
         if numPlayers > 3:
-            self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
+            self.playerList.append(Player(3, "ship4", "missle4", (600, 700), 32, 32))
         
         self.paused = False
         self.start = True
@@ -87,6 +87,8 @@ class multiGame:
         self.mouseDelay = 100
         self.mouseNext = pygame.time.get_ticks()
 
+        self.serverReady = False
+
         #for server
         self.socket = socket
         if self.clientPlayerNum == 0:
@@ -109,6 +111,7 @@ class multiGame:
 
         random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
+        self.socket.send("GAMEREADY:" + self.hostName)
 
     #def reset(self, numPlayers):
     #    self.numPlayers = numPlayers
@@ -183,38 +186,41 @@ class multiGame:
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
             #print(modifiedMessage)
+            if modifiedMessage[0] == "GAMESTART":
+                self.serverReady = True
+
             if modifiedMessage[0]  == "MOV":
                 if int(modifiedMessage[1]) != self.clientPlayerNum:
                     self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
                     self.playerList[int(modifiedMessage[1])].posy = int(modifiedMessage[3])
         except:
             pass
+        if self.serverReady:
+            if self.start:
+                if pygame.time.get_ticks() >= self.startTime + 100:
+                    self.soundManager.playSound("Enemy_entrance.ogg")
+                    pygame.time.delay(2000)
+                    self.soundManager.playNewMusic("Space Invaders Theme.ogg", .2)
+                    self.start = False
 
-        if self.start:
-            if pygame.time.get_ticks() >= self.startTime + 100:
-                self.soundManager.playSound("Enemy_entrance.ogg")
-                pygame.time.delay(2000)
-                self.soundManager.playNewMusic("Space Invaders Theme.ogg", .2)
-                self.start = False
+            self.keyUpdate()
+            #if not self.paused:
+            self.backgroundUpdate()
+            self.state = self.enemyUpdate()
 
-        self.keyUpdate()
-        #if not self.paused:
-        self.backgroundUpdate()
-        self.state = self.enemyUpdate()
-
-        if self.checkState():
-            return self.state
+            if self.checkState():
+                return self.state
         
-        self.checkMissiles()
+            self.checkMissiles()
 
-        self.state = self.checkPlayerLives()
-        if self.checkState():
-            return self.state
+            self.state = self.checkPlayerLives()
+            if self.checkState():
+                return self.state
         
-        self.checkEnemyCount()
+            self.checkEnemyCount()
 
-        if self.paused:
-            return self.mouseUpdate()
+            if self.paused:
+                return self.mouseUpdate()
 
         return self.state
     
@@ -325,7 +331,7 @@ class multiGame:
                                 self.playerList[self.clientPlayerNum].score += 100 * self.level
                         return
 
-    #Handles the effects of the missles from both players(1) and enemies(0)
+    #Handles the effects of the missles from both players(1) and enemies(-1)
     def checkMissiles(self):
         numMissiles = 0
         while numMissiles < len(self.missiles):
@@ -333,23 +339,23 @@ class multiGame:
 
             attacker = self.missiles[numMissiles].owner
             #1 is the player's missle shots
-            if attacker == 1:
-                if ((self.missiles[numMissiles].posy - self.missiles[numMissiles].imageh) <= 0):
+            if attacker == self.clientPlayerNum:
+                if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) <= 0):
                     self.socket.send("SHOOT:" + str(self.clientPlayerNum))
                     self.missiles.pop(numMissiles)
                     self.playerList[self.clientPlayerNum].missileCount -= 1
 
                 else:
                     self.checkHit(numMissiles)
-            #0 is the enemy's missle shots                    
-            elif attacker == 0:
+            #-1 is the enemy's missle shots                    
+            elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.playerList[self.clientPlayerNum].collider)):
                     self.playerList[self.clientPlayerNum].lives -= 1
                     self.socket.send("HIT:" + str(self.clientPlayerNum))
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 
-                elif ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) >= self.screenh):
+                elif ((self.missiles[numMissiles].posy) >= self.screenh):
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 

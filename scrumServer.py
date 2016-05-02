@@ -68,6 +68,8 @@ class Socket:
                                 for room in self.rooms:
                                         if room["HOST"] == read[1]:
                                                 for username in room.keys():
+                                                        if username != "HOST":
+                                                                room[username] = False
                                                         for address, client in self.clientAddress.items():
                                                                 if client == username:
                                                                         data = json.dumps(list(room.keys()))
@@ -108,8 +110,20 @@ class Socket:
                                 self.gameGrids[read[1]] = setRNums
 
                         if read[0] == "GETGRID":
-                                 self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
-                                                
+                                if read[1] in self.gameGrids.keys():
+                                        self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
+
+                        if read[0] == "GAMEREADY":
+                                for room in self.rooms:
+                                        if room["HOST"] == read[1]:
+                                                room[self.clientAddress[clientID]] = True
+
+                                                if False not in room.values():
+                                                        for username in room.keys():
+                                                                for address, client in self.clientAddress.items():
+                                                                        if client == username:
+                                                                                self.serverSocket.sendto("GAMESTART".encode(), address)
+                                
                         if read[0] == "MOV":
                                 self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
 ##                                for room in self.rooms:
