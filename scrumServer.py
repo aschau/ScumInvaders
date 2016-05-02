@@ -1,4 +1,4 @@
-from socket import *
+﻿from socket import *
 import sqlite3
 import json
 import random
@@ -152,6 +152,8 @@ class Socket:
 ##                                                                if client == username: #and address != clientID[0]:
 ####                                                                        print(read[2] + ":" + read[3])                                                                        
 ##                                                                        self.serverSocket.sendto((read[2]+":"+read[3]).encode(), address)
+                        if read[0] == "SHOOT":
+                            self.gameUpdates[read[1]].append(read[0] + ":" + read[2])
 
 ##                        for clientIP in self.clientAddress.values():
 ##                                self.serverSocket.sendto("Still here.".encode(), clientIP)
