@@ -117,12 +117,22 @@ class Socket:
                                 for room in self.rooms:
                                         if room["HOST"] == read[1]:
                                                 room[self.clientAddress[clientID]] = True
-
+##                                                print(room.items())
+                        if read[0] == "GETGAMESTART":
+                                for room in self.rooms:
+                                        if room["HOST"] == read[1]:
                                                 if False not in room.values():
-                                                        for username in room.keys():
-                                                                for address, client in self.clientAddress.items():
-                                                                        if client == username:
-                                                                                self.serverSocket.sendto("GAMESTART".encode(), address)
+                                                        self.serverSocket.sendto("GAMESTART".encode(), clientID)
+                                        
+##                                for room in self.rooms:
+##                                        if room["HOST"] == read[1]:
+##                                                if False not in room.values():
+##                                                        for username in room.keys():
+##                                                                for address, client in self.clientAddress.items():
+##                                                                        if client == username:
+####                                                                                print(username)
+##                                                                                self.serverSocket.sendto("GAMESTART".encode(), address)
+                                                
                                 
                         if read[0] == "MOV":
                                 self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])

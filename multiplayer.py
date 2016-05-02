@@ -182,10 +182,14 @@ class multiGame:
     #Handles everything that needs to go on in the game
     def update(self):
         try:
-            self.socket.send("RECEIVE:"+self.hostName)
+            if self.serverReady:
+                self.socket.send("RECEIVE:"+self.hostName)
+            else:
+                self.socket.send("GETGAMESTART:" + self.hostName)
+
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
-            #print(modifiedMessage)
+            print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
 
