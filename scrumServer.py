@@ -117,12 +117,12 @@ class Socket:
                         if read[0] == "GAMEREADY":
                                 for room in self.rooms:
                                         if room["HOST"] == read[1]:
-                                                print("CLIENTID")
-                                                print(clientID)
-                                                print("ROOM")
-                                                print(room)
-                                                print("ADDRESSES")
-                                                print(self.clientAddress)
+##                                                print("CLIENTID")
+##                                                print(clientID)
+##                                                print("ROOM")
+##                                                print(room)
+##                                                print("ADDRESSES")
+##                                                print(self.clientAddress)
                                                 room[self.clientAddress[clientID]] = True
                                                 self.serverSocket.sendto("GAMEREADY".encode(), clientID)
 ##                                                print(room.items())

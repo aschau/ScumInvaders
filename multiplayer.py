@@ -372,11 +372,11 @@ class multiGame:
 
             attacker = self.missiles[numMissiles].owner
             #1 is the player's missle shots
-            if attacker == self.clientPlayerNum:
+            if attacker >= 0:
                 if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) <= 0):
                     #self.socket.send("SHOOT:" + self.hostName + ":" + str(self.clientPlayerNum))
                     self.missiles.pop(numMissiles)
-                    self.playerList[self.clientPlayerNum].missileCount -= 1
+                    self.playerList[attacker].missileCount -= 1
 
                 else:
                     self.checkHit(numMissiles)
