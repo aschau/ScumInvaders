@@ -247,6 +247,20 @@ class multiGame:
     '''Odd levels -> change speed; even levels -> change health'''
     def nextLevel(self):   
         self.enemyGrid = []
+        if self.clientPlayerNum == 0:
+            self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
+        
+        tryGrid = True
+        while tryGrid:
+            try:
+                self.socket.send("GETGRID:" + self.hostName)
+                message, address = self.socket.clientSocket.recvfrom(2048)
+                modifiedMessage = message.decode().split(":")
+                if modifiedMessage[0] == "GRID":
+                    #self.setGrid(modifiedMessage[1:])
+                    tryGrid = False
+            except:
+                tryGrid = True
         self.level += 1
 
         if self.level == 5:
@@ -260,9 +274,9 @@ class multiGame:
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
                 self.enemyFireChance -= 2;
-            self.setGrid(16 + self.level/2, self.level/2)
+            self.setGrid(modifiedMessage[1:], 16 + self.level/2, self.level/2)
         else: 
-            self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
+            self.setGrid(modifiedMessage[1:], 16 + (self.level -1)/2, self.level//2 + 1)
             
         if self.level %2 == 1:
             self.playerList[self.clientPlayerNum].missileCap += 1 
