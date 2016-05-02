@@ -209,7 +209,7 @@ class multiGame:
                     self.playerList[int(modifiedMessage[1])].posy = int(modifiedMessage[3])
             if modifiedMessage[0] == "SHOOT":
                 if int(modifiedMessage[1]) != self.clientPlayerNum:
-                    self.missiles.append(Missile(int(modifiedMessage[4]), self.playerList[int(modifiedMessage[4])], (self.posx + (self.imagew - 18), self.posy - (self.imageh)), 8, 32))
+                    self.missiles.append(Missile(int(modifiedMessage[4]), self.playerList[int(modifiedMessage[4])].missileImage, (self.playerList[int(modifiedMessage[4]).posx + (self.playerList[int(modifiedMessage[4])].imagew - 18), self.playerList[int(modifiedMessage[4]).posy - (self.playerList[int(modifiedMessage[4])].imageh)), 8, 32))
         except:
             pass
         if self.serverReady:
@@ -373,7 +373,7 @@ class multiGame:
             if attacker == self.clientPlayerNum:
                 if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) <= 0):
                     #self.socket.send("SHOOT:" + self.hostName + ":" + str(self.clientPlayerNum))
-                    self.socket.send("SHOOT:" + self.hostName + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.clientPlayerNum))
+                    self.socket.send("SHOOT:" + self.hostName + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy) + ":" + str(self.clientPlayerNum))
                     self.missiles.pop(numMissiles)
                     self.playerList[self.clientPlayerNum].missileCount -= 1
 
