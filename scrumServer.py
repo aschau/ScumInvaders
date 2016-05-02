@@ -144,7 +144,7 @@ class Socket:
                                                 
                                 
                         if read[0] == "MOV":
-                                self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
+                            self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
 ##                                for room in self.rooms:
 ##                                        if room["HOST"] == read[1]:
 ##                                                for username in room.keys():
@@ -153,8 +153,7 @@ class Socket:
 ####                                                                        print(read[2] + ":" + read[3])                                                                        
 ##                                                                        self.serverSocket.sendto((read[2]+":"+read[3]).encode(), address)
                         if read[0] == "SHOOT":
-                            self.gameUpdates[read[1]].append(read[0] + ":" + read[2])
-
+                            self.gameUpdates[read[1]].append(read[0] + ":" + read[2] + ":" + read[3] + ":" + read[4])
 ##                        for clientIP in self.clientAddress.values():
 ##                                self.serverSocket.sendto("Still here.".encode(), clientIP)
                         

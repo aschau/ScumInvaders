@@ -8,6 +8,7 @@ import random
 from datetime import datetime
 from socket import *
 from Connect import Connect
+from missile import Missile
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -208,8 +209,7 @@ class multiGame:
                     self.playerList[int(modifiedMessage[1])].posy = int(modifiedMessage[3])
             if modifiedMessage[0] == "SHOOT":
                 if int(modifiedMessage[1]) != self.clientPlayerNum:
-                    self.playerList[int(modifiedMessage[1])].fire()
-                     
+                    self.missiles.append(Missile(int(modifiedMessage[4]), self.playerList[int(modifiedMessage[4])], (self.posx + (self.imagew - 18), self.posy - (self.imageh)), 8, 32))
         except:
             pass
         if self.serverReady:
@@ -372,7 +372,8 @@ class multiGame:
             #1 is the player's missle shots
             if attacker == self.clientPlayerNum:
                 if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) <= 0):
-                    self.socket.send("SHOOT:" + self.hostName + ":" + str(self.clientPlayerNum))
+                    #self.socket.send("SHOOT:" + self.hostName + ":" + str(self.clientPlayerNum))
+                    self.socket.send("SHOOT:" + self.hostName + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.clientPlayerNum))
                     self.missiles.pop(numMissiles)
                     self.playerList[self.clientPlayerNum].missileCount -= 1
 
