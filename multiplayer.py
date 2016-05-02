@@ -111,7 +111,16 @@ class multiGame:
 
         random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
-        self.socket.send("GAMEREADY:" + self.hostName)
+        tryGameReady = True
+        while tryGameReady:
+            try:
+                self.socket.send("GAMEREADY:" + self.hostName)
+                message, address = self.socket.clientSocket.recvfrom(2048)
+                modifiedMessage = message.decode().split(":")
+                if modifiedMessage[0] == "GAMEREADY":
+                    tryGameReady = False
+            except:
+                tryGameReady = True
 
     #def reset(self, numPlayers):
     #    self.numPlayers = numPlayers
@@ -189,7 +198,7 @@ class multiGame:
 
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
-            print(modifiedMessage)
+            #print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
 

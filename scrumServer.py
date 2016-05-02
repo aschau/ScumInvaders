@@ -111,16 +111,25 @@ class Socket:
 
                         if read[0] == "GETGRID":
                                 if read[1] in self.gameGrids.keys():
+##                                        print(clientID)
                                         self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
 
                         if read[0] == "GAMEREADY":
                                 for room in self.rooms:
                                         if room["HOST"] == read[1]:
+                                                print("CLIENTID")
+                                                print(clientID)
+                                                print("ROOM")
+                                                print(room)
+                                                print("ADDRESSES")
+                                                print(self.clientAddress)
                                                 room[self.clientAddress[clientID]] = True
+                                                self.serverSocket.sendto("GAMEREADY".encode(), clientID)
 ##                                                print(room.items())
                         if read[0] == "GETGAMESTART":
                                 for room in self.rooms:
                                         if room["HOST"] == read[1]:
+##                                                print(room.items())     
                                                 if False not in room.values():
                                                         self.serverSocket.sendto("GAMESTART".encode(), clientID)
                                         
