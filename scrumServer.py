@@ -12,6 +12,7 @@ class Socket:
                 self.clientAddress = {}
                 self.players = 0
                 self.rooms = []
+                self.roomIPList = {}
                 self.gameUpdates = {}
                 self.gameGrids = {}
                 random.seed(datetime.now())
@@ -47,12 +48,14 @@ class Socket:
                                 self.gameUpdates[self.clientAddress[clientID]] = []
                                 self.rooms[-1][str(self.clientAddress[clientID])] = False
                                 self.rooms[-1]["HOST"] = self.clientAddress[clientID]
+                                self.roomIPList[self.clientAddress[clientID]] = [clientID]
 
                         if read[0] == "JOIN":
                             for room in self.rooms:
                                 if room["HOST"] == read[1]:
                                     room[str(self.clientAddress[clientID])] = False
-                        
+                                    self.roomIPList[read[1]].append(clientID)
+                                    
                         if read[0] == "REFRESH":
                                 data = json.dumps(self.rooms)
 ##                                print(data)
@@ -70,17 +73,18 @@ class Socket:
                                                 for username in room.keys():
                                                         if username != "HOST":
                                                                 room[username] = False
-                                                        for address, client in self.clientAddress.items():
-                                                                if client == username:
-                                                                        data = json.dumps(list(room.keys()))
-                                                                        self.serverSocket.sendto(("Start:" + data).encode(), address)
+
+                                                data = json.dumps(list(room.keys()))
+                                                for client in self.roomIPList[read[1]]:
+                                                        self.serverSocket.sendto(("Start:" + data).encode(), client)
                         
                         if read[0] == "LEAVE ROOM":
                                  for room in self.rooms:
                                          if room["HOST"] == read[1]:
+                                                 del room[self.clientAddress[clientID]]
+                                                 self.roomIPList[read[1]].pop(self.roomIPList[read[1]].index(clientID))
                                                  if self.clientAddress[clientID] == room["HOST"]:
                                                          room["HOST"] = list(room.keys())[0]
-                                                 del room[self.clientAddress[clientID]]
 ##                              deleting rooms with no one left inside
                                  roomNum = 0
                                  while roomNum < len(self.rooms):
@@ -96,11 +100,13 @@ class Socket:
                                         event = self.gameUpdates[read[1]].pop(0)
                                         for room in self.rooms:
                                                 if room["HOST"] == read[1]:
-                                                        for username in room.keys():
-                                                                for address, client in self.clientAddress.items():
-                                                                        if client == username: #and address != clientID:
-##                                                                                print(address, clientID)
-                                                                                self.serverSocket.sendto(event.encode(), address)
+##                                                        for username in room.keys():
+##                                                                for address, client in self.clientAddress.items():
+##                                                                        if client == username: #and address != clientID:
+####                                                                                print(address, clientID)
+                                                        for client in self.roomIPList[read[1]]:
+                                                                self.serverSocket.sendto(event.encode(), client)
+                                                                
                         if read[0] == "SETGRID":
                                 setRNums = ""
                                 for row in range(int(read[2])):

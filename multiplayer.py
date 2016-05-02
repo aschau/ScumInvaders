@@ -200,7 +200,7 @@ class multiGame:
 
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
-            print(modifiedMessage)
+            #print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
 
