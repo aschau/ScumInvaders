@@ -251,8 +251,9 @@ class multiGame:
     def checkPlayerLives(self):
         #if (self.playerList[self.clientPlayerNum].lives <= 0):
         #    return "Room"
-        return "multiGame"
-
+        #return "multiGame"
+        if (self.playerList[self.clientPlayerNum].lives <= 0):
+            return "Score"
     def checkEnemyCount(self):
         if self.enemyCount == 0:
             self.enemyCount = 50

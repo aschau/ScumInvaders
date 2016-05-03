@@ -50,6 +50,10 @@ class Main_Menu():
             self.currentRoom = None
             self.currentRoomLength = 0
 
+            self.score = 0
+            self.scoreButtons = []
+            self.scoreButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
+            
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
             self.host = False
@@ -111,6 +115,11 @@ class Main_Menu():
                                     self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
                                 playerNumber += 1
                         break
+            elif self.state == "Score":
+                self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
+                for button in self.scoreButtons:
+                    button.draw()
+                self.screen.blit(self.font.render(str(self.score), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
 
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
@@ -168,7 +177,15 @@ class Main_Menu():
                                     self.host = True
                                     self.state = "Room"
                                     self.currentRoom = self.username.input
-                    
+                     ## Message == SCORE:playerScore
+                    elif self.state == "Score":
+                        modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
+                        data = modifiedMessage.split(":")
+                        if data[0] == "SCORE":
+                            self.score = int(data[1])
+                        if button.checkClicked(pygame.mouse.get_pos()):
+                            self.state = button.click()
+
                     elif self.state == "Room":
                         for button in self.roomButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
