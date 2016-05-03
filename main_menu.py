@@ -241,7 +241,8 @@ class Main_Menu():
                     self.lobbyRoomButtons = lobbyRoomButtons
                  
                 except:
-                    print("Diddly")
+                    #print("Diddly")
+                    pass
 
                 for button in self.lobbyRoomButtons:
                     button.checkHover(pygame.mouse.get_pos())
@@ -289,7 +290,8 @@ class Main_Menu():
                                     break
 
                 except:
-                    print("Diddly")
+                    #print("Diddly")
+                    pass
 
                 for button in self.roomButtons:
                     button.checkHover(pygame.mouse.get_pos())

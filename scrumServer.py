@@ -9,9 +9,11 @@ class Socket:
                 #self.serverPort = port #can be any number > 1024 cuz otherwise reserved
                 self.serverSocket = socket(AF_INET, SOCK_DGRAM)
                 self.serverSocket.bind((host, port))
+                self.serverSocket.settimeout(0.0)
                 self.clientAddress = {}
                 self.players = 0
                 self.rooms = []
+                self.roomIPList = {}
                 self.gameUpdates = {}
                 self.gameGrids = {}
                 random.seed(datetime.now())
@@ -23,140 +25,113 @@ class Socket:
         print(gethostbyname(gethostname()))
         def run(self):
                 while 1:
-                        message, clientID = self.serverSocket.recvfrom(2048) #2048 is bytes of data to be received
-                        #when something is recieved through serverSocket, the data will be stored in message.
-                        #Also the client IP and port will be extracted and stored in variable clientAddress.
-                        #recvfrom is specific to D_GRAMS foor UDP
-                        #decodes the message
-                        
-                        modMessage = message.decode()
-##                        print(modMessage)
-                        read = modMessage.split(":")
-##                        if read[0] == "TALK":
-##                                for i in self.clientAddress.values():
-##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
-                        if read[0] == "LOG":
-                                self.players += 1
-                                self.checkLog(read[1], read[2], clientID)
-##                                self.serverSocket.sendto(("Lobby:"  + str(self.rooms)).encode(), clientID)
-##                                for room in range(len(self.rooms)):
-##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
-
-                        if read[0] == "CREATE":
-                                self.rooms.append({})
-                                self.gameUpdates[self.clientAddress[clientID]] = []
-                                self.rooms[-1][str(self.clientAddress[clientID])] = False
-                                self.rooms[-1]["HOST"] = self.clientAddress[clientID]
-
-                        if read[0] == "JOIN":
-                            for room in self.rooms:
-                                if room["HOST"] == read[1]:
-                                    room[str(self.clientAddress[clientID])] = False
-                        
-                        if read[0] == "REFRESH":
-                                data = json.dumps(self.rooms)
-##                                print(data)
-                                self.serverSocket.sendto(("Lobby:"+data).encode(), clientID)
-##                                for room in range(len(self.rooms)):
-##                                        self.serverSocket.sendto(("Lobby:" + str(self.rooms[room]["Host"]) + ":" + str(len(self.rooms[room]) - 1)).encode(), clientID)
-
-                        if read[0] == "READY":
-                                for room in self.rooms:
-                                        if room["HOST"] == read[1]:
-                                                room[self.clientAddress[clientID]] = not room[self.clientAddress[clientID]]     
-                        if read[0] == "START":
-                                for room in self.rooms:
-                                        if room["HOST"] == read[1]:
-                                                for username in room.keys():
-                                                        if username != "HOST":
-                                                                room[username] = False
-                                                        for address, client in self.clientAddress.items():
-                                                                if client == username:
-                                                                        data = json.dumps(list(room.keys()))
-                                                                        self.serverSocket.sendto(("Start:" + data).encode(), address)
-                        
-                        if read[0] == "LEAVE ROOM":
-                                 for room in self.rooms:
-                                         if room["HOST"] == read[1]:
-                                                 if self.clientAddress[clientID] == room["HOST"]:
-                                                         room["HOST"] = list(room.keys())[0]
-                                                 del room[self.clientAddress[clientID]]
-##                              deleting rooms with no one left inside
-                                 roomNum = 0
-                                 while roomNum < len(self.rooms):
-                                     if len(self.rooms[roomNum]) == 1:
-                                         self.rooms.pop(roomNum)
-                                         del self.gameUpdates[read[1]]
+                        try:
+                                message, clientID = self.serverSocket.recvfrom(2048) #2048 is bytes of data to be received
+                                #when something is recieved through serverSocket, the data will be stored in message.
+                                #Also the client IP and port will be extracted and stored in variable clientAddress.
+                                #recvfrom is specific to D_GRAMS foor UDP
+                                #decodes the message
                                 
-                        if read[0] == "END":
-                                break
-                        #MOV:playerNumber:playerPosX:playerPosY
-                        if read[0] == "RECEIVE":
-                                if len(self.gameUpdates[read[1]]) > 0:
-                                        event = self.gameUpdates[read[1]].pop(0)
+                                modMessage = message.decode()
+        ##                        print(modMessage)
+                                read = modMessage.split(":")
+        ##                        if read[0] == "TALK":
+        ##                                for i in self.clientAddress.values():
+        ##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
+                                if read[0] == "LOG":
+                                        self.players += 1
+                                        self.checkLog(read[1], read[2], clientID)
+
+                                if read[0] == "CREATE":
+                                        self.rooms.append({})
+                                        self.gameUpdates[self.clientAddress[clientID]] = []
+                                        self.rooms[-1][str(self.clientAddress[clientID])] = False
+                                        self.rooms[-1]["HOST"] = self.clientAddress[clientID]
+                                        self.roomIPList[self.clientAddress[clientID]] = [clientID]
+
+                                if read[0] == "JOIN":
+                                    for room in self.rooms:
+                                        if room["HOST"] == read[1]:
+                                            room[str(self.clientAddress[clientID])] = False
+                                            self.roomIPList[read[1]].append(clientID)
+                                            
+                                if read[0] == "REFRESH":
+                                        data = json.dumps(self.rooms)
+                                        self.serverSocket.sendto(("Lobby:"+data).encode(), clientID)
+                                        
+                                if read[0] == "READY":
+                                        for room in self.rooms:
+                                                if room["HOST"] == read[1]:
+                                                        room[self.clientAddress[clientID]] = not room[self.clientAddress[clientID]]     
+                                if read[0] == "START":
                                         for room in self.rooms:
                                                 if room["HOST"] == read[1]:
                                                         for username in room.keys():
-                                                                for address, client in self.clientAddress.items():
-                                                                        if client == username: #and address != clientID:
-##                                                                                print(address, clientID)
-                                                                                self.serverSocket.sendto(event.encode(), address)
-                        if read[0] == "SETGRID":
-                                setRNums = ""
-                                for row in range(int(read[2])):
-                                        for column in range(int(read[3])):
-                                                setRNums += str(random.randint(1, 100)) + ":"
+                                                                if username != "HOST":
+                                                                        room[username] = False
 
-                                self.gameGrids[read[1]] = setRNums
-
-                        if read[0] == "GETGRID":
-                                if read[1] in self.gameGrids.keys():
-##                                        print(clientID)
-                                        self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
-
-                        if read[0] == "GAMEREADY":
-                                for room in self.rooms:
-                                        if room["HOST"] == read[1]:
-##                                                print("CLIENTID")
-##                                                print(clientID)
-##                                                print("ROOM")
-##                                                print(room)
-##                                                print("ADDRESSES")
-##                                                print(self.clientAddress)
-                                                room[self.clientAddress[clientID]] = True
-                                                self.serverSocket.sendto("GAMEREADY".encode(), clientID)
-##                                                print(room.items())
-                        if read[0] == "GETGAMESTART":
-                                for room in self.rooms:
-                                        if room["HOST"] == read[1]:
-##                                                print(room.items())     
-                                                if False not in room.values():
-                                                        self.serverSocket.sendto("GAMESTART".encode(), clientID)
-                                        
-##                                for room in self.rooms:
-##                                        if room["HOST"] == read[1]:
-##                                                if False not in room.values():
-##                                                        for username in room.keys():
-##                                                                for address, client in self.clientAddress.items():
-##                                                                        if client == username:
-####                                                                                print(username)
-##                                                                                self.serverSocket.sendto("GAMESTART".encode(), address)
-                                                
+                                                        data = json.dumps(list(room.keys()))
+                                                        for client in self.roomIPList[read[1]]:
+                                                                self.serverSocket.sendto(("Start:" + data).encode(), client)
                                 
-                        if read[0] == "MOV":
-                            self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
-##                                for room in self.rooms:
-##                                        if room["HOST"] == read[1]:
-##                                                for username in room.keys():
-##                                                        for address, client in self.clientAddress.items():
-##                                                                if client == username: #and address != clientID[0]:
-####                                                                        print(read[2] + ":" + read[3])                                                                        
-##                                                                        self.serverSocket.sendto((read[2]+":"+read[3]).encode(), address)
-                        if read[0] == "SHOOT":
-                            self.gameUpdates[read[1]].append(read[0] + ":" + read[2] + ":" + read[3] + ":" + read[4])
-##                        for clientIP in self.clientAddress.values():
-##                                self.serverSocket.sendto("Still here.".encode(), clientIP)
-                        
+                                if read[0] == "LEAVE ROOM":
+                                         for room in self.rooms:
+                                                 if room["HOST"] == read[1]:
+                                                         del room[self.clientAddress[clientID]]
+                                                         self.roomIPList[read[1]].pop(self.roomIPList[read[1]].index(clientID))
+                                                         if self.clientAddress[clientID] == room["HOST"]:
+                                                                 room["HOST"] = list(room.keys())[0]
+        ##                              deleting rooms with no one left inside
+                                         roomNum = 0
+                                         while roomNum < len(self.rooms):
+                                             if len(self.rooms[roomNum]) == 1:
+                                                 self.rooms.pop(roomNum)
+                                                 del self.gameUpdates[read[1]]
+                                        
+                                if read[0] == "END":
+                                        break
+                                
+                                if read[0] == "RECEIVE":
+                                        if len(self.gameUpdates[read[1]]) > 0:
+                                                event = self.gameUpdates[read[1]].pop(0)
+                                                for room in self.rooms:
+                                                        if room["HOST"] == read[1]:
+                                                                for client in self.roomIPList[read[1]]:
+                                                                        self.serverSocket.sendto(event.encode(), client)
+                                                                        
+                                if read[0] == "SETGRID":
+                                        setRNums = ""
+                                        for row in range(int(read[2])):
+                                                for column in range(int(read[3])):
+                                                        setRNums += str(random.randint(1, 100)) + ":"
+
+                                        self.gameGrids[read[1]] = setRNums
+
+                                if read[0] == "GETGRID":
+                                        if read[1] in self.gameGrids.keys():
+                                                self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
+
+                                if read[0] == "GAMEREADY":
+                                        for room in self.rooms:
+                                                if room["HOST"] == read[1]:
+                                                        room[self.clientAddress[clientID]] = True
+                                                        self.serverSocket.sendto("GAMEREADY".encode(), clientID)
+                                                        
+                                if read[0] == "GETGAMESTART":
+                                        for room in self.rooms:
+                                                if room["HOST"] == read[1]:
+                                                        if False not in room.values():
+                                                                for client in self.roomIPList[read[1]]:
+                                                                        self.serverSocket.sendto("GAMESTART".encode(), client)
+                                 
+                                if read[0] == "MOV":
+                                    self.gameUpdates[read[1]].append(read[0] + ":" + read[2]+":"+read[3])
+
+                                if read[0] == "SHOOT":
+                                    self.gameUpdates[read[1]].append(read[0] + ":" + read[2] + ":" + read[3] + ":" + read[4])
+
+                        except:
+                                pass
                 #self.serverSocket.close()
         def checkLog(self,username, password, clientAddress):
                 if clientAddress not in self.clientAddress.values():

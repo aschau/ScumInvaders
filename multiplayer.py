@@ -196,11 +196,12 @@ class multiGame:
                 if self.clientPlayerNum == 0:
                     self.socket.send("RECEIVE:"+self.hostName)
             else:
-                self.socket.send("GETGAMESTART:" + self.hostName)
+                if self.clientPlayerNum == 0:
+                    self.socket.send("GETGAMESTART:" + self.hostName)
 
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
-            print(modifiedMessage)
+            #print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
 
@@ -280,11 +281,11 @@ class multiGame:
 
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
-            self.playerList[self.clientPlayerNum].image = "ship1upgrade2"    
+            self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade2"    
 
         elif self.level == 10:
             self.soundManager.playSound("LevelUp.ogg")
-            self.playerList[self.clientPlayerNum].image = "ship1upgrade3"
+            self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade3"
 
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
