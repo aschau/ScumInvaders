@@ -196,12 +196,17 @@ class multiGame:
                 if self.clientPlayerNum == 0:
                     self.socket.send("RECEIVE:"+self.hostName)
             else:
+
                 if self.clientPlayerNum == 0:
                     self.socket.send("GETGAMESTART:" + self.hostName)
 
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
-            #print(modifiedMessage)
+
+            mod = ' '.join(modifiedMessage)
+            with open("Log.txt","a") as f:
+                f.write(mod)
+            print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
 
@@ -213,7 +218,7 @@ class multiGame:
                 if int(modifiedMessage[3]) != self.clientPlayerNum:
                     self.missiles.append(Missile(int(modifiedMessage[3]), self.playerList[int(modifiedMessage[3])].missileImage, (int(modifiedMessage[1]) + self.playerList[int(modifiedMessage[3])].imagew - 18, int(modifiedMessage[2]) - self.playerList[int(modifiedMessage[3])].imageh),8, 32)) #(self.playerList[int(modifiedMessage[3])].posx + (self.playerList[int(modifiedMessage[3])].imagew - 18), self.playerList[int(modifiedMessage[3])].posy - (self.playerList[int(modifiedMessage[3])].imageh)), 8, 32))
         except:
-            pass
+
         if self.serverReady:
             if self.start:
                 if pygame.time.get_ticks() >= self.startTime + 100:
@@ -280,10 +285,12 @@ class multiGame:
 
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
+
             self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade2"    
 
         elif self.level == 10:
             self.soundManager.playSound("LevelUp.ogg")
+
             self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade3"
 
         if self.level % 2 == 0:
