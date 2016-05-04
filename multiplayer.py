@@ -9,6 +9,7 @@ from datetime import datetime
 from socket import *
 from Connect import Connect
 from missile import Missile
+import time
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -115,7 +116,8 @@ class multiGame:
         tryGameReady = True
         while tryGameReady:
             try:
-                self.socket.send("GAMEREADY:" + self.hostName)
+                clienttime = time.time()
+                self.socket.send("GAMEREADY:" + self.hostName + ":" + clienttime) #append client time to message for server
                 message, address = self.socket.clientSocket.recvfrom(2048)
                 modifiedMessage = message.decode().split(":")
                 if modifiedMessage[0] == "GAMEREADY":

@@ -3,6 +3,7 @@ import sqlite3
 import json
 import random
 from datetime import datetime
+import time
 
 class Socket:
         def __init__(self, host, port):
@@ -31,13 +32,17 @@ class Socket:
                                 #Also the client IP and port will be extracted and stored in variable clientAddress.
                                 #recvfrom is specific to D_GRAMS foor UDP
                                 #decodes the message
-                                
+
+                                serversendtime = time.time()
                                 modMessage = message.decode()
         ##                        print(modMessage)
                                 read = modMessage.split(":")
         ##                        if read[0] == "TALK":
         ##                                for i in self.clientAddress.values():
         ##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
+                                clientsendtime = read[-1] #assumes all client messages end with their send time
+                                clientoffset = abs(clientsendtime - serversendtime) #in case it's the otehrway and is negative
+                                
                                 if read[0] == "LOG":
                                         self.players += 1
                                         self.checkLog(read[1], read[2], clientID)
@@ -148,6 +153,7 @@ class Socket:
                 #executes the SQL statement 
                 connection.execute('''CREATE TABLE IF NOT EXISTS scores
                             (user text, pass text, score real, wins real)''')
+                offsets = [(username, clientoffset)] #record offsets
                 tups = [(username, password)]
                 c.execute("SELECT * FROM scores")
                 #returns a list of the results
@@ -163,6 +169,7 @@ class Socket:
                                 else:
                                         connected = 1
                 if un == "":
+                        c.executemany("INSERT PLAYER OFFSETS ", offsets) #add offsets to database?
                         c.executemany("INSERT INTO scores VALUES (?,?,0,0)", tups)
                         connected = 2
                 #commits the action to the database?
