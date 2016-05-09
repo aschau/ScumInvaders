@@ -287,12 +287,14 @@ class multiGame:
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
 
-            self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade2"    
+            for player in range(len(self.playerList)):
+                self.playerList[player].image = "ship" + str(player+1) + "upgrade2"    
 
         elif self.level == 10:
             self.soundManager.playSound("LevelUp.ogg")
-
-            self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade3"
+            
+            for player in range(len(self.playerList)):
+                self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
 
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
@@ -357,7 +359,7 @@ class multiGame:
                         attacker = self.missiles.pop(numMissiles).owner
                         self.enemyGrid[row][column].health -= 1
                         self.socket.send("HIT:" + "ENEMY:" + str(row) + ":" + str(column))
-                        self.playerList[self.clientPlayerNum].missileCount -= 1
+                        self.playerList[attacker].missileCount -= 1
                         if self.enemyGrid[row][column].health == 0 and not self.enemyGrid[row][column].dead:
                             self.enemyGrid[row][column].dead = True
                             self.socket.send("DEATH:" + "ENEMY:" + str(row) + ":" + str(column))
