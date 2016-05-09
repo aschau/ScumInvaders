@@ -73,7 +73,6 @@ class Socket:
                                                         data = json.dumps(list(room.keys()))
                                                         for client in self.roomIPList[read[1]]:
                                                                 self.serverSocket.sendto(("Start:" + data).encode(), client)
-                                
                                 if read[0] == "LEAVE ROOM":
                                          for room in self.rooms:
                                                  if room["HOST"] == read[1]:
@@ -129,10 +128,26 @@ class Socket:
 
                                 if read[0] == "SHOOT":
                                     self.gameUpdates[read[1]].append(read[0] + ":" + read[2] + ":" + read[3] + ":" + read[4])
+                                if read[0] == "SCORE":
+                                    '''This function does not accomodate for multiple hosts and rooms yet'''
+                                    #self.serverSocket.sendto(("SCORE:" + str(self.clientAddress[clientID]) + ":" + str(read[2])).encode(),client)
+                                    score(self.clientAddress[clientID], str(read[2]))
+                                    self.players -= 1
+                                    if self.players <= 0:
+                                        self.serverSocket.sendto("SCORE:sendScore".encode(), client)
 
                         except:
                                 pass
                 #self.serverSocket.close()
+        def score(self,id, score):
+            database = sqlite3.connect("scoreTable.db")
+            d = database.cursor()
+            print(id, score)
+            database.execute("UPDATE scores set score = {sc} where user={un}".format(sc = score, un = id))
+            database.commit()
+            d.execute("SELECT * FROM scores")
+            data = d.fetchall()
+            print(data)
         def checkLog(self,username, password, clientAddress):
                 if clientAddress not in self.clientAddress.values():
                         if self.players < 5:
@@ -147,12 +162,12 @@ class Socket:
                 c = connection.cursor()
                 #executes the SQL statement 
                 connection.execute('''CREATE TABLE IF NOT EXISTS scores
-                            (user text, pass text, score real, wins real)''')
+                            (user TEXT, pass TEXT, score REAL, wins REAL)''')
                 tups = [(username, password)]
                 c.execute("SELECT * FROM scores")
                 #returns a list of the results
                 data = c.fetchall()
-##                print(data)
+                print(data)
                 un = ""
                 for i in data:
                         if i[0] == username:
@@ -175,7 +190,7 @@ class Socket:
                         self.serverSocket.sendto("Invalid Password".encode(), clientAddress)
                 #sends the moddifiedMessage to client with IP and port stored in clientAddress 
                 
-                
+            
 if __name__ == "__main__":
         socket = Socket('0.0.0.0', 12000)
         socket.run()

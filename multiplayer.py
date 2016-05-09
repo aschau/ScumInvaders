@@ -9,6 +9,7 @@ from datetime import datetime
 from socket import *
 from Connect import Connect
 from missile import Missile
+import sqlite3
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -254,7 +255,10 @@ class multiGame:
         #    return "Room"
         #return "multiGame"
         if (self.playerList[self.clientPlayerNum].lives <= 0):
+            self.socket.send("SCORE:" + self.hostName + ":" + str(self.playerList[self.clientPlayerNum].score))
             return "Score"
+        return "multiGame"
+
     def checkEnemyCount(self):
         if self.enemyCount == 0:
             self.enemyCount = 50

@@ -99,7 +99,12 @@ class ScumInvaders:
             
                 else:
                     self.state = output
-                    if output == "Menu":
+                    if self.state == "Score":
+                        self.mainMenu.state = "Score"
+                        self.sounds.playNewMusic('mainMenu.ogg')
+                        self.state = "Menu"
+
+                    elif output == "Menu":
                         self.mainMenu.state = "Main"
                         self.sounds.playNewMusic('mainMenu.ogg')
                     
