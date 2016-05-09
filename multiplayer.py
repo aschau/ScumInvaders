@@ -43,10 +43,10 @@ class multiGame:
             self.playerList.append(Player(1, "ship2", "missile2", (400, 700), 32, 32))
 
         if numPlayers > 2:
-            self.playerList.append(Player(2, "ship3", "missle3", (500, 700), 32, 32))
+            self.playerList.append(Player(2, "ship3", "missile3", (500, 700), 32, 32))
 
         if numPlayers > 3:
-            self.playerList.append(Player(3, "ship4", "missle4", (600, 700), 32, 32))
+            self.playerList.append(Player(3, "ship4", "missile4", (600, 700), 32, 32))
         
         self.paused = False
         self.start = True
