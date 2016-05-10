@@ -92,6 +92,7 @@ class multiGame:
         self.serverReady = False
 
         #for server
+##        self.clientsentcheck = False #keep sending client time/offset in case packet loss
         self.socket = socket
         if self.clientPlayerNum == 0:
             self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))

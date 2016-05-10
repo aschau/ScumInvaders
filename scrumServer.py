@@ -31,6 +31,9 @@ class Socket:
                 self.gameUpdates = {}
                 self.gameGrids = {}
                 self.offsets = {} # username:[serverclientoffset, clientserveroffset]
+                self.serversentcheck = False #maybe loss of packets, keep sending
+                self.clientoffsetcheck = False
+                self.serverreceivecheck = False
                 random.seed(datetime.now())
                 #serverSocket.listen(4) #denotes the number of clients can queue
                 #it binds the serverSocket to port number specified in serverPort variable.
@@ -57,12 +60,15 @@ class Socket:
         ##                                for i in self.clientAddress.values():
         ##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
                                 if 'serverclientoffset' in read:
+                                        self.serversentcheck = True
+                                        self.clientoffsetcheck = True
                                         print('server received message')
                                         if len(self.offsets[clientID]) == 0: #if values has empty list
                                                 self.offsets[clientID] = [read[read.index('serverclientoffset') + 1]]
                                         #finds the index (+1) of where the the offset value is in the message
                                 if 'clientsendtime' in read:
                                         if len(self.offsets[clientID]) == 1: #has s->c offset in value list
+                                                self.serverreceivecheck = True
                                                 clientsendtime = read[read.index('clientsendtime') + 1] #don't assume timestamp is last
                                                 clientserveroffset = abs(serverreceivetime - clientsendtime) #in case it's the otherway and is negative
                                                 self.offsets[clientID].append(clientserveroffset) #sets second value of tuple client to server offset
@@ -159,14 +165,17 @@ class Socket:
                                 if read[0] == "SHOOT":
                                     self.gameUpdates[read[1]].append(read[0] + ":" + read[2] + ":" + read[3] + ":" + read[4])
 
-                                #testing
-                                if bool(self.offsets) == True: #if the dictionary is not empty
-                                        print('Offsets dictionary: ')
-                                        print(self.offsets.items())
-                                        print('keys: ')
-                                        print(self.offsets.keys())
-                                        print('values: ')
-                                        print(self.offsets.values())
+                                self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
+                                print('server sent message: ' + time.time())
+
+##                                #testing
+##                                if bool(self.offsets) == True: #if the dictionary is not empty
+##                                        print('Offsets dictionary: ')
+##                                        print(self.offsets.items())
+##                                        print('keys: ')
+##                                        print(self.offsets.keys())
+##                                        print('values: ')
+##                                        print(self.offsets.values())
 
                         except:
                                 pass
@@ -208,9 +217,14 @@ class Socket:
                 if connected == 2: #Username does not exist
                         self.serverSocket.sendto("Username does not exist".encode(), clientAddress)
                 if connected == 0: #Successfully logged in
+                        print('IS THIS WORKING?!') #testing, works
                         self.serverSocket.sendto("Success".encode(), clientAddress)
-                        self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
-                        print('server sent message')
+                        print('HOW ABOUT NOW?!') #testing two, works
+                        while self.serversentcheck == False: #keep sending until received
+                                print('ARE WE HERE?!') #wth
+                                self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
+                                print('Sending?!?') #does not get here.... and not looping
+                        print('server sent message: ' + time.time())
                 if connected == 1: #Password is invalid 
                         self.serverSocket.sendto("Invalid Password".encode(), clientAddress)
                 #sends the modifiedMessage to client with IP and port stored in clientAddress 
