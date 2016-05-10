@@ -57,12 +57,15 @@ class Socket:
         ##                                for i in self.clientAddress.values():
         ##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
                                 if 'serverclientoffset' in read:
-                                        self.offsets[clientID] = [read[read.index('serverclientoffset') + 1]]
+                                        print('server received message')
+                                        if len(self.offsets[clientID]) == 0: #if values has empty list
+                                                self.offsets[clientID] = [read[read.index('serverclientoffset') + 1]]
                                         #finds the index (+1) of where the the offset value is in the message
                                 if 'clientsendtime' in read:
-                                        clientsendtime = read[read.index('clientsendtime') + 1] #don't assume timestamp is last
-                                        clientserveroffset = abs(serverreceivetime - clientsendtime) #in case it's the otherway and is negative
-                                        self.offsets[clientID].append(clientserveroffset) #sets second value of tuple client to server offset
+                                        if len(self.offsets[clientID]) == 1: #has s->c offset in value list
+                                                clientsendtime = read[read.index('clientsendtime') + 1] #don't assume timestamp is last
+                                                clientserveroffset = abs(serverreceivetime - clientsendtime) #in case it's the otherway and is negative
+                                                self.offsets[clientID].append(clientserveroffset) #sets second value of tuple client to server offset
                                 
                                 if read[0] == "LOG":
                                         self.players += 1
@@ -160,6 +163,10 @@ class Socket:
                                 if bool(self.offsets) == True: #if the dictionary is not empty
                                         print('Offsets dictionary: ')
                                         print(self.offsets.items())
+                                        print('keys: ')
+                                        print(self.offsets.keys())
+                                        print('values: ')
+                                        print(self.offsets.values())
 
                         except:
                                 pass
@@ -200,9 +207,10 @@ class Socket:
                 connection.commit()
                 if connected == 2: #Username does not exist
                         self.serverSocket.sendto("Username does not exist".encode(), clientAddress)
-                if connected == 0: #Successfully logged in 
+                if connected == 0: #Successfully logged in
                         self.serverSocket.sendto("Success".encode(), clientAddress)
                         self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
+                        print('server sent message')
                 if connected == 1: #Password is invalid 
                         self.serverSocket.sendto("Invalid Password".encode(), clientAddress)
                 #sends the modifiedMessage to client with IP and port stored in clientAddress 

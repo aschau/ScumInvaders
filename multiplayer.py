@@ -205,6 +205,16 @@ class multiGame:
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
 
+            if 'serversendtime' in modifiedMessage:
+                print('client received message')
+                #calculate offset
+                serverclientoffset = abs(clientreceivetime - modifiedMessage[modifiedMessage.index('serversendtime')+1])
+                #send info back to server to store
+                self.socket.send('serverclientoffset: ' + serverclientoffset + ' clientsendtime: ' + time.time())
+                print('client sent message')
+
+
+
             #print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
