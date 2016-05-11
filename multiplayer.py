@@ -208,11 +208,11 @@ class multiGame:
 
             #rather than print, maybe write to a file to check what's going on since dunno where prints are printing out...
             print('right before offset code stuff for test')
-            if 'serversendtime' in modifiedMessage:
+            if 'serversendtime' in modifiedMessage: #okay, server sent message but it does not detect
                 print('client received message')
                 #calculate offset
                 clientreceivetime = time.time()
-                serverclientoffset = abs(clientreceivetime - modifiedMessage[modifiedMessage.index('serversendtime')+1])
+                serverclientoffset = abs(double(clientreceivetime) - modifiedMessage[modifiedMessage.index('serversendtime')+1])
                 #send info back to server to store
                 self.socket.send('serverclientoffset: ' + str(serverclientoffset) + ' clientsendtime: ' + str(time.time()))
                 print('client sent message')

@@ -58,7 +58,7 @@ class Socket:
                                         if len(self.offsets[clientID]) == 1: #has s->c offset in value list
                                                 self.serverreceivecheck = True
                                                 clientsendtime = read[read.index('clientsendtime') + 1] #don't assume timestamp is last
-                                                clientserveroffset = abs(serverreceivetime - clientsendtime) #in case it's the otherway and is negative
+                                                clientserveroffset = abs(double(serverreceivetime) - double(clientsendtime)) #in case it's the otherway and is negative
                                                 self.offsets[clientID].append(clientserveroffset) #sets second value of tuple client to server offset
                                 
                                 if read[0] == "LOG":
