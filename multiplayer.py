@@ -211,6 +211,7 @@ class multiGame:
             if 'serversendtime' in modifiedMessage:
                 print('client received message')
                 #calculate offset
+                clientreceivetime = time.time()
                 serverclientoffset = abs(clientreceivetime - modifiedMessage[modifiedMessage.index('serversendtime')+1])
                 #send info back to server to store
                 self.socket.send('serverclientoffset: ' + serverclientoffset + ' clientsendtime: ' + time.time())
