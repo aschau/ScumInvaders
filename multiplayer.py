@@ -9,7 +9,6 @@ from datetime import datetime
 from socket import *
 from Connect import Connect
 from missile import Missile
-import json, pickle
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -93,29 +92,25 @@ class multiGame:
 
         #for server
         self.socket = socket
-        random.seed(datetime.now())
-
         if self.clientPlayerNum == 0:
-            self.setGrid()
-            data = pickle.dumps(["SETGRID", self.hostName, self.enemyGrid])
-            self.socket.send(data)
+            self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
         
-        else:
-            tryGrid = True
-            while tryGrid:
-                try:
-                    self.socket.send("GETGRID:" + self.hostName)
-                    message, address = self.socket.clientSocket.recvfrom(2048)
-                    modifiedMessage = message.decode().split(":")
-                    if modifiedMessage[0] == "GRID":
-                        self.enemyGrid = pickle.loads(modifiedMessage[1])
-                        tryGrid = False
-                except:
-                    tryGrid = True
+        tryGrid = True
+        while tryGrid:
+            try:
+                self.socket.send("GETGRID:" + self.hostName)
+                message, address = self.socket.clientSocket.recvfrom(2048)
+                modifiedMessage = message.decode().split(":")
+                if modifiedMessage[0] == "GRID":
+                    self.setGrid(modifiedMessage[1:])
+                    tryGrid = False
+            except:
+                tryGrid = True
                  
         #self.socket.serverName = ip
         #self.socket.clientSocket.setblocking(False)
 
+        random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
         tryGameReady = True
         while tryGameReady:
@@ -129,28 +124,12 @@ class multiGame:
                 tryGameReady = True
 
     #Creates the grid for the enemies in the game
-    #def setGrid(self, rNumList, speed = 16, health = 1):
-    #    rNums = rNumList
-    #    for row in range(self.enemyRowCount):
-    #        self.enemyGrid.append([])
-    #        for column in range(self.enemyColumnCount):
-    #            rnum = int(rNums.pop(0))
-    #            enemySprite = "Alien1SpriteSheet"
-    #            if rnum <= 45:
-    #                enemySprite = "Alien2SpriteSheet"
-
-    #            elif rnum >= 90 and rnum < 98:
-    #                enemySprite = "Alien3SpriteSheet"
-
-    #            elif rnum >= 98:
-    #                enemySprite = "Alien4SpriteSheet"
-
-    #            self.enemyGrid[row].append(Enemy((32 + (column * 96), (row * 64) - self.enemyRowCount * 64), 32, 32, Animate(self.sprites.getSprite(enemySprite), 2, 2, 32, 32, 10), health, speed, row, column, enemySprite))
-    def setGrid(self, speed = 16, health = 1):
-         for row in range(self.enemyRowCount):
+    def setGrid(self, rNumList, speed = 16, health = 1):
+        rNums = rNumList
+        for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
-                rnum = random.randint(1, 100)
+                rnum = int(rNums.pop(0))
                 enemySprite = "Alien1SpriteSheet"
                 if rnum <= 45:
                     enemySprite = "Alien2SpriteSheet"
@@ -190,10 +169,8 @@ class multiGame:
         try:
             if self.serverReady:
                 if self.clientPlayerNum == 0:
-                    data = pickle.dumps(["SETGRID", self.hostName, self.enemyGrid])
-                    self.socket.send(data)
-                else:
-                    self.socket.send("GETGRID:" + self.hostName)
+                    #self.socket.send("RECEIVE:"+self.hostName)
+                    pass
             else:
 
                 if self.clientPlayerNum == 0:
@@ -205,10 +182,6 @@ class multiGame:
             #print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
-            
-            if modifiedMessage[0] == "GRID":
-                if self.clientPlayerNum != 0:
-                    self.enemyGrid = pickle.loads(modifiedMessage[1])
 
             if modifiedMessage[0]  == "MOV":
                 if int(modifiedMessage[1]) != self.clientPlayerNum:
