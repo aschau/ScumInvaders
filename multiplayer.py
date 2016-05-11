@@ -10,6 +10,7 @@ from socket import *
 from Connect import Connect
 from missile import Missile
 import time
+import sqlite3
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -44,10 +45,12 @@ class multiGame:
             self.playerList.append(Player(1, "ship2", "missile2", (400, 700), 32, 32))
 
         if numPlayers > 2:
-            self.playerList.append(Player(2, "ship3", "missle3", (500, 700), 32, 32))
+            
+            self.playerList.append(Player(2, "ship3", "missile3", (500, 700), 32, 32))
 
         if numPlayers > 3:
-            self.playerList.append(Player(3, "ship4", "missle4", (600, 700), 32, 32))
+            
+            self.playerList.append(Player(3, "ship4", "missile4", (600, 700), 32, 32))
         
         self.paused = False
         self.start = True
@@ -135,10 +138,12 @@ class multiGame:
     #        self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
 
     #    if numPlayers > 2:
-    #        self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
+
+    #        self.playerList.append(Player(3, "ship3", "missile3", (500, 700), 32, 32))
 
     #    if numPlayers > 3:
-    #        self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
+
+    #        self.playerList.append(Player(4, "ship4", "missile4", (600, 700), 32, 32))
 
     #    self.enemyGrid = []
     #    self.missiles = []
@@ -274,6 +279,10 @@ class multiGame:
     def checkPlayerLives(self):
         #if (self.playerList[self.clientPlayerNum].lives <= 0):
         #    return "Room"
+        #return "multiGame"
+        if (self.playerList[self.clientPlayerNum].lives <= 0):
+            self.socket.send("SCORE:" + self.hostName + ":" + str(self.playerList[self.clientPlayerNum].score))
+            return "Score"
         return "multiGame"
 
     def checkEnemyCount(self):
@@ -303,12 +312,16 @@ class multiGame:
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
 
-            self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade2"    
+
+            for player in range(len(self.playerList)):
+                self.playerList[player].image = "ship" + str(player+1) + "upgrade2"    
 
         elif self.level == 10:
             self.soundManager.playSound("LevelUp.ogg")
+            
+            for player in range(len(self.playerList)):
+                self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
 
-            self.playerList[self.clientPlayerNum].image = "ship" + str(self.clientPlayerNum+1) + "upgrade3"
 
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
@@ -373,7 +386,8 @@ class multiGame:
                         attacker = self.missiles.pop(numMissiles).owner
                         self.enemyGrid[row][column].health -= 1
                         self.socket.send("HIT:" + "ENEMY:" + str(row) + ":" + str(column))
-                        self.playerList[self.clientPlayerNum].missileCount -= 1
+
+                        self.playerList[attacker].missileCount -= 1
                         if self.enemyGrid[row][column].health == 0 and not self.enemyGrid[row][column].dead:
                             self.enemyGrid[row][column].dead = True
                             self.socket.send("DEATH:" + "ENEMY:" + str(row) + ":" + str(column))
@@ -389,14 +403,15 @@ class multiGame:
                                 self.playerList[self.clientPlayerNum].score += 100 * self.level
                         return
                         
-    #Handles the effects of the missles from both players(1) and enemies(-1)
+
+    #Handles the effects of the missiles from both players(1) and enemies(-1)
     def checkMissiles(self):
         numMissiles = 0
         while numMissiles < len(self.missiles):
             self.missiles[numMissiles].update()
 
             attacker = self.missiles[numMissiles].owner
-            #1 is the player's missle shots
+            #1 is the player's missile shots
             if attacker >= 0:
                 if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) <= 0):
                     #self.socket.send("SHOOT:" + self.hostName + ":" + str(self.clientPlayerNum))
@@ -405,7 +420,8 @@ class multiGame:
 
                 else:
                     self.checkHit(numMissiles)
-            #-1 is the enemy's missle shots                    
+
+            #-1 is the enemy's missile shots                    
             elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.playerList[self.clientPlayerNum].collider)):
                     self.playerList[self.clientPlayerNum].lives -= 1
