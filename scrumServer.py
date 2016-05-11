@@ -100,17 +100,12 @@ class Socket:
 ##                                                                        self.serverSocket.sendto(event.encode(), client)
                                                                         
                                 if read[0] == "SETGRID":
-                                        setRNums = ""
-                                        for row in range(int(read[2])):
-                                                for column in range(int(read[3])):
-                                                        setRNums += str(random.randint(1, 100)) + ":"
-
-                                        self.gameGrids[read[1]] = setRNums
+                                        self.gameGrids[read[1]] = read[2]
 
                                 if read[0] == "GETGRID":
                                         if read[1] in self.gameGrids.keys():
                                                 self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
-
+                                
                                 if read[0] == "GAMEREADY":
                                         for room in self.rooms:
                                                 if room["HOST"] == read[1]:
