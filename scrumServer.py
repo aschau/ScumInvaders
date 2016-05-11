@@ -5,18 +5,6 @@ import random
 from datetime import datetime
 import time
 
-#forgot if I saved this in multiplayer or main_menu before exiting
-##message, serverAddress = self.socket.clientSocket.recvfrom(2048)
-##                modifiedMessage = message.decode()
-##                clientreceivetime = time.time()
-##
-##                if 'serversendtime' in modifiedMessage:
-##                    #calculate offset
-##                    serverclientoffset = abs(clientreceivetime - modifiedMessage[modifiedMessage.index('serversendtime')+1])
-##                    #send info back to server to store
-##                    self.socket.send('serverclientoffset: ' + serverclientoffset + ' clientsendtime: ' + time.time())
-
-
 
 class Socket:
         def __init__(self, host, port):
@@ -165,8 +153,13 @@ class Socket:
                                 if read[0] == "SHOOT":
                                     self.gameUpdates[read[1]].append(read[0] + ":" + read[2] + ":" + read[3] + ":" + read[4])
 
+
+                                print('serversend: '+self.serversendcheck) #did not even print...
+                                print('serversend: '+self.clientoffsetcheck)
+                                print('serversend: '+self.serverreceivecheck)
                                 self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
                                 print('server sent message: ' + time.time())
+
 
 ##                                #testing
 ##                                if bool(self.offsets) == True: #if the dictionary is not empty
@@ -223,7 +216,10 @@ class Socket:
                         while self.serversentcheck == False: #keep sending until received
                                 print('ARE WE HERE?!') #wth
                                 self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
-                                print('Sending?!?') #does not get here.... and not looping
+                                #it does send but refuses to print out the statement after....
+                                #if commented out, it's stuck in a loop
+                                #so apparently it's been sending and catching maybe...?
+                                #print('Sending?!?') #does not get here.... and not looping
                         print('server sent message: ' + time.time())
                 if connected == 1: #Password is invalid 
                         self.serverSocket.sendto("Invalid Password".encode(), clientAddress)

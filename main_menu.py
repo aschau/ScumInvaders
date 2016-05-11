@@ -207,7 +207,7 @@ class Main_Menu():
                 self.ip.update()
                 self.username.update()
                 self.password.update()
-
+                #attempted to put offset messages here but it crashes for some reason
                 return "Menu"
             
             elif self.state == "Lobby":

@@ -206,6 +206,8 @@ class multiGame:
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
             modifiedMessage = message.decode().split(":")
 
+            #rather than print, maybe write to a file to check what's going on since dunno where prints are printing out...
+            print('right before offset code stuff for test')
             if 'serversendtime' in modifiedMessage:
                 print('client received message')
                 #calculate offset
