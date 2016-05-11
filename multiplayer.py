@@ -169,7 +169,8 @@ class multiGame:
         try:
             if self.serverReady:
                 if self.clientPlayerNum == 0:
-                    self.socket.send("RECEIVE:"+self.hostName)
+                    #self.socket.send("RECEIVE:"+self.hostName)
+                    pass
             else:
 
                 if self.clientPlayerNum == 0:

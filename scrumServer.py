@@ -91,13 +91,13 @@ class Socket:
                                 if read[0] == "END":
                                         break
                                 
-                                if read[0] == "RECEIVE":
-                                        if len(self.gameUpdates[read[1]]) > 0:
-                                                event = self.gameUpdates[read[1]].pop(0)
-                                                for room in self.rooms:
-                                                        if room["HOST"] == read[1]:
-                                                                for client in self.roomIPList[read[1]]:
-                                                                        self.serverSocket.sendto(event.encode(), client)
+##                                if read[0] == "RECEIVE":
+##                                        if len(self.gameUpdates[read[1]]) > 0:
+##                                                event = self.gameUpdates[read[1]].pop(0)
+##                                                for room in self.rooms:
+##                                                        if room["HOST"] == read[1]:
+##                                                                for client in self.roomIPList[read[1]]:
+##                                                                        self.serverSocket.sendto(event.encode(), client)
                                                                         
                                 if read[0] == "SETGRID":
                                         setRNums = ""
@@ -131,7 +131,13 @@ class Socket:
                                     self.gameUpdates[read[1]].append(read[0] + ":" + read[2] + ":" + read[3] + ":" + read[4])
 
                         except:
-                                pass
+                                for room in self.gameUpdates.keys():
+                                    if len(self.gameUpdates[room]) > 0:
+                                        for event in self.gameUpdates[room]:
+                                            for client in self.roomIPList[room]:
+                                                self.serverSocket.sendto(event.encode(), client)
+                                        self.gameUpdates[room] = []
+
                 #self.serverSocket.close()
         def checkLog(self,username, password, clientAddress):
                 if clientAddress not in self.clientAddress.values():
