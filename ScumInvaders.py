@@ -67,7 +67,8 @@ class ScumInvaders:
                 if "multiGame" in output:
                     self.screen.blit(self.AllSprites.getSprite("Loading"), (0, 0))
                     self.state = "multiGame"
-                    self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites, self.sounds, int(output[-2]), int(output[-1]), self.mainMenu.ip.input, self.mainMenu.currentRoom, self.mainMenu.socket)
+                    self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites,\
+                        self.sounds, int(output[-2]), int(output[-1]), self.mainMenu.ip.input, self.mainMenu.currentRoom, self.mainMenu.socket)
 
                 elif output == "Exit":
                     self.running = False
@@ -101,6 +102,7 @@ class ScumInvaders:
                     self.state = output
                     if self.state == "Score":
                         self.mainMenu.state = "Score"
+                        self.mainMenu.score = self.multiGame.playerList[self.multiGame.clientPlayerNum].score
                         self.sounds.playNewMusic('mainMenu.ogg')
                         self.state = "Menu"
 

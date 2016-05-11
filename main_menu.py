@@ -118,15 +118,16 @@ class Main_Menu():
                         break
             elif self.state == "Score":
                 self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
+                self.screen.blit(self.font.render(str(self.score), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 for button in self.scoreButtons:
                     button.draw()
 
-                database = sqlite3.connect("scoreTable.db")
-                d = database.cursor()
-                data = d.execute('SELECT * FROM scores')
-                for i in data:
-                    if i[0] == self.username.input:
-                        self.screen.blit(self.font.render(str(i[2]), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
+                #database = sqlite3.connect("scoreTable.db")
+                #d = database.cursor()
+                #data = d.execute('SELECT * FROM scores')
+                #for i in data:
+                #    if i[0] == self.username.input:
+                #        self.screen.blit(self.font.render(str(i[2]), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
 
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
@@ -257,13 +258,14 @@ class Main_Menu():
             elif self.state == "Score":
                 for button in self.scoreButtons:
                     button.checkHover(pygame.mouse.get_pos())
-                try:
-                    modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
-                    data = modifiedMessage.split(":")
-                    if data[0] == "SCORE":
-                        self.score = int(data[1])
-                except:
-                    pass
+                #try:
+                #    self.socket.send("SCORE:GIMME")
+                #    modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
+                #    data = modifiedMessage.split(":")
+                #    if data[0] == "SCORE":
+                #        self.score = int(data[1])
+                #except:
+                #    pass
                 return "Menu"
 
             elif self.state == "Room":
