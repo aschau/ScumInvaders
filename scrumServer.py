@@ -150,10 +150,10 @@ class Socket:
             print(data)
         def checkLog(self,username, password, clientAddress):
                 if clientAddress not in self.clientAddress.values():
-                        if self.players < 5:
-                                self.clientAddress[clientAddress] = username
-                        else:
-                                print("The server is full. Please leave.")
+##                        if self.players < 5:
+                        self.clientAddress[clientAddress] = username
+##                        else:
+##                                print("The server is full. Please leave.")
                 #clientSocket, addr = serverSocket.accept()
                 connected = None
                 #opens connection to SQLite database file database and returns a connection object
