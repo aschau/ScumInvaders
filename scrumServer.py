@@ -15,7 +15,7 @@ class Socket:
                 self.rooms = []
                 self.roomIPList = {}
                 self.gameUpdates = {}
-                self.gameGrids = {}
+                self.gameGridTypes = {}
                 random.seed(datetime.now())
                 #serverSocket.listen(4) #denotes the number of clients can queue
                 #it binds the serverSocket to port number specified in serverPort variable.
@@ -105,12 +105,15 @@ class Socket:
                                                 for column in range(int(read[3])):
                                                         setRNums += str(random.randint(1, 100)) + ":"
 
-                                        self.gameGrids[read[1]] = setRNums
+                                        self.gameGridTypes[read[1]] = setRNums
 
-                                if read[0] == "GETGRID":
-                                        if read[1] in self.gameGrids.keys():
-                                                self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
+                                if read[0] == "GETGRIDTYPES":
+                                        if read[1] in self.gameGridTypes.keys():
+                                                self.serverSocket.sendto(("GRID:" + self.gameGridTypes[read[1]]).encode(), clientID)
 
+                                if read[0] == "ENEMYGRID":
+                                        pass
+                                
                                 if read[0] == "GAMEREADY":
                                         for room in self.rooms:
                                                 if room["HOST"] == read[1]:

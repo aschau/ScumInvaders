@@ -9,6 +9,7 @@ from datetime import datetime
 from socket import *
 from Connect import Connect
 from missile import Missile
+import json
 
 '''
 initializes score, enemyCount, enemyGrid, missile count, and level here 
@@ -89,12 +90,13 @@ class multiGame:
         self.mouseNext = pygame.time.get_ticks()
 
         self.serverReady = False
+        random.seed(datetime.now())
 
         #for server
         self.socket = socket
         if self.clientPlayerNum == 0:
             self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
-        
+
         tryGrid = True
         while tryGrid:
             try:
@@ -106,11 +108,11 @@ class multiGame:
                     tryGrid = False
             except:
                 tryGrid = True
+            
                  
         #self.socket.serverName = ip
         #self.socket.clientSocket.setblocking(False)
 
-        random.seed(datetime.now())
         self.startTime = pygame.time.get_ticks()
         tryGameReady = True
         while tryGameReady:
@@ -122,6 +124,15 @@ class multiGame:
                     tryGameReady = False
             except:
                 tryGameReady = True
+
+
+    def sendGrid(self):
+        grid = []
+        for row in range(self.enemyRowCount):
+            for column in range(self.enemyColumnCount):
+                grid.append({key:self.enemyGrid[row][column].__dict__[key] for key in ['row', 'column', 'health', 'posx', 'posy', 'lastMove', 'dead', 'speed']})
+        data = json.dumps(grid)
+        self.socket.send("ENEMYGRID:" + self.hostName + ":" + data)
 
     #Creates the grid for the enemies in the game
     def setGrid(self, rNumList, speed = 16, health = 1):
@@ -169,8 +180,7 @@ class multiGame:
         try:
             if self.serverReady:
                 if self.clientPlayerNum == 0:
-                    #self.socket.send("RECEIVE:"+self.hostName)
-                    pass
+                    self.sendGrid()
             else:
 
                 if self.clientPlayerNum == 0:
@@ -251,11 +261,11 @@ class multiGame:
         tryGrid = True
         while tryGrid:
             try:
-                self.socket.send("GETGRID:" + self.hostName)
+                self.socket.send("GETGRIDTYPES:" + self.hostName)
                 message, address = self.socket.clientSocket.recvfrom(2048)
                 modifiedMessage = message.decode().split(":")
                 if modifiedMessage[0] == "GRID":
-                    #self.setGrid(modifiedMessage[1:])
+                    self.setGrid(modifiedMessage[1:])
                     tryGrid = False
             except:
                 tryGrid = True
