@@ -100,7 +100,7 @@ class multiGame:
         tryGrid = True
         while tryGrid:
             try:
-                self.socket.send("GETGRID:" + self.hostName)
+                self.socket.send("GETGRIDTYPES:" + self.hostName)
                 message, address = self.socket.clientSocket.recvfrom(2048)
                 modifiedMessage = message.decode().split(":")
                 if modifiedMessage[0] == "GRID":
@@ -130,9 +130,12 @@ class multiGame:
         grid = []
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
-                grid.append({key:self.enemyGrid[row][column].__dict__[key] for key in ['row', 'column', 'health', 'posx', 'posy', 'lastMove', 'dead', 'speed']})
+                grid.append({key:self.enemyGrid[row][column].__dict__[key] for key in ['row', 'col', 'health', 'posx', 'posy', 'lastMove', 'dead', 'speed']})
         data = json.dumps(grid)
         self.socket.send("ENEMYGRID:" + self.hostName + ":" + data)
+
+    def readGrid(self, gridData):
+        print(gridData)
 
     #Creates the grid for the enemies in the game
     def setGrid(self, rNumList, speed = 16, health = 1):
@@ -187,8 +190,12 @@ class multiGame:
                     self.socket.send("GETGAMESTART:" + self.hostName)
 
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
-            modifiedMessage = message.decode().split(":")
+            modifiedMessage = message.decode()
+            if "ENEMYGRID" in modifiedMessage:
+                data = json.loads(modifiedMessage[10:])
+                self.readGrid(data)
 
+            modifiedMessage = modifiedMessage.split(":")
             #print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
