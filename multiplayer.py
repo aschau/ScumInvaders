@@ -117,7 +117,7 @@ class multiGame:
         tryGameReady = True
         while tryGameReady:
             try:
-                clienttime = time.time()
+                clienttime = str(time.time())
                 self.socket.send("GAMEREADY:" + self.hostName + ":" + clienttime) #append client time to message for server
                 message, address = self.socket.clientSocket.recvfrom(2048)
                 modifiedMessage = message.decode().split(":")
@@ -214,7 +214,7 @@ class multiGame:
                 clientreceivetime = time.time()
                 serverclientoffset = abs(clientreceivetime - modifiedMessage[modifiedMessage.index('serversendtime')+1])
                 #send info back to server to store
-                self.socket.send('serverclientoffset: ' + serverclientoffset + ' clientsendtime: ' + time.time())
+                self.socket.send('serverclientoffset: ' + str(serverclientoffset) + ' clientsendtime: ' + str(time.time()))
                 print('client sent message')
 
 

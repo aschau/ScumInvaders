@@ -157,8 +157,8 @@ class Socket:
                                 print('serversend: '+self.serversendcheck) #did not even print...
                                 print('serversend: '+self.clientoffsetcheck)
                                 print('serversend: '+self.serverreceivecheck)
-                                self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
-                                print('server sent message: ' + time.time())
+                                self.serverSocket.sendto(("serversendtime: " + str(time.time())).encode(), clientAddress) #send serversend time
+                                print('server sent message: ' + str(time.time()))
 
 
 ##                                #testing
@@ -213,14 +213,14 @@ class Socket:
                         print('IS THIS WORKING?!') #testing, works
                         self.serverSocket.sendto("Success".encode(), clientAddress)
                         print('HOW ABOUT NOW?!') #testing two, works
-                        while self.serversentcheck == False: #keep sending until received
-                                print('ARE WE HERE?!') #wth
-                                self.serverSocket.sendto(("serversendtime: " + time.time()).encode(), clientAddress) #send serversend time
+##                        while self.serversentcheck == False: #keep sending until received
+                        print('ARE WE HERE?!') #wth
+                        self.serverSocket.sendto(("serversendtime: " + str(time.time())).encode(), clientAddress) #send serversend time
                                 #it does send but refuses to print out the statement after....
                                 #if commented out, it's stuck in a loop
                                 #so apparently it's been sending and catching maybe...?
                                 #print('Sending?!?') #does not get here.... and not looping
-                        print('server sent message: ' + time.time())
+                        print('server sent message: ' + str(time.time()))
                 if connected == 1: #Password is invalid 
                         self.serverSocket.sendto("Invalid Password".encode(), clientAddress)
                 #sends the modifiedMessage to client with IP and port stored in clientAddress 
