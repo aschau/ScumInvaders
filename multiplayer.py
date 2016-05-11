@@ -228,24 +228,25 @@ class multiGame:
                     self.soundManager.playNewMusic("Space Invaders Theme.ogg", .2)
                     self.start = False
 
-            self.keyUpdate()
-            #if not self.paused:
-            self.backgroundUpdate()
+            
             self.state = self.enemyUpdate()
 
             if self.checkState():
                 return self.state
-        
-            self.checkMissiles()
 
-            self.state = self.checkPlayerLives()
-            if self.checkState():
-                return self.state
-        
             self.checkEnemyCount()
 
-            if self.paused:
-                return self.mouseUpdate()
+        
+        self.keyUpdate()
+        self.backgroundUpdate()
+        self.checkMissiles()
+        self.state = self.checkPlayerLives()
+
+        if self.checkState():
+            return self.state
+
+        if self.paused:
+            return self.mouseUpdate()
 
         return self.state
     
