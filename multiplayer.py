@@ -123,31 +123,6 @@ class multiGame:
             except:
                 tryGameReady = True
 
-    #def reset(self, numPlayers):
-    #    self.numPlayers = numPlayers
-    #    self.playerList = []
-    #    self.playerList.append(Player(1, "ship1", "missile1", (300, 700), 32, 32))
-
-    #    if numPlayers > 1:
-    #        self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
-
-    #    if numPlayers > 2:
-    #        self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
-
-    #    if numPlayers > 3:
-    #        self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
-
-    #    self.enemyGrid = []
-    #    self.missiles = []
-    #    self.enemyCount = 50
-    #    self.setGrid()
-    #    self.level = 1
-    #    self.playerList[self.clientPlayerNum].score = 0
-    #    self.state = "multiGame"
-    #    self.paused = False
-    #    self.start = True
-    #    self.startTime = pygame.time.get_ticks()
-
     #Creates the grid for the enemies in the game
     def setGrid(self, rNumList, speed = 16, health = 1):
         rNums = rNumList
@@ -210,11 +185,11 @@ class multiGame:
             if modifiedMessage[0]  == "MOV":
                 if int(modifiedMessage[1]) != self.clientPlayerNum:
                     self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
-                    self.playerList[int(modifiedMessage[1])].posy = int(modifiedMessage[3])
+
             if modifiedMessage[0] == "SHOOT":
                 if int(modifiedMessage[3]) != self.clientPlayerNum:
                     self.missiles.append(Missile(int(modifiedMessage[3]), self.playerList[int(modifiedMessage[3])].missileImage, (int(modifiedMessage[1]) + self.playerList[int(modifiedMessage[3])].imagew - 18, int(modifiedMessage[2]) - self.playerList[int(modifiedMessage[3])].imageh),8, 32)) #(self.playerList[int(modifiedMessage[3])].posx + (self.playerList[int(modifiedMessage[3])].imagew - 18), self.playerList[int(modifiedMessage[3])].posy - (self.playerList[int(modifiedMessage[3])].imageh)), 8, 32))
-        except Exception as error:
+        except BlockingIOError as error:
             if type(error) != BlockingIOError:
                 mod = ' '.join(str(type(error)))
                 with open("Log.txt","a") as f:
@@ -320,13 +295,13 @@ class multiGame:
             if keys[pygame.K_a]:
                 if not ((self.playerList[self.clientPlayerNum].posx - self.playerList[self.clientPlayerNum].speed) <= 0):
                     self.playerList[self.clientPlayerNum].moveLeft()
-                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy))
+                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
 
 
             if keys[pygame.K_d]:
                 if not ((self.playerList[self.clientPlayerNum].posx + self.playerList[self.clientPlayerNum].speed + self.playerList[self.clientPlayerNum].imagew) >= self.screenw):
                     self.playerList[self.clientPlayerNum].moveRight()
-                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy))
+                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
 
             if pygame.time.get_ticks() > self.nextMissile:
                 self.nextMissile = pygame.time.get_ticks() + self.missileDelay
