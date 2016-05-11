@@ -277,14 +277,14 @@ class game:
                                 self.player.score += 100 * self.level
                         return
 
-    #Handles the effects of the missles from both players(1) and enemies(0)
+    #Handles the effects of the missiles from both players(1) and enemies(0)
     def checkMissiles(self):
         numMissiles = 0
         while numMissiles < len(self.missiles):
             self.missiles[numMissiles].update()
 
             attacker = self.missiles[numMissiles].owner
-            #1 is the player's missle shots
+            #1 is the player's missile shots
             if attacker == 1:
                 if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) < 0):
                     self.missiles.pop(numMissiles)
@@ -292,7 +292,7 @@ class game:
 
                 else:
                     self.checkHit(numMissiles)
-            #-1 is the enemy's missle shots                    
+            #-1 is the enemy's missile shots                    
             elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.player.collider)):
                     self.player.lives -= 1

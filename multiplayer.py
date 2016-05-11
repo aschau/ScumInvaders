@@ -132,10 +132,10 @@ class multiGame:
     #        self.playerList.append(Player(2, "ship2", "missile2", (400, 700), 32, 32))
 
     #    if numPlayers > 2:
-    #        self.playerList.append(Player(3, "ship3", "missle3", (500, 700), 32, 32))
+    #        self.playerList.append(Player(3, "ship3", "missile3", (500, 700), 32, 32))
 
     #    if numPlayers > 3:
-    #        self.playerList.append(Player(4, "ship4", "missle4", (600, 700), 32, 32))
+    #        self.playerList.append(Player(4, "ship4", "missile4", (600, 700), 32, 32))
 
     #    self.enemyGrid = []
     #    self.missiles = []
@@ -375,14 +375,14 @@ class multiGame:
                                 self.playerList[self.clientPlayerNum].score += 100 * self.level
                         return
                         
-    #Handles the effects of the missles from both players(1) and enemies(-1)
+    #Handles the effects of the missiles from both players(1) and enemies(-1)
     def checkMissiles(self):
         numMissiles = 0
         while numMissiles < len(self.missiles):
             self.missiles[numMissiles].update()
 
             attacker = self.missiles[numMissiles].owner
-            #1 is the player's missle shots
+            #1 is the player's missile shots
             if attacker >= 0:
                 if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) <= 0):
                     #self.socket.send("SHOOT:" + self.hostName + ":" + str(self.clientPlayerNum))
@@ -391,7 +391,7 @@ class multiGame:
 
                 else:
                     self.checkHit(numMissiles)
-            #-1 is the enemy's missle shots                    
+            #-1 is the enemy's missile shots                    
             elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.playerList[self.clientPlayerNum].collider)):
                     self.playerList[self.clientPlayerNum].lives -= 1
