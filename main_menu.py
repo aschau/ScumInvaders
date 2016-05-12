@@ -5,6 +5,7 @@ from socket import *
 from Connect import Connect
 import select
 import json
+import sqlite3
 
 class Main_Menu():
         def __init__(self, screen, screenw, screenh, spriteList, soundManager):
@@ -50,6 +51,10 @@ class Main_Menu():
             self.currentRoom = None
             self.currentRoomLength = 0
 
+            self.score = 0
+            self.scoreButtons = []
+            self.scoreButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
+            
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
             self.host = False
@@ -111,6 +116,18 @@ class Main_Menu():
                                     self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
                                 playerNumber += 1
                         break
+            elif self.state == "Score":
+                self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
+                self.screen.blit(self.font.render(str(self.score), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
+                for button in self.scoreButtons:
+                    button.draw()
+
+                #database = sqlite3.connect("scoreTable.db")
+                #d = database.cursor()
+                #data = d.execute('SELECT * FROM scores')
+                #for i in data:
+                #    if i[0] == self.username.input:
+                #        self.screen.blit(self.font.render(str(i[2]), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
 
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
@@ -168,7 +185,12 @@ class Main_Menu():
                                     self.host = True
                                     self.state = "Room"
                                     self.currentRoom = self.username.input
-                    
+                     ## Message == SCORE:playerScore
+                    elif self.state == "Score":
+                        for button in self.scoreButtons:
+                            if button.checkClicked(pygame.mouse.get_pos()):
+                                self.state = button.click()
+
                     elif self.state == "Room":
                         for button in self.roomButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
@@ -232,6 +254,18 @@ class Main_Menu():
 
                 for button in self.lobbyButtons:
                     button.checkHover(pygame.mouse.get_pos())
+                return "Menu"
+            elif self.state == "Score":
+                for button in self.scoreButtons:
+                    button.checkHover(pygame.mouse.get_pos())
+                #try:
+                #    self.socket.send("SCORE:GIMME")
+                #    modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
+                #    data = modifiedMessage.split(":")
+                #    if data[0] == "SCORE":
+                #        self.score = int(data[1])
+                #except:
+                #    pass
                 return "Menu"
 
             elif self.state == "Room":
