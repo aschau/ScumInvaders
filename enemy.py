@@ -44,5 +44,8 @@ class Enemy:
         self.posy += self.downSpeed
         self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
 
+    def updateCollider(self):
+        self.collider = pygame.Rect(self.posx, self.posy, self.imagew, self.imageh)
+
     def getPos(self):
         return (self.posx, self.posy)

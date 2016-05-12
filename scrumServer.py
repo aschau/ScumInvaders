@@ -17,6 +17,7 @@ class Socket:
                 self.rooms = []
                 self.roomIPList = {}
                 self.gameUpdates = {}
+                self.gameGridTypes = {}
                 self.gameGrids = {}
                 self.offsets = {} # username:[serverclientoffset, clientserveroffset]
                 self.serversentcheck = False #maybe loss of packets, keep sending
@@ -42,7 +43,7 @@ class Socket:
         
                                 serverreceivetime = time.time() #for offset calculation
                                 modMessage = message.decode()
-        ##                        print(modMessage)
+##                                print(modMessage)
                                 read = modMessage.split(":")
         ##                        if read[0] == "TALK":
         ##                                for i in self.clientAddress.values():
@@ -112,26 +113,38 @@ class Socket:
                                 if read[0] == "END":
                                         break
                                 
-                                if read[0] == "RECEIVE":
-                                        if len(self.gameUpdates[read[1]]) > 0:
-                                                event = self.gameUpdates[read[1]].pop(0)
-                                                for room in self.rooms:
-                                                        if room["HOST"] == read[1]:
-                                                                for client in self.roomIPList[read[1]]:
-                                                                        self.serverSocket.sendto(event.encode(), client)
-                                                                        
+##                                if read[0] == "RECEIVE":
+##                                        if len(self.gameUpdates[read[1]]) > 0:
+##                                                event = self.gameUpdates[read[1]].pop(0)
+##                                                for room in self.rooms:
+##                                                        if room["HOST"] == read[1]:
+##                                                                for client in self.roomIPList[read[1]]:
+##                                                                        self.serverSocket.sendto(event.encode(), client)
+                                if read[0] == "HIT":
+                                        for client in self.roomIPList[read[1]]:
+                                                self.serverSocket.sendto(message, client)
+
+                                
                                 if read[0] == "SETGRID":
                                         setRNums = ""
                                         for row in range(int(read[2])):
                                                 for column in range(int(read[3])):
                                                         setRNums += str(random.randint(1, 100)) + ":"
 
-                                        self.gameGrids[read[1]] = setRNums
+                                        self.gameGridTypes[read[1]] = setRNums
 
-                                if read[0] == "GETGRID":
-                                        if read[1] in self.gameGrids.keys():
-                                                self.serverSocket.sendto(("GRID:" + self.gameGrids[read[1]]).encode(), clientID)
+                                if read[0] == "GETGRIDTYPES":
+                                        if read[1] in self.gameGridTypes.keys():
+                                                self.serverSocket.sendto(("GRID:" + self.gameGridTypes[read[1]]).encode(), clientID)
 
+##                                if read[0] == "ENEMYGRID":
+##                                        print("ENEMYGRID")
+##                                        self.gameGrids[read[1]] = read[2]
+##                                        print("GG?")
+##                                        for client in self.roomIPList[read[1]]:
+##                                                self.serverSocket.sendto(("ENEMYGRID:" + read[2]).encode(), client)
+##                                                print("TROOLOLOL")
+                                
                                 if read[0] == "GAMEREADY":
                                         for room in self.rooms:
                                                 if room["HOST"] == read[1]:
@@ -177,7 +190,13 @@ class Socket:
 ##                                        print(self.offsets.values())
 
                         except:
-                                pass
+                                for room in self.gameUpdates.keys():
+                                    if len(self.gameUpdates[room]) > 0:
+                                        for event in self.gameUpdates[room]:
+                                            for client in self.roomIPList[room]:
+                                                self.serverSocket.sendto(event.encode(), client)
+                                        self.gameUpdates[room] = []
+
                 #self.serverSocket.close()
         def score(self,id, score):
             print("Is this working?")
