@@ -34,7 +34,7 @@ class Socket:
                                 #decodes the message
                                 
                                 modMessage = message.decode()
-                                print(modMessage)
+##                                print(modMessage)
                                 read = modMessage.split(":")
         ##                        if read[0] == "TALK":
         ##                                for i in self.clientAddress.values():
@@ -99,7 +99,11 @@ class Socket:
 ##                                                        if room["HOST"] == read[1]:
 ##                                                                for client in self.roomIPList[read[1]]:
 ##                                                                        self.serverSocket.sendto(event.encode(), client)
-                                                                        
+                                if read[0] == "HIT":
+                                        for client in self.roomIPList[read[1]]:
+                                                self.serverSocket.sendto(message, client)
+
+                                
                                 if read[0] == "SETGRID":
                                         setRNums = ""
                                         for row in range(int(read[2])):
@@ -112,13 +116,13 @@ class Socket:
                                         if read[1] in self.gameGridTypes.keys():
                                                 self.serverSocket.sendto(("GRID:" + self.gameGridTypes[read[1]]).encode(), clientID)
 
-                                if read[0] == "ENEMYGRID":
-                                        print("ENEMYGRID")
-                                        self.gameGrids[read[1]] = read[2]
-                                        print("GG?")
-                                        for client in self.roomIPList[read[1]]:
-                                                self.serverSocket.sendto(("ENEMYGRID:" + read[2]).encode(), client)
-                                                print("TROOLOLOL")
+##                                if read[0] == "ENEMYGRID":
+##                                        print("ENEMYGRID")
+##                                        self.gameGrids[read[1]] = read[2]
+##                                        print("GG?")
+##                                        for client in self.roomIPList[read[1]]:
+##                                                self.serverSocket.sendto(("ENEMYGRID:" + read[2]).encode(), client)
+##                                                print("TROOLOLOL")
                                 
                                 if read[0] == "GAMEREADY":
                                         for room in self.rooms:
