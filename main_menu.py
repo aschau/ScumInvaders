@@ -58,11 +58,12 @@ class Main_Menu():
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
             self.host = False
+            self.loginPressed = False
 
             #for server
             self.socket = Connect()
             self.socket.serverName = None
-            self.socket.clientSocket.settimeout(5.0)
+            self.socket.clientSocket.settimeout(0.0)
             self.loginStatus = ""
             self.player = 1
 
@@ -81,7 +82,7 @@ class Main_Menu():
                 if self.loginStatus == "Invalid Password":
                     self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 elif self.loginStatus == "No Server":
-                    self.screen.blit(self.font.render("The server is unavailable.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
+                    self.screen.blit(self.font.render("Waiting for server. Double check info.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 elif self.loginStatus == "Missing Field(s)":
                     self.screen.blit(self.font.render("Missing Field(s).", True, pygame.Color(255,255,255)),(self.screenw/2 - (len("Invalid Format.") * 30)/4,self.screenh/2 - 100))
                 
@@ -142,6 +143,7 @@ class Main_Menu():
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Lobby":
+                                    self.loginPressed = True
                                     if self.ip.input != "" and self.username.input != "" and self.password.input != "":
                                         message = self.username.input + ":" + self.password.input
                                         self.socket.serverName = self.ip.input
@@ -153,7 +155,6 @@ class Main_Menu():
                                             if modifiedMessage.decode() == "Invalid Password":
                                                 self.loginStatus = "Invalid Password"
                                                 self.state = "Login"
-                                            self.socket.clientSocket.settimeout(0.0)
                                         except:
                                             self.loginStatus = "No Server"
                                             self.state = "Login"
@@ -223,6 +224,22 @@ class Main_Menu():
                 return "Menu"
 
             elif self.state == "Login":
+                if self.loginPressed:
+                    try:
+                        modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
+                        self.loginStatus = ""
+                
+                        if modifiedMessage.decode() == "Invalid Password":
+                            self.loginStatus = "Invalid Password"
+                            self.state = "Login"
+                    
+                        elif modifiedMessage.decode() == "Success":
+                            self.state = "Lobby"
+
+                    except:
+                        self.loginStatus = "No Server"
+                        self.state = "Login"
+
                 for button in self.loginButtons:
                     button.checkHover(pygame.mouse.get_pos())
 
