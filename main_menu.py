@@ -21,11 +21,7 @@ class Main_Menu():
             self.mainButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Exit", 'Exit.ogg', soundManager))
 
             self.fontsize = 30
-            self.lobbyFontSize = 80
-            self.roomFontSize = 50
             self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
-            self.lobbyFont = pygame.font.Font(os.path.join('Fonts', 'BaconFarm.ttf'), self.lobbyFontSize)
-            self.roomFont = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.roomFontSize)
 
             self.loginButtons = []
             self.ip = textInput(self.screen, "Server IP", (self.screenw/2 - 200, 30), (self.font.get_height() * 8), 50, 15)
@@ -34,30 +30,8 @@ class Main_Menu():
             self.loginButtons.append(Button(self.screen, self.sprites.getSprite("login"), self.sprites.getSprite("loginHighlighted"), 368, 442, 281, 68, "Lobby", 'Start Button.ogg', soundManager))
             self.loginButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
 
-            self.lobbyButtons = []
-
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyCreateButton"), self.sprites.getSprite("LobbyCreateButtonHovered"), self.screenw - 283, 225, 280, 68, "Create", 'Start Button.ogg', soundManager))
-            self.lobbyButtons.append(Button(self.screen, self.sprites.getSprite("LobbyEjectButton"), self.sprites.getSprite("LobbyEjectButtonHovered"), self.screenw - 283, 425, 280, 68, "Main", 'Exit.ogg', soundManager))
-
-            self.lobbyRoomButtons = []
-
-            self.roomButtons = []
-
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("ready"), self.sprites.getSprite("readyhover"), 0, self.screenh - 90, 184, 85, "Ready", 'Start Button.ogg', soundManager))
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 220*2, self.screenh - 90, 184, 85, "Lobby", 'Exit.ogg', soundManager))
-            self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbuttondisable"), self.sprites.getSprite("startbuttondisable"), 220, self.screenh - 90, 184, 85, "multiGame", 'Start Button.ogg', self.soundManager, True))
-
-            self.rooms = []
-            self.currentRoom = None
-            self.currentRoomLength = 0
-
-            self.score = 0
-            self.scoreButtons = []
-            self.scoreButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Main", 'Exit.ogg', soundManager))
-            
             self.mouseDelay = 100
             self.mouseNext = pygame.time.get_ticks()
-            self.host = False
             self.loginPressed = False
 
             #for server
@@ -88,47 +62,6 @@ class Main_Menu():
                 
                 for button in self.loginButtons:
                     button.draw()
-
-            elif self.state == "Lobby":
-                self.screen.fill((0, 0, 0))
-                self.screen.blit(self.sprites.getSprite("LobbyRoomBackgroundOutline"), (5, 33))
-                for button in range(len(self.lobbyRoomButtons)):
-                    self.lobbyRoomButtons[button].draw()
-                    self.screen.blit(self.lobbyFont.render(self.lobbyRoomButtons[button].function + "'s Room " + str(len(self.rooms[button].keys())-1) + "/4", True, pygame.Color(89, 89, 89)), (self.lobbyRoomButtons[button].posx + 25, self.lobbyRoomButtons[button].posy + 10))
-
-                for button in self.lobbyButtons:
-                    button.draw()
-
-            elif self.state == "Room":
-                self.screen.blit(self.sprites.getSprite("GameRoomBackground"), (0, 0))
-                for button in self.roomButtons:
-                    button.draw()
-
-                playerNumber = 0
-                for room in self.rooms:
-                    if room["HOST"] == self.currentRoom:
-                        for player, status in room.items():
-                            if player != "HOST":
-                                self.screen.blit(self.sprites.getSprite("RoomNameBox"), (20, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
-                                self.screen.blit(self.roomFont.render(player, True, pygame.Color(0,0,0)),(40, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
-                                if status == True:
-                                    self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
-                                else:
-                                    self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
-                                playerNumber += 1
-                        break
-            elif self.state == "Score":
-                self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
-                self.screen.blit(self.font.render(str(self.score), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
-                for button in self.scoreButtons:
-                    button.draw()
-
-                #database = sqlite3.connect("scoreTable.db")
-                #d = database.cursor()
-                #data = d.execute('SELECT * FROM scores')
-                #for i in data:
-                #    if i[0] == self.username.input:
-                #        self.screen.blit(self.font.render(str(i[2]), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
 
         def mouseUpdate(self):
             if pygame.time.get_ticks() >= self.mouseNext:
@@ -226,6 +159,8 @@ class Main_Menu():
             elif self.state == "Login":
                 if self.loginPressed:
                     try:
+                        message = self.username.input + ":" + self.password.input
+                        self.socket.send("LOG:" + message)
                         modifiedMessage, serverAddress = self.socket.clientSocket.recvfrom(2048)
                         self.loginStatus = ""
                 

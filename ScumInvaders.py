@@ -9,7 +9,7 @@ from Sprite_Manager import sprites
 from soundManager import soundManager
 from game import game
 from multiplayer import multiGame
-
+from lobby import Lobby
 #server stuff
 from socket import *
 
@@ -42,6 +42,7 @@ class ScumInvaders:
         self.state = "Menu"
         self.sounds = soundManager("Sound")
         self.mainMenu = Main_Menu(self.screen, self.width, self.height, self.AllSprites, self.sounds)
+        self.lobby = Lobby(self.screen, self.width, self.height, self.AllSprites, self.sounds)
         self.game = game(self.screen, self.width, self.height, self.AllSprites, self.sounds)
         
         self.multiGame = None
@@ -77,6 +78,10 @@ class ScumInvaders:
                     self.state = output
                     if output == "Game":
                         self.game.reset()
+            
+            elif output == "Lobby":
+                self.lobby.draw()
+                output = self.lobby.update()
 
             elif (self.state == "Game"):
                 self.game.draw()

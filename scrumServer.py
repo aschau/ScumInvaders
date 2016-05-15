@@ -167,7 +167,7 @@ class Socket:
             database.commit()
             d.execute("SELECT * FROM scores")
             data = d.fetchall()
-            print(data)
+##            print(data)
         def checkLog(self,username, password, clientAddress):
                 if clientAddress not in self.clientAddress.values():
 ##                        if self.players < 5:
@@ -187,7 +187,7 @@ class Socket:
                 c.execute("SELECT * FROM scores")
                 #returns a list of the results
                 data = c.fetchall()
-                print(data)
+##                print(data)
                 un = ""
                 for i in data:
                         if i[0] == username:
