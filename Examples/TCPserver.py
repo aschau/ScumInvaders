@@ -6,10 +6,21 @@ import threading
 
 class TCP_Server:
     def __init__(self, host, port):
-        self.host = ''
-        self.port = 12000
+        self.host = host
+        self.port = port
         self.serverSocket = socket(AF_INET, SOCK_STREAM)
-        self.serverSocket.bind((host, port))
+        self.serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        serverPortTaken = True
+        while serverPortTaken:
+            try:
+                self.serverSocket.bind((host, port))
+                serverPortTaken = False
+                
+            except:
+                self.port = self.port = self.port + 1
+                print(self.port)
+
+            
         self.serverSocket.listen(4)
         #self.serverSocket.settimeout(0.0)
         self.connectSocket = None
@@ -114,7 +125,7 @@ class clientChannel(threading.Thread):
         data = c.fetchall()
         print(data)
 if __name__ == "__main__":
-    socket = TCP_Server("", 12000)
+    socket = TCP_Server("", 1)
     print(gethostbyname(gethostname()))
     socket.run()
     socket.serverSocket.close()
