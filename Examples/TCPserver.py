@@ -47,45 +47,11 @@ class TCP_Server:
             self.connectSocket, clientID = self.serverSocket.accept()
             print("...connected from: ", clientID)
             conSock = clientChannel(self.connectSocket, clientID[0])
-            conSock.start()
+            conSock.run()
             self.threads.append(conSock)
         self.connectSocket.close()
         for c in self.threads:
             c.join()
-##            try:
-##                while True:
-##                    data = self.connectSocket.recv(200)
-##                    if not data: break
-##                    read = data.decode().split(":")
-##                    print(read)
-##                    if read[0] == "LOG":
-##                        self.checkLog(read[1], read[2], clientID)
-##                    elif read[0] == "TALK":
-##                        self.connectSocket.send(read[1].encode())
-##                    elif read[0] == "STOP":
-##                        self.connectSocket.send(read[0].encode())
-##                        break
-##                    else:
-##                        self.connectSocket.send("Send again".encode())
-##        ##                connectSocket, clientID = self.serverSocket.accept()
-##        ##                print("It accepted.")
-##        ##                connectSocket.send("You have connected.".encode()) 
-##        ##                message = connectSocket.recv(1024)
-##        ##                read = message.decode().split(":")
-##        ##                print(read)
-##        ##                if read[0] == "LOG":
-##        ##                    self.checkLog(read[1], read[2], clientID)
-##        ##                elif read[0] == "TALK":
-##        ##                    connectSocket.send(read[1].encode())
-##        ##                elif read[0] == "STOP":
-##        ##                    connectSocket.send(read[0].encode())
-##        ##                    break
-##        ##                else:
-##        ##                    connectSocket.send("Send again".encode())
-##            finally:
-##                self.connectSocket.close()
-##                break
-
 
 class clientChannel(threading.Thread):
     def __init__(self, client, address):
