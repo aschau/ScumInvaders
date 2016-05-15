@@ -9,6 +9,7 @@ class TCP_Server:
         self.host = ''
         self.port = 12000
         self.serverSocket = socket(AF_INET, SOCK_STREAM)
+        self.serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.serverSocket.bind((host, port))
         self.serverSocket.listen(4)
         #self.serverSocket.settimeout(0.0)
