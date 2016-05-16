@@ -10,6 +10,7 @@ class TCP_Server:
         self.port = port
         self.serverSocket = socket(AF_INET, SOCK_STREAM)
         self.serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.serverSocket.setblocking(False)
         serverPortTaken = True
         while serverPortTaken:
             try:
@@ -27,15 +28,17 @@ class TCP_Server:
     def run(self):
         #self.setUp()
         while True:
-            self.connectSocket, clientID = self.serverSocket.accept()
-            print("...connected from: ", clientID)
-            conSock = clientChannel(self.connectSocket, clientID[0])
-            conSock.run()
-            self.threads.append(conSock)
-        self.connectSocket.close()
-        for c in self.threads:
-            c.join()
+            try:
+                self.connectSocket, clientID = self.serverSocket.accept()
+                print("...connected from: ", clientID)
+                conSock = clientChannel(self.connectSocket, clientID[0])
+                self.threads.append(conSock)
+            except:
+                for c in self.threads:
+                    c.run()
 
+        self.connectSocket.close()
+        
 class clientChannel(threading.Thread):
     def __init__(self, client, address):
         threading.Thread.__init__(self)
@@ -44,22 +47,20 @@ class clientChannel(threading.Thread):
         self.size = 1024
     def run(self):
         try:
-            while True:
-                data = self.client.recv(200)
-                if not data: break
-                read = data.decode().split(":")
-                print(read)
-                if read[0] == "LOG":
-                    self.checkLog(read[1], read[2])
-                elif read[0] == "TALK":
-                    self.client.send(read[1].encode())
-                elif read[0] == "STOP":
-                    self.client.send(read[0].encode())
-                    break
-                else:
-                    self.client.send("Send again".encode())
-        finally:
-            self.client.close()
+            data = self.client.recv(200)
+            read = data.decode().split(":")
+            print(read)
+            if read[0] == "LOG":
+                self.checkLog(read[1], read[2])
+            elif read[0] == "TALK":
+                self.client.send(read[1].encode())
+            elif read[0] == "STOP":
+                self.client.send(read[0].encode())
+            else:
+                self.client.send("Send again".encode())
+        except:
+            pass
+
     def checkLog(self,username, password):
         connected = None
         connection = sqlite3.connect("testData.db")
