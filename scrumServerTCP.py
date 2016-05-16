@@ -52,12 +52,9 @@ class clientChannel(threading.Thread):
         try:
             data = self.client.recv(200)
             read = data.decode().split(":")
-            print(read)
             if read[0] == "LOG":
                 self.checkLog(read[1], read[2])
-##            elif read[0] == "TALK":
-##                return read[1]
-##                self.client.send(read[1].encode())
+
             elif read[0] == "STOP":
                 self.client.send(read[0].encode())
             else:
