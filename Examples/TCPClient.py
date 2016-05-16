@@ -26,7 +26,7 @@ class TCP_Client:
 ##        socket.send()
 ##    print("The server has closed")
 socket = TCP_Client()
-socket.run(12000)
+socket.run(9000)
 while socket.running == True:
     socket.send()
 print("You have left the server.")

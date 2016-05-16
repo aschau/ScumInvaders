@@ -19,8 +19,6 @@ class TCP_Server:
             except:
                 self.port = self.port = self.port + 1
                 print(self.port)
-
-            
         self.serverSocket.listen(4)
         #self.serverSocket.settimeout(0.0)
         self.connectSocket = None
@@ -125,7 +123,7 @@ class clientChannel(threading.Thread):
         data = c.fetchall()
         print(data)
 if __name__ == "__main__":
-    socket = TCP_Server("", 1)
+    socket = TCP_Server("", 9000)
     print(gethostbyname(gethostname()))
     socket.run()
     socket.serverSocket.close()
