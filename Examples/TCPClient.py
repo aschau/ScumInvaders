@@ -9,20 +9,17 @@ class TCP_Client:
         self.clientServer.connect((ip, port))
     def send(self):
         while self.running:
-            try:
-                data = self.clientServer.recv(1024)
-                if data:
-                    read = data.decode().split(":")
-                    if read[0] == "STOP":
-                        self.running = False
-                        self.close()
-                    else:
-                        print(read[0])
+            data = self.clientServer.recv(1024)
+            if data:
+                read = data.decode().split(":")
+                if read[0] == "STOP":
+                    self.running = False
+                    self.close()
                 else:
-                    message = input("Send a message: ")
-                    self.clientServer.send(message.encode())
-            except:
-                print("Something failed.")
+                    print(read[0])
+            else:
+                message = input("Send a message: ")
+                self.clientServer.send(message.encode())
     def close(self):
         self.clientServer.close()
 ##if __name__ == "__main__":

@@ -23,26 +23,37 @@ class TCP_Server:
         while True:
             try:
                 connectSocket, clientID = self.serverSocket.accept()
+                print("It's not accepting.")
                 if connectSocket:
                     if len(self.connectedSockets) < 4:
                         self.connectedSockets.append((connectSocket,clientID[1]))
+                        print("Added socket.")
+                connectSocket.send("You have connected.".encode())
                 while True:
-                    data = self.client.recv(200)
-                    if not data: break
-                    read = data.decode().split(":")
-                    print(read)
-                    if read[0] == "TALK":
-                        self.broadcast(read[2])
-                    elif read[0] == "STOP":
-                        self.client.send(read[0].encode())
-                        break
-                    else:
-                        self.client.send("Send again".encode())
-                        
+                    try:
+                        print("asking for data")
+                        data = connectSocket.recv(200)
+                        print("Received data")
+                        if data:
+                            print("reading data?")
+                            read = data.decode().split(":")
+                            print(read)
+                            if read[0] == "TALK":
+                                connectSocket.send("WHY YOU NO WORK".encode())
+                                self.broadcast(read[1])
+                            elif read[0] == "STOP":
+                                connectSocket.send(read[0].encode())
+                                break
+                            else:
+                                connectSocket.send("Send again".encode())
+                    except:
+                        pass
+                connectSocket.close()
             except:
                 print("The connection failed.")
     def broadcast(self, msg):
         for i in self.connectedSockets:
+            print("Is this sending")
             i.send(msg.encode())
 if __name__ == "__main__":
     socket = TCP_Server("", 9000)
