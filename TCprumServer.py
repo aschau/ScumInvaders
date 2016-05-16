@@ -15,7 +15,7 @@ class TCP_Socket:
             while serverPortTaken:
                 try:
                     self.serverSocket.bind((host, port))
-                    serverPOrtTaken = False
+                    serverPortTaken = False
                 except:
                     self.port += 1
                     print(self.port)
@@ -50,6 +50,6 @@ class TCP_Socket:
                 c.join()
 
 if __name__ == "__main__":
-    socket = TCP_Socket('0.0.0.0', 12000)
+    socket = TCP_Socket('0.0.0.0', 9000)
     socket.run()
     socket.close
