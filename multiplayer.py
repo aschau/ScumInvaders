@@ -85,7 +85,7 @@ class multiGame:
         self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontsize)
 
         self.pauseButtons = []
-        self.pauseButtons.append(Button(screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 330, 281, 68, "Menu", 'Exit.ogg', soundManager))
+        self.pauseButtons.append(Button(screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 330, 281, 68, "Lobby", 'Exit.ogg', soundManager))
         
         self.mouseDelay = 100
         self.mouseNext = pygame.time.get_ticks()
@@ -228,7 +228,7 @@ class multiGame:
                         self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
                         self.enemyCount -= 1
 
-        except BlockingIOError as error:
+        except Exception as error:
             if type(error) != BlockingIOError:
                 mod = ' '.join(str(type(error)))
                 with open("Log.txt","a") as f:
@@ -239,7 +239,7 @@ class multiGame:
                 if pygame.time.get_ticks() >= self.startTime + 100:
                     self.soundManager.playSound("Enemy_entrance.ogg")
                     pygame.time.delay(2000)
-                    self.soundManager.playNewMusic("ScumInvadersTheme(Final).ogg", .2)
+                    self.soundManager.playNewMusic("ScumInvadersTheme(New).ogg", .2)
                     self.start = False
 
             self.state = self.enemyUpdate()

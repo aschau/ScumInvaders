@@ -159,7 +159,7 @@ class clientChannel(threading.Thread):
         data = c.fetchall()
         print(data)
 if __name__ == "__main__":
-    socket = TCP_Server("", 1)
+    socket = TCP_Server("", 9000)
     print(gethostbyname(gethostname()))
     socket.run()
     socket.serverSocket.close()

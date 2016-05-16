@@ -42,9 +42,9 @@ class ScumInvaders:
         self.state = "Menu"
         self.sounds = soundManager("Sound")
         self.mainMenu = Main_Menu(self.screen, self.width, self.height, self.AllSprites, self.sounds)
-        self.lobby = Lobby(self.screen, self.width, self.height, self.AllSprites, self.sounds)
         self.game = game(self.screen, self.width, self.height, self.AllSprites, self.sounds)
         
+        self.lobby = None
         self.multiGame = None
 
         self.fontsize = 10
@@ -61,63 +61,61 @@ class ScumInvaders:
 
             if (self.state == "Menu"):
                 self.mainMenu.draw()
-                output = self.mainMenu.update()
+                self.state = self.mainMenu.update()
 
-                #main menu returns multiplayer_number of players_player number
-                #multiGame gets that spliced
+                if self.state == "Exit":
+                    self.running = False
+                
+                elif self.state == "Lobby":
+                    self.lobby = Lobby(self.screen, self.width, self.height, self.AllSprites, self.sounds, self.mainMenu.username, self.mainMenu.socket)
+
+                elif self.state == "Game":
+                    self.game.reset()
+            
+            elif (self.state == "Lobby"):
+                self.lobby.draw()
+                output = self.lobby.update()
+
                 if "multiGame" in output:
                     self.screen.blit(self.AllSprites.getSprite("Loading"), (0, 0))
                     self.state = "multiGame"
                     self.multiGame = multiGame(self.screen, self.width, self.height, self.AllSprites,\
-                        self.sounds, int(output[-2]), int(output[-1]), self.mainMenu.ip.input, self.mainMenu.currentRoom, self.mainMenu.socket)
-
-                elif output == "Exit":
-                    self.running = False
+                        self.sounds, int(output[-2]), int(output[-1]), self.mainMenu.ip.input, self.lobby.currentRoom, self.lobby.socket)
 
                 else:
+                    if output == "Menu":
+                        self.mainMenu.state = "Login"
+                        self.mainMenu.loginPressed = False
+                        self.mainMenu.loginStatus = ""
+
                     self.state = output
-                    if output == "Game":
-                        self.game.reset()
-            
-            elif output == "Lobby":
-                self.lobby.draw()
-                output = self.lobby.update()
 
             elif (self.state == "Game"):
                 self.game.draw()
-                output = self.game.update()
+                self.state = self.game.update()
 
-                if output == "Exit":
+                if self.state == "Exit":
                     self.running = False
             
-                else:
-                    self.state = output
-                    if output == "Menu":
-                        self.mainMenu.state = "Main"
-                        self.sounds.playNewMusic('mainMenu.ogg')
+                elif self.state == "Menu":
+                    self.mainMenu.state = "Main"
+                    self.sounds.playNewMusic('mainMenu.ogg')
 
             elif (self.state == "multiGame"):
                 self.multiGame.draw()
-                output = self.multiGame.update()
+                self.state = self.multiGame.update()
 
-                if output == "Exit":
+                if self.state == "Exit":
                     self.running = False
-            
-                else:
-                    self.state = output
-                    if self.state == "Score":
-                        self.mainMenu.state = "Score"
-                        self.mainMenu.score = self.multiGame.playerList[self.multiGame.clientPlayerNum].score
-                        self.sounds.playNewMusic('mainMenu.ogg')
-                        self.state = "Menu"
 
-                    elif output == "Menu":
-                        self.mainMenu.state = "Main"
-                        self.sounds.playNewMusic('mainMenu.ogg')
+                elif self.state == "Score":
+                    self.lobby.state = "Score"
+                    self.lobby.score = self.multiGame.playerList[self.multiGame.clientPlayerNum].score
+                    self.sounds.playNewMusic('mainMenu.ogg')
                     
-                    elif output == "Room":
-                        self.mainMenu.state = "Room"
-                        self.sounds.playNewMusic('mainMenu.ogg')
+                elif self.state == "Lobby":
+                    self.lobby.state = "Room"
+                    self.sounds.playNewMusic('mainMenu.ogg')
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
