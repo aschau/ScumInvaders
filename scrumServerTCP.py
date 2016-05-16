@@ -35,7 +35,10 @@ class TCP_Server:
                 self.threads.append(conSock)
             except:
                 for c in self.threads:
-                    c.run()
+                    output = c.run()
+                    if output != None:
+                        for c in self.threads:
+                            c.client.send(output.encode())
 
         self.connectSocket.close()
         
@@ -52,12 +55,14 @@ class clientChannel(threading.Thread):
             print(read)
             if read[0] == "LOG":
                 self.checkLog(read[1], read[2])
-            elif read[0] == "TALK":
-                self.client.send(read[1].encode())
+##            elif read[0] == "TALK":
+##                return read[1]
+##                self.client.send(read[1].encode())
             elif read[0] == "STOP":
                 self.client.send(read[0].encode())
             else:
-                self.client.send("Send again".encode())
+                return read[0]
+##                self.client.send(read[1].encode())
         except:
             pass
 
