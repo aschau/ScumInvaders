@@ -10,6 +10,8 @@ class TCP_Server:
         self.port = port
         self.serverSocket = socket(AF_INET, SOCK_STREAM)
         self.serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        #create a list of all the connections?
+        self.connectedSockets = []
         serverPortTaken = True
         while serverPortTaken:
             try:
@@ -18,10 +20,9 @@ class TCP_Server:
                 
             except:
                 self.port = self.port = self.port + 1
-                print(self.port)
+                print(self.port) 
         self.serverSocket.listen(4)
         #self.serverSocket.settimeout(0.0)
-        self.connectSocket = None
         self.clientAddresses = {}
         self.threads = []
 ##    def setUp(self):
@@ -53,10 +54,11 @@ class TCP_Server:
         #self.setUp()
         while True:
             #conn, clientID = self.serverSocket.accept()
-            self.connectSocket, clientID = self.serverSocket.accept()
+            connectSocket, clientID = self.serverSocket.accept()
             print("...connected from: ", clientID)
+            self.connectedSocket.append(connectSocket)
             conSock = clientChannel(self.connectSocket, clientID[0])
-            conSock.run()
+            conSock.start()
             self.threads.append(conSock)
         self.connectSocket.close()
         for c in self.threads:
@@ -84,6 +86,7 @@ class clientChannel(threading.Thread):
                     break
                 else:
                     self.client.send("Send again".encode())
+            self.client.close()
         finally:
             self.client.close()
     def checkLog(self,username, password):
