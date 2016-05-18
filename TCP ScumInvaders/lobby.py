@@ -30,9 +30,8 @@ class Lobby:
             self.roomButtons.append(Button(self.screen, self.sprites.getSprite("exitbutton"), self.sprites.getSprite("exitbuttonhover"), 220*2, self.screenh - 90, 184, 85, "Lobby", 'Exit.ogg', soundManager))
             self.roomButtons.append(Button(self.screen, self.sprites.getSprite("startbuttondisable"), self.sprites.getSprite("startbuttondisable"), 220, self.screenh - 90, 184, 85, "multiGame", 'Start Button.ogg', self.soundManager, True))
 
-            self.rooms = []
+            self.rooms = {}
             self.currentRoom = None
-            self.currentRoomLength = 0
 
             self.score = 0
             self.scoreButtons = []
@@ -46,9 +45,9 @@ class Lobby:
             if self.state == "Lobby":
                 self.screen.fill((0, 0, 0))
                 self.screen.blit(self.sprites.getSprite("LobbyRoomBackgroundOutline"), (5, 33))
-                for button in range(len(self.lobbyRoomButtons)):
-                    self.lobbyRoomButtons[button].draw()
-                    self.screen.blit(self.font.render(self.lobbyRoomButtons[button].function + "'s Room " + str(len(self.rooms[button].keys())-1) + "/4", True, pygame.Color(89, 89, 89)), (self.lobbyRoomButtons[button].posx + 25, self.lobbyRoomButtons[button].posy + 10))
+                for button in self.lobbyRoomButtons:
+                    button.draw()
+                    self.screen.blit(self.font.render(button.function + "'s Room " + str(len(self.rooms[button.function])) + "/4", True, pygame.Color(89, 89, 89)), (button.posx + 25, button.posy + 10))
 
                 for button in self.lobbyButtons:
                     button.draw()
@@ -59,18 +58,16 @@ class Lobby:
                     button.draw()
 
                 playerNumber = 0
-                for room in self.rooms:
-                    if room["HOST"] == self.currentRoom:
-                        for player, status in room.items():
-                            if player != "HOST":
-                                self.screen.blit(self.sprites.getSprite("RoomNameBox"), (20, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
-                                self.screen.blit(self.roomFont.render(player, True, pygame.Color(0,0,0)),(40, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
-                                if status == True:
-                                    self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
-                                else:
-                                    self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
-                                playerNumber += 1
-                        break
+                for player, status in self.rooms[self.currentRoom].items():
+                    if player != "HOST":
+                        self.screen.blit(self.sprites.getSprite("RoomNameBox"), (20, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
+                        self.screen.blit(self.roomFont.render(player, True, pygame.Color(0,0,0)),(40, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
+                        if status == True:
+                            self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
+                        else:
+                            self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
+                        playerNumber += 1
+                        
             elif self.state == "Score":
                 self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
                 self.screen.blit(self.font.render(str(self.score), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
@@ -82,14 +79,17 @@ class Lobby:
             if self.state == "Lobby":
                 try:
                     self.socket.send("REFRESH")
-                    message, serverAddress = self.socket.clientSocket.recvfrom(2048)
-                    modifiedMessage = message.decode()
+                    
+                    modifiedMessage = None
+                    while modifiedMessage == None:
+                        modifiedMessage = self.socket.receive()
+
                     if modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
 
                         lobbyRoomButtons = []
-                        for room in range(len(self.rooms)):
-                            lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, self.rooms[room]["HOST"], "Start Button.ogg", self.soundManager))
+                        for key in self.rooms.keys():
+                            lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, key, "Start Button.ogg", self.soundManager))
 
                         self.lobbyRoomButtons = lobbyRoomButtons
                  
@@ -111,43 +111,36 @@ class Lobby:
                 return "Lobby"
 
             elif self.state == "Room":
-                try:
-                    self.socket.send("REFRESH")
-                    message, serverAddress = self.socket.clientSocket.recvfrom(2048)
-                    modifiedMessage = message.decode()
-                    if modifiedMessage.split(":")[0] == "Start":
-                        players = json.loads(modifiedMessage.split(":")[1])
-                        players.pop(players.index("HOST"))
-                        for room in self.rooms:
-                            if room["HOST"] == self.currentRoom:
-                                return "multiGame" + str(self.currentRoomLength-1) + str(players.index(self.username.input))
+                #try:
+                self.socket.send("REFRESH")
                     
-                    elif modifiedMessage[:5] == "Lobby":
-                        self.rooms = json.loads(modifiedMessage[6:])
+                modifiedMessage = None
+                while modifiedMessage == None:
+                    modifiedMessage = self.socket.receive()
+
+                if modifiedMessage[0] == "Start":
+                    players = json.loads(modifiedMessage.split(":")[1])
+                    return "multiGame" + str(len(players)) + str(players.index(self.username.input))
                     
-                        for room in self.rooms:
-                            if room["HOST"] == self.currentRoom:
-                                self.currentRoomLength = len(room)
+                elif modifiedMessage[:5] == "Lobby":
+                    self.rooms = json.loads(modifiedMessage[6:])
+                    #print(self.rooms)
 
-                        if self.host:
-                            for room in self.rooms:
-                                if room["HOST"] == self.currentRoom:
-                                    if False in room.values():
-                                        self.roomButtons[-1].disabled = True
-                                        self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
-                                        self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
-                                        self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+                    if self.host:
+                        if False in self.rooms[self.currentRoom].values():
+                            self.roomButtons[-1].disabled = True
+                            self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
+                            self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
+                            self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
 
-                                    else:
-                                        self.roomButtons[-1].disabled = False
-                                        self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
-                                        self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
-                                        self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
+                        else:
+                            self.roomButtons[-1].disabled = False
+                            self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
+                            self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
+                            self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
                                                                                 
-                                    break
-
-                except Exception as error:
-                    print(error)
+                #except Exception as error:
+                #    print(error)
 
                 for button in self.roomButtons:
                     button.checkHover(pygame.mouse.get_pos())
@@ -166,9 +159,7 @@ class Lobby:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 self.socket.send("JOIN:" + self.state)
-                                for room in range(len(self.rooms)): 
-                                    if self.rooms[room]["HOST"] == self.state:
-                                        self.currentRoom = self.rooms[room]["HOST"]
+                                self.currentRoom = self.state
                                 self.state = "Room"
 
                         for button in self.lobbyButtons:
@@ -191,16 +182,16 @@ class Lobby:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
                                 if self.state == "Ready":
-                                    self.socket.send("READY:"+self.currentRoom)
+                                    self.socket.send("READY")
                                     self.state = "Room"
 
                                 elif self.state == "Lobby":
-                                    self.socket.send("LEAVE ROOM:" + self.currentRoom)
+                                    self.socket.send("LEAVE ROOM")
                                     self.currentRoom = None
                                     self.host = False
 
                                 elif self.state == "multiGame":
-                                    self.socket.send("START:" + self.currentRoom)
+                                    self.socket.send("START")
                                     self.state = "Room"
                                     
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay

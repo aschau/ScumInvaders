@@ -3,6 +3,7 @@ import sqlite3
 import hashlib
 import os
 import threading
+import json
 
 class TCP_Server:
     def __init__(self, host, port):
@@ -23,7 +24,8 @@ class TCP_Server:
         self.serverSocket.listen(4)
         self.connectSocket = None
         self.threads = []
-
+        self.rooms = {}
+        
     def run(self):
         #self.setUp()
         while True:
@@ -36,9 +38,25 @@ class TCP_Server:
                 numThreads = 0
                 while numThreads < len(self.threads):
                     output = self.threads[numThreads].run()
-                    if output == "DISCONNECT":
-                        self.threads.pop(numThreads)
+                    if output != None:
+                        output = output.split(":")
+                        if output[0] == "DISCONNECT":
+                            self.threads.pop(numThreads)
 
+                        elif output[0] == "CREATE":
+                            self.rooms[self.threads[numThreads].username] = {}
+                            self.rooms[self.threads[numThreads].username][self.threads[numThreads].username] = False
+
+                        elif output[0] == "JOIN":
+                            self.rooms[output[1]][self.threads[numThreads].username] = False
+
+                        elif output[0] == "READY":
+                            self.rooms[self.threads[numThreads].room][self.threads[numThreads].username] = not self.rooms[self.threads[numThreads].room][self.threads[numThreads].username]
+
+                        elif output[0] == "REFRESH":
+                            data = json.dumps(self.rooms)
+                            self.threads[numThreads].send("Lobby:"+data)
+                            
                     numThreads += 1
 
         self.connectSocket.close()
@@ -48,8 +66,10 @@ class clientChannel(threading.Thread):
         threading.Thread.__init__(self)
         self.client = client
         self.address = address
+        self.username = None
         self.bufferSize = 9
         self.loggedIn = False
+        self.room = None
         
     def run(self):
         try:
@@ -58,9 +78,7 @@ class clientChannel(threading.Thread):
             read = data.decode()
             readList = read.split(":")
             if readList[0] == "SIZE":
-##                print(readList[1][:-readList[1].count("~")])
                 self.bufferSize = int(readList[1][:-readList[1].count("~")])
-##                print(self.bufferSize)
 
             else:
                 if readList[0] == "LOG":
@@ -73,11 +91,22 @@ class clientChannel(threading.Thread):
                     else:
                         self.send("Invalid Password")
 
+                elif readList[0] == "CREATE":
+                        self.room = self.username
+                        return readList[0]
+
+                elif readList[0] == "JOIN":
+                        self.room = readList[1]
+                        return read
+
                 elif readList[0] == "STOP":
                     self.send(readList[0])
                     print(self.address, "DISCONNECTED")
                     self.client.close()
                     return "Disconnect"
+
+                else:
+                    return readList[0]
 
 ##                self.send(read[1].encode())
         except:
@@ -107,6 +136,7 @@ class clientChannel(threading.Thread):
                 hashed.update((salt + password).encode())
                 if hashed.hexdigest() == i[1]:
                     self.loggedIn = True
+                    self.username = username
                     self.send("Success")
                     print("Success")
                 else:

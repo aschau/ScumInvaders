@@ -55,7 +55,7 @@ class Main_Menu():
                 if self.loginStatus == "Invalid Password":
                     self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 elif self.loginStatus == "No Server":
-                    self.screen.blit(self.font.render("Waiting for server. Double check info.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
+                    self.screen.blit(self.font.render("Could not reach server. Wrong Info/Poor connection.", True, pygame.Color(255,255,255)),(100,self.screenh/2 - 100))
                 elif self.loginStatus == "Missing Field(s)":
                     self.screen.blit(self.font.render("Missing Field(s).", True, pygame.Color(255,255,255)),(self.screenw/2 - (len("Invalid Format.") * 30)/4,self.screenh/2 - 100))
                 
@@ -92,6 +92,8 @@ class Main_Menu():
                                                 modifiedMessage = None
                                                 while modifiedMessage == None:
                                                     modifiedMessage = self.socket.receive()
+                                                    
+                                                modifiedMessage = modifiedMessage.split(":")
 
                                                 self.loginStatus = ""
                                                 if modifiedMessage[0] == "Invalid Password":
@@ -99,7 +101,6 @@ class Main_Menu():
                                                     self.state = "Login"
 
                                                 elif modifiedMessage[0] == "Success":
-                                                    print("Yay")
                                                     self.connected = False
                                                     self.state = "Lobby"
 
@@ -142,14 +143,14 @@ class Main_Menu():
                         while modifiedMessage == None:
                             modifiedMessage = self.socket.receive()
 
-                        print(modifiedMessage)
+                        modifiedMessage = modifiedMessage.split(":")
+
                         self.loginStatus = ""
                         if modifiedMessage[0] == "Invalid Password":
                             self.loginStatus = "Invalid Password"
                             self.state = "Login"
                     
                         elif modifiedMessage[0] == "Success":
-                            print("Yay")
                             self.loginStatus = ""
                             self.connected = False
                             self.state = "Lobby"

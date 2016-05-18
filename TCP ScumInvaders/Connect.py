@@ -5,6 +5,7 @@ import os
 class Connect:
     def __init__(self, ip, port):
         self.clientSocket = socket(AF_INET, SOCK_STREAM)
+        self.clientSocket.settimeout(5.0)
         self.clientSocket.connect((ip, port))
         self.clientSocket.setblocking(False)
         self.bufferSize = 9
@@ -16,13 +17,15 @@ class Connect:
 
     def receive(self):
         try:
-            message = self.clientSocket.recv(self.bufferSize).decode().split(":")
+            message = self.clientSocket.recv(self.bufferSize).decode()
+            modifiedMessage = message.split(":")
             self.bufferSize = 9
-            if message[0] == "SIZE":
-                self.bufferSize = int(message[1][:-message[1].count("~")])
+
+            if modifiedMessage[0] == "SIZE":
+                self.bufferSize = int(modifiedMessage[1][:-modifiedMessage[1].count("~")])
             
             else:
-                if message[0] == "STOP":
+                if modifiedMessage[0] == "STOP":
                     self.clientSocket.close()
 
                 return message
