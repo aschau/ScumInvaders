@@ -67,6 +67,7 @@ class ScumInvaders:
                     self.running = False
                 
                 elif self.state == "Lobby":
+                    self.mainMenu.state = "Login"
                     self.lobby = Lobby(self.screen, self.width, self.height, self.AllSprites, self.sounds, self.mainMenu.username, self.mainMenu.socket)
 
                 elif self.state == "Game":
@@ -84,6 +85,7 @@ class ScumInvaders:
 
                 else:
                     if output == "Menu":
+                        self.mainMenu.socket.send("STOP")
                         self.mainMenu.state = "Login"
                         self.mainMenu.loginPressed = False
                         self.mainMenu.loginStatus = ""
