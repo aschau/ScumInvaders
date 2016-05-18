@@ -160,6 +160,7 @@ class Lobby:
                                 self.state = button.click()
                                 self.socket.send("JOIN:" + self.state)
                                 self.currentRoom = self.state
+                                self.state = "Room"
 
                         for button in self.lobbyButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):

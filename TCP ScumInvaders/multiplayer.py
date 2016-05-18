@@ -170,6 +170,7 @@ class multiGame:
 
         elif modifiedMessage[0] == "HIT":
             if modifiedMessage[1] == "ENEMY":
+                print(modifiedMessage)
                 self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health -= 1
                 if self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health == 0 and not self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead:
                     self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead = True
@@ -365,7 +366,7 @@ class multiGame:
             elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.playerList[self.clientPlayerNum].collider)):
                     self.playerList[self.clientPlayerNum].lives -= 1
-                    self.socket.send("HIT:" + str(self.clientPlayerNum))
+                    #self.socket.send("HIT:" + str(self.clientPlayerNum))
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 

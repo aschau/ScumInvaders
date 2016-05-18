@@ -32,8 +32,6 @@ class Connect:
             if modifiedMessage[0] == "STOP":
                 self.clientSocket.close()
 
-            
-
             return message
 
         except Exception as error:
