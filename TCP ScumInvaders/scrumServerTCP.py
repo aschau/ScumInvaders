@@ -12,6 +12,7 @@ class TCP_Server:
         self.port = port
         self.serverSocket = socket(AF_INET, SOCK_STREAM)
         self.serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.serverSocket.setsockopt(IPPROTO_TCP, TCP_NODELAY, 1)
         self.serverSocket.setblocking(False)
         serverPortTaken = True
         while serverPortTaken:

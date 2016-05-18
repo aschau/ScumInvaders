@@ -5,6 +5,7 @@ import os
 class Connect:
     def __init__(self, ip, port):
         self.clientSocket = socket(AF_INET, SOCK_STREAM)
+        self.clientSocket.setsockopt(IPPROTO_TCP, TCP_NODELAY, 1)
         self.clientSocket.settimeout(5.0)
         self.clientSocket.connect((ip, port))
         self.clientSocket.setblocking(False)
