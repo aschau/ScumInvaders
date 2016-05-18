@@ -121,7 +121,8 @@ class multiGame:
         self.screen.blit(self.sprites.getSprite(self.background), (0, self.currentBG1Height))
         self.screen.blit(self.sprites.getSprite(self.background2), (0, self.currentBG2Height))
         for player in self.playerList:
-            self.screen.blit(self.sprites.getSprite(player.image), player.getPos())
+            if player.alive == True:
+                self.screen.blit(self.sprites.getSprite(player.image), player.getPos())
         
         for missile in self.missiles:
             self.screen.blit(self.sprites.getSprite(missile.image), missile.getPos())
@@ -161,6 +162,9 @@ class multiGame:
         elif modifiedMessage[0]  == "MOV":
             if int(modifiedMessage[1]) != self.clientPlayerNum:
                 self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
+
+        elif modifiedMessage[0] == "DEATH":
+            self.playerList[modifiedMessage[1]].alive = False
 
 
         elif modifiedMessage[0] == "SHOOT":
@@ -219,6 +223,7 @@ class multiGame:
         #return "multiGame"
         if (self.playerList[self.clientPlayerNum].lives <= 0):
             self.socket.send("SCORE:" + str(self.playerList[self.clientPlayerNum].score))
+            self.socket.send("DEATH:" + str(self.playerList[self.clientPlayerNum]))
             return "Score"
         return "multiGame"
 

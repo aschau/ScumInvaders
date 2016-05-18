@@ -24,6 +24,7 @@ class Player:
         self.missileCount = 0
         self.missileCap = 3
         self.lives = 3
+        self.alive = True
 
     def moveLeft(self):
         self.posx -= self.speed
