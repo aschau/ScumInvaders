@@ -111,6 +111,7 @@ class ScumInvaders:
                     self.running = False
 
                 elif self.state == "Score":
+                    self.state = "Lobby"
                     self.lobby.state = "Score"
                     self.lobby.score = self.multiGame.playerList[self.multiGame.clientPlayerNum].score
                     self.sounds.playNewMusic('mainMenu.ogg')

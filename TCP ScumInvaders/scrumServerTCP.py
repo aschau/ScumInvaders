@@ -77,6 +77,9 @@ class TCP_Server:
                                 if thread.room == self.threads[numThreads].room:
                                     thread.send("START:" + data)
                                     thread.send("GRID:"+data2)
+
+                            for thread in self.threads:
+                                if thread.room == self.threads[numThreads].room:
                                     thread.send("GAMESTART")
 
                         elif output[0] == "GETGRID":
