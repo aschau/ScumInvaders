@@ -164,7 +164,7 @@ class multiGame:
                 self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
 
         elif modifiedMessage[0] == "DEATH":
-            self.playerList[modifiedMessage[1]].alive = False
+            self.playerList[int(modifiedMessage[1])].alive = False
 
 
         elif modifiedMessage[0] == "SHOOT":
