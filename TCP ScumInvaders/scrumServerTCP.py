@@ -53,9 +53,9 @@ class TCP_Server:
             except:
                 numThreads = 0
                 while numThreads < len(self.threads):
-                    output = self.threads[numThreads].run()
-                    if output != None:
-                        output = output.split(":")
+                    message = self.threads[numThreads].run()
+                    if message != None:
+                        output = message.split(":")
                         if output[0] == "DISCONNECT":
                             self.threads.pop(numThreads)
 
@@ -89,6 +89,11 @@ class TCP_Server:
                         elif output[0] == "REFRESH":
                             data = json.dumps(self.rooms)
                             self.threads[numThreads].send("Lobby:"+data)
+
+                        else:
+                            for thread in self.threads:
+                                if thread.username != self.threads[numThreads].username:
+                                    thread.send(message)
                             
                     numThreads += 1
 
@@ -139,7 +144,7 @@ class clientChannel(threading.Thread):
                     return "Disconnect"
 
                 else:
-                    return readList[0]
+                    return read
 
 ##                self.send(read[1].encode())
         except:

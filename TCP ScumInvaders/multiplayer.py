@@ -169,12 +169,12 @@ class multiGame:
 
 
         elif modifiedMessage[0] == "HIT":
-            if modifiedMessage[2] == "ENEMY":
-                self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].health -= 1
-                if self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].health == 0 and not self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].dead:
-                    self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].dead = True
+            if modifiedMessage[1] == "ENEMY":
+                self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health -= 1
+                if self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health == 0 and not self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead:
+                    self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead = True
                     #self.socket.send("DEATH:" + self.hostName + ":" + "ENEMY:" + str(row) + ":" + str(column))
-                    self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
+                    self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
                     self.enemyCount -= 1
 
         if self.serverReady:
@@ -217,7 +217,7 @@ class multiGame:
         #    return "Room"
         #return "multiGame"
         if (self.playerList[self.clientPlayerNum].lives <= 0):
-            self.socket.send("SCORE:" + self.hostName + ":" + str(self.playerList[self.clientPlayerNum].score))
+            self.socket.send("SCORE:" + str(self.playerList[self.clientPlayerNum].score))
             return "Score"
         return "multiGame"
 
@@ -230,7 +230,7 @@ class multiGame:
     def nextLevel(self):   
         self.enemyGrid = []
         if self.clientPlayerNum == 0:
-            self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
+            self.socket.send("SETGRID:" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
         
         tryGrid = True
         while tryGrid:
@@ -282,21 +282,21 @@ class multiGame:
                 if not ((self.playerList[self.clientPlayerNum].posx - self.playerList[self.clientPlayerNum].speed) <= 0):
                     self.playerList[self.clientPlayerNum].moveLeft()
 
-                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
+                    self.socket.send("MOV:" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
 
 
             if keys[pygame.K_d]:
                 if not ((self.playerList[self.clientPlayerNum].posx + self.playerList[self.clientPlayerNum].speed + self.playerList[self.clientPlayerNum].imagew) >= self.screenw):
                     self.playerList[self.clientPlayerNum].moveRight()
 
-                    self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
+                    self.socket.send("MOV:" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
 
             if pygame.time.get_ticks() > self.nextMissile:
                 self.nextMissile = pygame.time.get_ticks() + self.missileDelay
 
                 if keys[pygame.K_SPACE]:
                     if self.playerList[self.clientPlayerNum].missileCount < self.playerList[self.clientPlayerNum].missileCap:
-                        self.socket.send("SHOOT:" + self.hostName + ":" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy) + ":" + str(self.clientPlayerNum))
+                        self.socket.send("SHOOT:" + str(self.playerList[self.clientPlayerNum].posx) + ":" + str(self.playerList[self.clientPlayerNum].posy) + ":" + str(self.clientPlayerNum))
                         self.missiles.append(self.playerList[self.clientPlayerNum].fire())
                         self.soundManager.playSound("Player_Shoot.ogg")
 
@@ -324,7 +324,7 @@ class multiGame:
                         attacker = self.missiles.pop(numMissiles).owner
                         if attacker == self.clientPlayerNum:
                             self.enemyGrid[row][column].health -= 1
-                            self.socket.send("HIT:" + self.hostName + ":" + "ENEMY:" + str(row) + ":" + str(column))
+                            self.socket.send("HIT:" + "ENEMY:" + str(row) + ":" + str(column))
                             self.playerList[attacker].missileCount -= 1
                             if self.enemyGrid[row][column].health == 0 and not self.enemyGrid[row][column].dead:
                                 self.enemyGrid[row][column].dead = True
