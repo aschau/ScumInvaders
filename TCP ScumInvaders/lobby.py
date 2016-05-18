@@ -86,15 +86,16 @@ class Lobby:
 
                     if modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
-
+                        
                         lobbyRoomButtons = []
-                        for key in self.rooms.keys():
-                            lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, key, "Start Button.ogg", self.soundManager))
+                        rooms = list(self.rooms.keys())
+                        for room in range(len(rooms)):
+                            lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, rooms[room], "Start Button.ogg", self.soundManager))
 
                         self.lobbyRoomButtons = lobbyRoomButtons
                  
-                except:
-                    pass
+                except Exception as error:
+                    print(error)
 
                 for button in self.lobbyRoomButtons:
                     button.checkHover(pygame.mouse.get_pos())
