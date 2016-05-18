@@ -56,6 +56,8 @@ class Main_Menu():
                     self.screen.blit(self.font.render("Wrong Password. Try again.", True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
                 elif self.loginStatus == "No Server":
                     self.screen.blit(self.font.render("Could not reach server. Wrong Info/Poor connection.", True, pygame.Color(255,255,255)),(100,self.screenh/2 - 100))
+                elif self.loginStatus == "Waiting":
+                    self.screen.blit(self.font.render("Waiting for server.", True, pygame.Color(255,255,255)),(self.screenw/2 - (len("Invalid Format.") * 30)/4,self.screenh/2 - 100))
                 elif self.loginStatus == "Missing Field(s)":
                     self.screen.blit(self.font.render("Missing Field(s).", True, pygame.Color(255,255,255)),(self.screenw/2 - (len("Invalid Format.") * 30)/4,self.screenh/2 - 100))
                 
@@ -82,35 +84,32 @@ class Main_Menu():
                                     if self.ip.input != "" and self.port.input != "" and self.username.input != "" and self.password.input != "":
                                         message = self.username.input + ":" + self.password.input
 
-                                        try:
-                                            if not self.connected:
+                                        if not self.connected:
+                                            try:
                                                 self.socket = Connect(self.ip.input, int(self.port.input))
                                                 self.connected = True
+                                            except:
+                                                self.loginStatus = "No Server"
+                                                self.state = "Login"
 
-                                            if self.connected:
-                                                self.socket.send("LOG:" + message)
-                                                modifiedMessage = None
-                                                while modifiedMessage == None:
-                                                    modifiedMessage = self.socket.receive()
+                                        if self.connected:
+                                            self.socket.send("LOG:" + message)
+                                            modifiedMessage = self.socket.receive()
                                                     
-                                                modifiedMessage = modifiedMessage.split(":")
+                                            modifiedMessage = modifiedMessage.split(":")
 
-                                                self.loginStatus = ""
-                                                if modifiedMessage[0] == "Invalid Password":
-                                                    self.loginStatus = "Invalid Password"
-                                                    self.state = "Login"
+                                            self.loginStatus = ""
+                                            if modifiedMessage[0] == "Invalid Password":
+                                                self.loginStatus = "Invalid Password"
+                                                self.state = "Login"
 
-                                                elif modifiedMessage[0] == "Success":
-                                                    self.connected = False
-                                                    self.state = "Lobby"
+                                            elif modifiedMessage[0] == "Success":
+                                                self.connected = False
+                                                self.state = "Lobby"
 
-                                                else:
-                                                    self.state = "Login"
-
-                                        except Exception as error:
-                                            print(error)
-                                            self.loginStatus = "No Server"
-                                            self.state = "Login"
+                                            elif modifiedMessage[0] == "":
+                                                self.loginStatus = "Waiting"
+                                                self.state = "Login"
 
                                     else:
                                         self.state = "Login"
@@ -135,29 +134,24 @@ class Main_Menu():
                 return "Menu"
 
             elif self.state == "Login":
-                if self.connected and self.loginStatus == "No Server":
-                    try:
-                        self.socket.send("CHECKLOG")
+                if self.connected and self.loginStatus == "Waiting":
+                    self.socket.send("CHECKLOG")
                         
-                        modifiedMessage = None
-                        while modifiedMessage == None:
-                            modifiedMessage = self.socket.receive()
+                    modifiedMessage = self.socket.receive()
 
-                        modifiedMessage = modifiedMessage.split(":")
+                    modifiedMessage = modifiedMessage.split(":")
 
-                        self.loginStatus = ""
-                        if modifiedMessage[0] == "Invalid Password":
-                            self.loginStatus = "Invalid Password"
-                            self.state = "Login"
+                    if modifiedMessage[0] == "Invalid Password":
+                        self.loginStatus = "Invalid Password"
+                        self.state = "Login"
                     
-                        elif modifiedMessage[0] == "Success":
-                            self.loginStatus = ""
-                            self.connected = False
-                            self.state = "Lobby"
+                    elif modifiedMessage[0] == "Success":
+                        self.loginStatus = ""
+                        self.connected = False
+                        self.state = "Lobby"
 
-                    except Exception as error:
-                        print(error)
-                        self.loginStatus = "No Server"
+                    elif modifiedMessage[0] == "":
+                        self.loginStatus = "Waiting"
                         self.state = "Login"
 
                 for button in self.loginButtons:

@@ -77,15 +77,16 @@ class Lobby:
         def update(self):
             self.mouseUpdate()
             if self.state == "Lobby":
-                try:
-                    self.socket.send("REFRESH")
+                self.socket.send("REFRESH")
                     
-                    modifiedMessage = None
-                    while modifiedMessage == None:
-                        modifiedMessage = self.socket.receive()
+                modifiedMessage = self.socket.receive()
 
+                if modifiedMessage != "":
                     if modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
+
+                        if self.currentRoom in self.rooms.keys():
+                            self.state = "Room"
                         
                         lobbyRoomButtons = []
                         rooms = list(self.rooms.keys())
@@ -93,10 +94,7 @@ class Lobby:
                             lobbyRoomButtons.append(Button(self.screen, self.sprites.getSprite("LobbyRoomButtonTemplate"), self.sprites.getSprite("LobbyRoomButtonTemplateHovered"), 17, 43 + room*100, 700, 100, rooms[room], "Start Button.ogg", self.soundManager))
 
                         self.lobbyRoomButtons = lobbyRoomButtons
-                 
-                except Exception as error:
-                    print(error)
-
+                
                 for button in self.lobbyRoomButtons:
                     button.checkHover(pygame.mouse.get_pos())
 
@@ -115,14 +113,15 @@ class Lobby:
                 #try:
                 self.socket.send("REFRESH")
                     
-                modifiedMessage = None
-                while modifiedMessage == None:
-                    modifiedMessage = self.socket.receive()
+                modifiedMessage = self.socket.receive()
 
-                if modifiedMessage[0] == "Start":
+                if modifiedMessage.split(":")[0] == "Start":
                     players = json.loads(modifiedMessage.split(":")[1])
                     return "multiGame" + str(len(players)) + str(players.index(self.username.input))
                     
+                elif modifiedMessage == "":
+                    pass
+
                 elif modifiedMessage[:5] == "Lobby":
                     self.rooms = json.loads(modifiedMessage[6:])
                     #print(self.rooms)
@@ -161,7 +160,6 @@ class Lobby:
                                 self.state = button.click()
                                 self.socket.send("JOIN:" + self.state)
                                 self.currentRoom = self.state
-                                self.state = "Room"
 
                         for button in self.lobbyButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
@@ -169,7 +167,7 @@ class Lobby:
                                 if self.state == "Create":
                                     self.socket.send("CREATE")
                                     self.host = True
-                                    self.state = "Room"
+                                    self.state = "Lobby"
                                     self.currentRoom = self.username.input
                 
                     ## Message == SCORE:playerScore
