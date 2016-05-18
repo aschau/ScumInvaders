@@ -57,6 +57,7 @@ class multiGame:
         self.background = "GameBackground"
         self.background2 = "GameBackground"
         self.enemyGrid = []
+        self.serverGridInfo = {}
         self.enemyRowCount = 5
 
         self.enemyColumnCount = 10
@@ -92,64 +93,18 @@ class multiGame:
 
         self.serverReady = False
         random.seed(datetime.now())
+        self.startTime = pygame.time.get_ticks()
 
         #for server
         self.socket = socket
-        if self.clientPlayerNum == 0:
-            self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))     
-
-        tryGrid = True
-        while tryGrid:
-            try:
-
-                self.socket.send("GETGRIDTYPES:" + self.hostName)
-                message, address = self.socket.clientSocket.recvfrom(2048)
-                modifiedMessage = message.decode().split(":")
-                if modifiedMessage[0] == "GRID":
-                    self.setGrid(modifiedMessage[1:])
-                    tryGrid = False
-            except:
-                tryGrid = True
-
-                 
-        #self.socket.serverName = ip
-        #self.socket.clientSocket.setblocking(False)
-
-
-        self.startTime = pygame.time.get_ticks()
-        tryGameReady = True
-        while tryGameReady:
-            try:
-                self.socket.send("GAMEREADY:" + self.hostName)
-                message, address = self.socket.clientSocket.recvfrom(2048)
-                modifiedMessage = message.decode().split(":")
-                if modifiedMessage[0] == "GAMEREADY":
-                    tryGameReady = False
-            except:
-                tryGameReady = True
-
-
-    def sendGrid(self):
-        grid = []
-        for row in range(self.enemyRowCount):
-            for column in range(self.enemyColumnCount):
-                grid.append({key:self.enemyGrid[row][column].__dict__[key] for key in ['row', 'col', 'health', 'posx', 'posy', 'lastMove', 'dead', 'speed']})
-        data = json.dumps(grid)
-        self.socket.send("ENEMYGRID:" + self.hostName + ":" + data)
-
-
-
-    def readGrid(self, gridData):
-        print(gridData)
-
 
     #Creates the grid for the enemies in the game
-    def setGrid(self, rNumList, speed = 16, health = 1):
-        rNums = rNumList
+    def setGrid(self, speed = 16, health = 1):
+        rNums = self.serverGridInfo["TYPES"]
         for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
             for column in range(self.enemyColumnCount):
-                rnum = int(rNums.pop(0))
+                rnum = rNums[row][column]
                 enemySprite = "Alien1SpriteSheet"
                 if rnum <= 45:
                     enemySprite = "Alien2SpriteSheet"
@@ -170,10 +125,11 @@ class multiGame:
         
         for missile in self.missiles:
             self.screen.blit(self.sprites.getSprite(missile.image), missile.getPos())
-     
-        for row in range(self.enemyRowCount):
-            for column in range(self.enemyColumnCount):
-                self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
+      
+        if self.serverReady:
+            for row in range(self.enemyRowCount):
+                for column in range(self.enemyColumnCount):
+                    self.enemyGrid[row][column].anim.draw(self.screen, self.enemyGrid[row][column].getPos())
 
         self.screen.blit(self.font.render("Lives: " + str(self.playerList[self.clientPlayerNum].lives), True, pygame.Color(255,255,255)), (0, 670))
         self.screen.blit(self.font.render("Ammo: " + str(self.playerList[self.clientPlayerNum].missileCap - self.playerList[self.clientPlayerNum].missileCount), True, pygame.Color(255,255,255)), (0, 670 + self.fontsize))
@@ -186,53 +142,40 @@ class multiGame:
 
     #Handles everything that needs to go on in the game
     def update(self):
-        try:
-            if self.serverReady:
 
-                pass
-                #if self.clientPlayerNum == 0:
-                #    self.sendGrid()
-            else:
+        message = self.socket.receive()
 
-                if self.clientPlayerNum == 0:
-                    self.socket.send("GETGAMESTART:" + self.hostName)
+        #if "ENEMYGRID" in modifiedMessage:
+        #    data = json.loads(modifiedMessage[10:])
+        #    self.readGrid(data)
 
-            message, serverAddress = self.socket.clientSocket.recvfrom(2048)
+        modifiedMessage = message.split(":")
+        #print(modifiedMessage)
+        if message[:4] == "GRID":
+            self.serverGridInfo = json.loads(message[5:])
+            self.setGrid()
 
-            modifiedMessage = message.decode()
-            #if "ENEMYGRID" in modifiedMessage:
-            #    data = json.loads(modifiedMessage[10:])
-            #    self.readGrid(data)
+        if modifiedMessage[0] == "GAMESTART":
+            self.serverReady = True
 
-            modifiedMessage = modifiedMessage.split(":")
-            #print(modifiedMessage)
-            if modifiedMessage[0] == "GAMESTART":
-                self.serverReady = True
-
-            if modifiedMessage[0]  == "MOV":
-                if int(modifiedMessage[1]) != self.clientPlayerNum:
-                    self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
+        elif modifiedMessage[0]  == "MOV":
+            if int(modifiedMessage[1]) != self.clientPlayerNum:
+                self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
 
 
-            if modifiedMessage[0] == "SHOOT":
-                if int(modifiedMessage[3]) != self.clientPlayerNum:
-                    self.missiles.append(Missile(int(modifiedMessage[3]), self.playerList[int(modifiedMessage[3])].missileImage, (int(modifiedMessage[1]) + self.playerList[int(modifiedMessage[3])].imagew - 18, int(modifiedMessage[2]) - self.playerList[int(modifiedMessage[3])].imageh),8, 32)) #(self.playerList[int(modifiedMessage[3])].posx + (self.playerList[int(modifiedMessage[3])].imagew - 18), self.playerList[int(modifiedMessage[3])].posy - (self.playerList[int(modifiedMessage[3])].imageh)), 8, 32))
+        elif modifiedMessage[0] == "SHOOT":
+            if int(modifiedMessage[3]) != self.clientPlayerNum:
+                self.missiles.append(Missile(int(modifiedMessage[3]), self.playerList[int(modifiedMessage[3])].missileImage, (int(modifiedMessage[1]) + self.playerList[int(modifiedMessage[3])].imagew - 18, int(modifiedMessage[2]) - self.playerList[int(modifiedMessage[3])].imageh),8, 32)) #(self.playerList[int(modifiedMessage[3])].posx + (self.playerList[int(modifiedMessage[3])].imagew - 18), self.playerList[int(modifiedMessage[3])].posy - (self.playerList[int(modifiedMessage[3])].imageh)), 8, 32))
 
 
-            if modifiedMessage[0] == "HIT":
-                if modifiedMessage[2] == "ENEMY":
-                    self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].health -= 1
-                    if self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].health == 0 and not self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].dead:
-                        self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].dead = True
-                        #self.socket.send("DEATH:" + self.hostName + ":" + "ENEMY:" + str(row) + ":" + str(column))
-                        self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
-                        self.enemyCount -= 1
-
-        except Exception as error:
-            if type(error) != BlockingIOError:
-                mod = ' '.join(str(type(error)))
-                with open("Log.txt","a") as f:
-                    f.write(mod)
+        elif modifiedMessage[0] == "HIT":
+            if modifiedMessage[2] == "ENEMY":
+                self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].health -= 1
+                if self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].health == 0 and not self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].dead:
+                    self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].dead = True
+                    #self.socket.send("DEATH:" + self.hostName + ":" + "ENEMY:" + str(row) + ":" + str(column))
+                    self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[3])][int(modifiedMessage[4])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
+                    self.enemyCount -= 1
 
         if self.serverReady:
             if self.start:
@@ -294,7 +237,7 @@ class multiGame:
             try:
 
                 self.socket.send("GETGRIDTYPES:" + self.hostName)
-                message, address = self.socket.clientSocket.recvfrom(2048)
+                modifiedMessage = self.socket.receive()
                 modifiedMessage = message.decode().split(":")
                 if modifiedMessage[0] == "GRID":
                     self.setGrid(modifiedMessage[1:])

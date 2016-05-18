@@ -4,6 +4,7 @@ import hashlib
 import os
 import threading
 import json
+import random
 
 class TCP_Server:
     def __init__(self, host, port):
@@ -25,6 +26,21 @@ class TCP_Server:
         self.connectSocket = None
         self.threads = []
         self.rooms = {}
+        self.gameGrids = {}
+
+    def setGrid(self, host):
+        self.gameGrids[host] = {}
+
+        typeList = []
+        posList = []
+        for row in range(5):
+            typeList.append([])
+            for column in range(10):
+                typeList[row].append(random.randint(1, 100))
+                posList.append([32 + (column * 96), (row * 64) - 5 * 64])
+                
+        self.gameGrids[host]["TYPES"] = typeList
+        self.gameGrids[host]["POS"] = posList
         
     def run(self):
         #self.setUp()
@@ -52,6 +68,20 @@ class TCP_Server:
 
                         elif output[0] == "READY":
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username] = not self.rooms[self.threads[numThreads].room][self.threads[numThreads].username]
+
+                        elif output[0] == "START":
+                            self.setGrid(self.threads[numThreads].room)
+                            data = json.dumps(list(self.rooms[self.threads[numThreads].username].keys()))
+                            data2 = json.dumps(self.gameGrids[self.threads[numThreads].room])
+                            for thread in self.threads:
+                                if thread.room == self.threads[numThreads].room:
+                                    thread.send("START:" + data)
+                                    thread.send("GRID:"+data2)
+                                    thread.send("GAMESTART")
+
+                        elif output[0] == "GETGRID":
+                            data = json.dumps(self.gameGrids[self.threads[numThreads].room])
+                            self.threads[numThreads].send("GRID:"+data)
 
                         elif output[0] == "REFRESH":
                             data = json.dumps(self.rooms)

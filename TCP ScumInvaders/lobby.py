@@ -115,7 +115,7 @@ class Lobby:
                     
                 modifiedMessage = self.socket.receive()
 
-                if modifiedMessage.split(":")[0] == "Start":
+                if modifiedMessage.split(":")[0] == "START":
                     players = json.loads(modifiedMessage.split(":")[1])
                     return "multiGame" + str(len(players)) + str(players.index(self.username.input))
                     
