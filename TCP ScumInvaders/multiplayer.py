@@ -223,7 +223,7 @@ class multiGame:
         #return "multiGame"
         if (self.playerList[self.clientPlayerNum].lives <= 0):
             self.socket.send("SCORE:" + str(self.playerList[self.clientPlayerNum].score))
-            self.socket.send("DEATH:" + str(self.playerList[self.clientPlayerNum]))
+            self.socket.send("DEATH:" + str(self.clientPlayerNum))
             return "Score"
         return "multiGame"
 
