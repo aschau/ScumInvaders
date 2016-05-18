@@ -22,7 +22,6 @@ class TCP_Server:
                 print(self.port)
         self.serverSocket.listen(4)
         self.connectSocket = None
-        self.clientAddresses = {}
         self.threads = []
 
     def run(self):
@@ -34,11 +33,13 @@ class TCP_Server:
                 conSock = clientChannel(self.connectSocket, clientID[0])
                 self.threads.append(conSock)
             except:
-                for c in self.threads:
-                    output = c.run()
-                    if output != None:
-                        for c in self.threads:
-                            c.client.send(output.encode())
+                numThreads = 0
+                while numThreads < len(self.threads):
+                    output = self.threads[numThreads].run()
+                    if output == "DISCONNECT":
+                        self.threads.pop(numThreads)
+
+                    numThreads += 1
 
         self.connectSocket.close()
         
@@ -47,21 +48,44 @@ class clientChannel(threading.Thread):
         threading.Thread.__init__(self)
         self.client = client
         self.address = address
-        self.size = 1024
+        self.bufferSize = 9
+        self.loggedIn = False
+        
     def run(self):
         try:
-            data = self.client.recv(200)
-            read = data.decode().split(":")
-            if read[0] == "LOG":
-                self.checkLog(read[1], read[2])
+            data = self.client.recv(self.bufferSize)
+            self.bufferSize = 9
+            read = data.decode()
+            readList = read.split(":")
+            if readList[0] == "SIZE":
+##                print(readList[1][:-readList[1].count("~")])
+                self.bufferSize = int(readList[1][:-readList[1].count("~")])
+##                print(self.bufferSize)
 
-            elif read[0] == "STOP":
-                self.client.send(read[0].encode())
             else:
-                return read[0]
-##                self.client.send(read[1].encode())
+                if readList[0] == "LOG":
+                    self.checkLog(readList[1], readList[2])
+
+                elif readList[0] == "CHECKLOG":
+                    if self.loggedIn:
+                        self.send("Success")
+
+                    else:
+                        self.send("Invalid Password")
+
+                elif readList[0] == "STOP":
+                    self.send(readList[0])
+                    print(self.address, "DISCONNECTED")
+                    self.client.close()
+                    return "Disconnect"
+
+##                self.send(read[1].encode())
         except:
             pass
+
+    def send(self, message):
+        self.client.send(("SIZE:" + str(len(message)) + ("~" * (4 - len(str(len(message)))))).encode())
+        self.client.send(message.encode())
 
     def checkLog(self,username, password):
         connected = None
@@ -82,9 +106,13 @@ class clientChannel(threading.Thread):
                 hashed = hashlib.md5()
                 hashed.update((salt + password).encode())
                 if hashed.hexdigest() == i[1]:
-                    self.client.send("Login success.".encode())
+                    self.loggedIn = True
+                    self.send("Success")
+                    print("Success")
                 else:
-                    self.client.send("Login failed.".encode())
+                    self.send("Invalid Password")
+                    print("Invalid Password")
+
         '''hashing password'''
         if un == "":
             print("Creating username.")
@@ -93,14 +121,16 @@ class clientChannel(threading.Thread):
             hashedPassword = str(hashed.hexdigest())
             tups = (username, hashedPassword)
             c.execute("INSERT INTO logins VALUES (?,?)", (username, hashedPassword))
-            self.client.send("Username created.".encode())
+            self.loggedIn = True
+            self.send("Success")
             print("Created username.")
             connection.commit()
         c.execute('SELECT * FROM logins')
         data = c.fetchall()
         print(data)
 if __name__ == "__main__":
-    socket = TCP_Server("", 9000)
+    port = input("Port #: ")
+    socket = TCP_Server("", int(port))
     print(gethostbyname(gethostname()))
     socket.run()
     socket.serverSocket.close()

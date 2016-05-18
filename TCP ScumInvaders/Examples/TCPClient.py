@@ -10,7 +10,7 @@ class TCP_Client:
     def send(self):
         message = input("Send a message: ")
         self.clientServer.send(message.encode())
-        data = self.clientServer.recv(200)
+        data = self.clientServer.recv(2)
         recvMessage = data.decode().split(":")
         if recvMessage[0] == "STOP":
             self.running = False
