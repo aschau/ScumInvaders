@@ -21,7 +21,7 @@ class TCP_Server:
                 serverPortTaken = False
                 
             except:
-                self.port = self.port = self.port + 1
+                self.port = self.port + 1
                 print(self.port)
         self.serverSocket.listen(4)
         self.connectSocket = None
