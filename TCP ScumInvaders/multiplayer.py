@@ -97,6 +97,7 @@ class multiGame:
 
         #for server
         self.socket = socket
+        print("IM IN GAME")
 
     #Creates the grid for the enemies in the game
     def setGrid(self, speed = 16, health = 1):
@@ -179,7 +180,7 @@ class multiGame:
 
         elif modifiedMessage[0] == "HIT":
             if modifiedMessage[1] == "ENEMY":
-                print(modifiedMessage)
+                #print(modifiedMessage)
                 self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health -= 1
                 if self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health == 0 and not self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead:
                     self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead = True
@@ -381,44 +382,44 @@ class multiGame:
 
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
+                    if not self.enemyGrid[row][column].dead:
+                        if (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.playerList[self.clientPlayerNum].posy and self.playerList[self.clientPlayerNum].posx < self.enemyGrid[row][column].posx < self.playerList[self.clientPlayerNum].posx + 64)) :
+                            self.togglePause()
 
-                    if (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.playerList[self.clientPlayerNum].posy and self.playerList[self.clientPlayerNum].posx < self.enemyGrid[row][column].posx < self.playerList[self.clientPlayerNum].posx + 64)) :
-                        self.togglePause()
-
-                        return "Menu"
+                            return "Room"
                     
-                    self.enemyGrid[row][column].anim.update()
+                        self.enemyGrid[row][column].anim.update()
                     
-                    rNum2 = random.randint(1,self.enemyFireChance)
-                    if rNum2 == 1:
+                        rNum2 = random.randint(1,self.enemyFireChance)
+                        if rNum2 == 1:
 
-                        if (self.enemyGrid[row][column].health > 0 and self.enemyGrid[row][column].missileCount < self.enemyGrid[row][column].missileCap):
-                            #self.socket.send("SHOOT:" + "ENEMY:" + str(row) + ":" + str(column))
-                            self.missiles.append(self.enemyGrid[row][column].fire())
+                            if (self.enemyGrid[row][column].health > 0 and self.enemyGrid[row][column].missileCount < self.enemyGrid[row][column].missileCap):
+                                #self.socket.send("SHOOT:" + "ENEMY:" + str(row) + ":" + str(column))
+                                self.missiles.append(self.enemyGrid[row][column].fire())
 
-                    if self.enemyGrid[row][column].lastMove == None:
-                        if row % 2 == 0:
-                            self.enemyGrid[row][column].lastMove = "Left"
-                        else: 
-                            self.enemyGrid[row][column].lastMove = "Right"
-                        self.enemyGrid[row][column].moveDown()
-                        self.enemyGrid[row][column].moveDown()
-                        self.enemyGrid[row][column].moveDown()
-                        #print("This happened.")
-                    elif self.enemyGrid[row][column].lastMove == "Left":
-                        if self.enemyGrid[row][column].posx <= 0: 
-                            self.enemyGrid[row][column].lastMove = "Right"
+                        if self.enemyGrid[row][column].lastMove == None:
+                            if row % 2 == 0:
+                                self.enemyGrid[row][column].lastMove = "Left"
+                            else: 
+                                self.enemyGrid[row][column].lastMove = "Right"
                             self.enemyGrid[row][column].moveDown()
-                          #  self.enemyGrid[row][column].moveRight()
-                        else:
-                            self.enemyGrid[row][column].moveLeft()
-                    elif self.enemyGrid[row][column].lastMove == "Right":
-                        if self.enemyGrid[row][column].posx + self.enemyGrid[row][column].imagew >= 1024:
-                            self.enemyGrid[row][column].lastMove = "Left"
                             self.enemyGrid[row][column].moveDown()
-                           # self.enemyGrid[row][column].moveLeft()
-                        else:
-                            self.enemyGrid[row][column].moveRight() 
+                            self.enemyGrid[row][column].moveDown()
+                            #print("This happened.")
+                        elif self.enemyGrid[row][column].lastMove == "Left":
+                            if self.enemyGrid[row][column].posx <= 0: 
+                                self.enemyGrid[row][column].lastMove = "Right"
+                                self.enemyGrid[row][column].moveDown()
+                              #  self.enemyGrid[row][column].moveRight()
+                            else:
+                                self.enemyGrid[row][column].moveLeft()
+                        elif self.enemyGrid[row][column].lastMove == "Right":
+                            if self.enemyGrid[row][column].posx + self.enemyGrid[row][column].imagew >= 1024:
+                                self.enemyGrid[row][column].lastMove = "Left"
+                                self.enemyGrid[row][column].moveDown()
+                               # self.enemyGrid[row][column].moveLeft()
+                            else:
+                                self.enemyGrid[row][column].moveRight() 
         return "multiGame"
 
     #scrolls through the background

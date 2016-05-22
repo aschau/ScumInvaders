@@ -90,23 +90,27 @@ class TCP_Server:
                             self.threads[numThreads].send("GRID:"+data)
 
                         elif output[0] == "NEXTLEVEL":
+                            ready = True
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0] = True
                             for player in self.rooms[self.threads[numThreads].room].values():
-                                if player[0] == False:
-                                    numThreads += 1
-                                    return
+                                if player == [False, "Game"]:
+                                    print("CHECK", self.threads[numThreads].username)
+                                    ready = False
 
-                            self.setGrid(self.threads[numThreads].room)
-                            data = json.dumps(self.gameGrids[self.threads[numThreads].room])
-                            for thread in self.threads:
-                                if thread.room == self.threads[numThreads].room:
-                                    thread.send("GRID:" + data)
-                                    self.rooms[thread.room][thread.username][0] = False
-                                    self.rooms[thread.room][thread.username][1] = "Game"
+                            print("NEXTLEVEL FINALLY")
+                            if ready:
+                                self.setGrid(self.threads[numThreads].room)
+                                data = json.dumps(self.gameGrids[self.threads[numThreads].room])
+                                for thread in self.threads:
+                                    if thread.room == self.threads[numThreads].room:
+                                        thread.send("GRID:" + data)
+                                        self.rooms[thread.room][thread.username][0] = False
 
-                            for thread in self.threads:
-                                if thread.room == self.threads[numThreads].room:
-                                    thread.send("GAMESTART")
+                                for thread in self.threads:
+                                    if thread.room == self.threads[numThreads].room:
+                                        thread.send("GAMESTART")
+
+                                print("FINISHED NEXTLEVEL")
 
                         elif output[0] == "REFRESH":
                             data = json.dumps(self.rooms)
