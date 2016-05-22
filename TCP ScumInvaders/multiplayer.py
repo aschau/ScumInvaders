@@ -52,7 +52,7 @@ class multiGame:
         
         self.paused = False
         self.start = True
-        self.level = 1
+        self.level = 0
 
         self.background = "GameBackground"
         self.background2 = "GameBackground"
@@ -100,6 +100,8 @@ class multiGame:
 
     #Creates the grid for the enemies in the game
     def setGrid(self, speed = 16, health = 1):
+        self.enemyGrid = []
+        self.enemyCount = 50
         rNums = self.serverGridInfo["TYPES"]
         for row in range(self.enemyRowCount):
             self.enemyGrid.append([])
@@ -155,9 +157,12 @@ class multiGame:
         if message[:4] == "GRID":
             self.serverGridInfo = json.loads(message[5:])
             self.setGrid()
+            print("GOTGRID")
 
         if modifiedMessage[0] == "GAMESTART":
             self.serverReady = True
+            self.nextLevel()
+            print("GAMESTART")
 
         elif modifiedMessage[0]  == "MOV":
             if int(modifiedMessage[1]) != self.clientPlayerNum:
@@ -182,9 +187,8 @@ class multiGame:
                     self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
                     self.enemyCount -= 1
 
-        elif modifiedMessage[0] == "NEXTLEVEL":
-            self.serverGridInfo = json.loads(message[5:])
-            self.setGrid()
+        #elif modifiedMessage[0] == "NEXTLEVEL":
+        #    self.serverGridInfo = json.loads(message[5:])
 
         if self.serverReady:
             if self.start:
@@ -238,30 +242,30 @@ class multiGame:
 
     '''Odd levels -> change speed; even levels -> change health'''
     def nextLevel(self):   
-        self.setGrid(modifiedMessage[1:])
         self.level += 1
 
-        if self.level % 2 == 0:
-            if self.enemyFireChance > 20:
-                self.enemyFireChance -= 2;
-            self.setGrid(16 + self.level/2, self.level/2)
-        else: 
-            self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
+        if self.level != 1:
+            if self.level % 2 == 0:
+                if self.enemyFireChance > 20:
+                    self.enemyFireChance -= 2;
+                self.setGrid(16 + self.level/2, self.level/2)
+            else: 
+                self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
 
-        if self.level == 5:
-            self.soundManager.playSound("LevelUp.ogg")
+            if self.level == 5:
+                self.soundManager.playSound("LevelUp.ogg")
 
-            for player in range(len(self.playerList)):
-                self.playerList[player].image = "ship" + str(player+1) + "upgrade2"    
+                for player in range(len(self.playerList)):
+                    self.playerList[player].image = "ship" + str(player+1) + "upgrade2"    
 
-        elif self.level == 10:
-            self.soundManager.playSound("LevelUp.ogg")
+            elif self.level == 10:
+                self.soundManager.playSound("LevelUp.ogg")
             
-            for player in range(len(self.playerList)):
-                self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
+                for player in range(len(self.playerList)):
+                    self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
             
-        if self.level %2 == 1:
-            self.playerList[self.clientPlayerNum].missileCap += 1 
+            if self.level %2 == 1:
+                self.playerList[self.clientPlayerNum].missileCap += 1 
 
     #Handles all of the keypresses (Movement, Shooting and pause)
     def keyUpdate(self):
