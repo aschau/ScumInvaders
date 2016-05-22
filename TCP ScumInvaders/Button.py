@@ -42,7 +42,7 @@ class Button():
 
     def flip_image(self):
         if not self.disabled:
-            self.soundManager.playSound("Button.ogg")
+            self.soundManager.playSound("Button.ogg", 2)
             if self.current == self.image:
                 self.current = self.sImage
             
@@ -52,6 +52,7 @@ class Button():
     def click(self):
         if not self.disabled:
             pygame.time.delay(500)
+            self.soundManager.playSound(self.sound)
             return self.function
 
     def draw(self):

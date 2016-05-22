@@ -25,6 +25,8 @@ class soundManager:
         self.loadAll()
 
         pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
+        self.buttonChannel = pygame.mixer.Channel(2)
+        self.soundChannel = pygame.mixer.Channel(1)
         self.music = pygame.mixer.music.load(os.path.join(self.folder, 'mainMenu.ogg'))
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
@@ -48,5 +50,11 @@ class soundManager:
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.play(-1)
 
-    def playSound(self, file):
-        self.all[file].play()
+    def playSound(self, file, channelNum = 1):
+        if channelNum == 1:
+            self.soundChannel.play(self.all[file])
+
+        else:
+            self.buttonChannel.play(self.all[file])
+
+        #self.all[file].play()
