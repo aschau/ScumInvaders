@@ -182,6 +182,10 @@ class multiGame:
                     self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
                     self.enemyCount -= 1
 
+        elif modifiedMessage[0] == "NEXTLEVEL":
+            self.serverGridInfo = json.loads(message[5:])
+            self.setGrid()
+
         if self.serverReady:
             if self.start:
                 if pygame.time.get_ticks() >= self.startTime + 100:
@@ -196,8 +200,6 @@ class multiGame:
                 return self.state
             self.checkEnemyCount()
 
-
-        
         self.keyUpdate()
         self.backgroundUpdate()
         self.checkMissiles()
@@ -230,27 +232,21 @@ class multiGame:
     def checkEnemyCount(self):
         if self.enemyCount == 0:
             self.enemyCount = 50
-            self.nextLevel()
+            self.serverReady = False
+            self.socket.send("NEXTLEVEL")
+            #self.nextLevel()
 
     '''Odd levels -> change speed; even levels -> change health'''
     def nextLevel(self):   
-        self.enemyGrid = []
-        if self.clientPlayerNum == 0:
-            self.socket.send("SETGRID:" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))
-        
-        tryGrid = True
-        while tryGrid:
-            try:
-
-                self.socket.send("GETGRIDTYPES:" + self.hostName)
-                modifiedMessage = self.socket.receive()
-                modifiedMessage = message.decode().split(":")
-                if modifiedMessage[0] == "GRID":
-                    self.setGrid(modifiedMessage[1:])
-                    tryGrid = False
-            except:
-                tryGrid = True
+        self.setGrid(modifiedMessage[1:])
         self.level += 1
+
+        if self.level % 2 == 0:
+            if self.enemyFireChance > 20:
+                self.enemyFireChance -= 2;
+            self.setGrid(16 + self.level/2, self.level/2)
+        else: 
+            self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
 
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
@@ -263,13 +259,6 @@ class multiGame:
             
             for player in range(len(self.playerList)):
                 self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
-
-        if self.level % 2 == 0:
-            if self.enemyFireChance > 20:
-                self.enemyFireChance -= 2;
-            self.setGrid(modifiedMessage[1:], 16 + self.level/2, self.level/2)
-        else: 
-            self.setGrid(modifiedMessage[1:], 16 + (self.level -1)/2, self.level//2 + 1)
             
         if self.level %2 == 1:
             self.playerList[self.clientPlayerNum].missileCap += 1 
@@ -315,6 +304,7 @@ class multiGame:
             if pygame.mouse.get_pressed()[0]:
                 for button in self.pauseButtons:
                     if button.checkClicked(pygame.mouse.get_pos()):
+                        self.socket.send("RETURN")
                         return button.click()
                                     
                 self.mouseNext = pygame.time.get_ticks() + self.mouseDelay

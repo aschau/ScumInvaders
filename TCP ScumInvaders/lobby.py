@@ -62,10 +62,12 @@ class Lobby:
                     if player != "HOST":
                         self.screen.blit(self.sprites.getSprite("RoomNameBox"), (20, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
                         self.screen.blit(self.roomFont.render(player, True, pygame.Color(0,0,0)),(40, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
-                        if status == True:
-                            self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
-                        else:
+                        if status[0] == False or status[1] == "Game":
                             self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
+                        
+                        else:
+                            self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
+
                         playerNumber += 1
                         
             elif self.state == "Score":
@@ -127,7 +129,8 @@ class Lobby:
                     #print(self.rooms)
 
                     if self.host:
-                        if False in self.rooms[self.currentRoom].values():
+                        statuses = list(self.rooms[self.currentRoom].values())
+                        if [False, "Room"] in statuses or [False, "Game"] in statuses or [True, "Game"] in statuses:
                             self.roomButtons[-1].disabled = True
                             self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
                             self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
