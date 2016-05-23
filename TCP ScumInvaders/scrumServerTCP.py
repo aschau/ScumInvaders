@@ -68,7 +68,7 @@ class TCP_Server:
                             self.rooms[output[1]][self.threads[numThreads].username] = [False, "Room"]
 
                         elif output[0] == "READY":
-                            self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0] = True
+                            self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0] = not self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0]
 
                         elif output[0] == "START":
                             self.setGrid(self.threads[numThreads].room)
