@@ -353,14 +353,15 @@ class multiGame:
 
             #1 is the player's missile shots
 
-            if attacker == self.clientPlayerNum:
+            if attacker >= 0:
                 if ((self.missiles[numMissiles].posy + self.missiles[numMissiles].imageh) <= 0):
                     #self.socket.send("SHOOT:" + self.hostName + ":" + str(self.clientPlayerNum))
                     self.missiles.pop(numMissiles)
                     self.playerList[attacker].missileCount -= 1
 
                 else:
-                    self.checkHit(numMissiles)
+                    if attacker == self.clientPlayerNum:
+                        self.checkHit(numMissiles)
 
             #-1 is the enemy's missile shots                    
             elif attacker == -1:
@@ -382,13 +383,12 @@ class multiGame:
 
             for row in range(self.enemyRowCount):
                 for column in range(self.enemyColumnCount):
+                    self.enemyGrid[row][column].anim.update()
                     if not self.enemyGrid[row][column].dead:
                         if (self.enemyGrid[row][column].posy + 32 >= 768 or (self.enemyGrid[row][column].posy + 32 > self.playerList[self.clientPlayerNum].posy and self.playerList[self.clientPlayerNum].posx < self.enemyGrid[row][column].posx < self.playerList[self.clientPlayerNum].posx + 64)) :
                             self.togglePause()
 
                             return "Room"
-                    
-                        self.enemyGrid[row][column].anim.update()
                     
                         rNum2 = random.randint(1,self.enemyFireChance)
                         if rNum2 == 1:
