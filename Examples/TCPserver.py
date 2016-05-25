@@ -10,8 +10,6 @@ class TCP_Server:
         self.port = port
         self.serverSocket = socket(AF_INET, SOCK_STREAM)
         self.serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        #create a list of all the connections?
-        self.connectedSockets = []
         serverPortTaken = True
         while serverPortTaken:
             try:
@@ -20,45 +18,19 @@ class TCP_Server:
                 
             except:
                 self.port = self.port = self.port + 1
-                print(self.port) 
+                print(self.port)
         self.serverSocket.listen(4)
-        #self.serverSocket.settimeout(0.0)
+        self.connectSocket = None
         self.clientAddresses = {}
         self.threads = []
-##    def setUp(self):
-##        try:
-##            self.serverSocket = socket(AF_INET, SOCK_STREAM)
-##            self.serverSocket.bind((self.host, self.port))
-##            self.serverSocket.listen(self.backLog)
-##        except:
-##            if self.serverSocket:
-##                self.serverSocket.close()
-##            print("Socket coulnd't be opened.")
-        ##                connectSocket, clientID = self.serverSocket.accept()
-        ##                print("It accepted.")
-        ##                connectSocket.send("You have connected.".encode()) 
-        ##                message = connectSocket.recv(1024)
-        ##                read = message.decode().split(":")
-        ##                print(read)
-        ##                if read[0] == "LOG":
-        ##                    self.checkLog(read[1], read[2], clientID)
-        ##                elif read[0] == "TALK":
-        ##                    connectSocket.send(read[1].encode())
-        ##                elif read[0] == "STOP":
-        ##                    connectSocket.send(read[0].encode())
-        ##                    break
-        ##                else:
-        ##                    connectSocket.send("Send again".encode())
 
     def run(self):
         #self.setUp()
         while True:
-            #conn, clientID = self.serverSocket.accept()
-            connectSocket, clientID = self.serverSocket.accept()
+            self.connectSocket, clientID = self.serverSocket.accept()
             print("...connected from: ", clientID)
-            self.connectedSocket.append(connectSocket)
             conSock = clientChannel(self.connectSocket, clientID[0])
-            conSock.start()
+            conSock.run()
             self.threads.append(conSock)
         self.connectSocket.close()
         for c in self.threads:
@@ -86,7 +58,6 @@ class clientChannel(threading.Thread):
                     break
                 else:
                     self.client.send("Send again".encode())
-            self.client.close()
         finally:
             self.client.close()
     def checkLog(self,username, password):
