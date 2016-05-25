@@ -257,13 +257,13 @@ class multiGame:
                 self.setGrid(16 + (self.level -1)/2, self.level//2 + 1)
 
             if self.level == 5:
-                self.soundManager.playSound("LevelUp.ogg")
+                self.soundManager.playSound("LevelUp.ogg", 2)
 
                 for player in range(len(self.playerList)):
                     self.playerList[player].image = "ship" + str(player+1) + "upgrade2"    
 
             elif self.level == 10:
-                self.soundManager.playSound("LevelUp.ogg")
+                self.soundManager.playSound("LevelUp.ogg", 2)
             
                 for player in range(len(self.playerList)):
                     self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
