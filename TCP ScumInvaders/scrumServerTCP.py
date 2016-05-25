@@ -97,8 +97,8 @@ class TCP_Server:
                                     print("CHECK", self.threads[numThreads].username)
                                     ready = False
 
-                            print("NEXTLEVEL FINALLY")
                             if ready:
+                                print("NEXTLEVEL FINALLY")
                                 self.setGrid(self.threads[numThreads].room)
                                 data = json.dumps(self.gameGrids[self.threads[numThreads].room])
                                 for thread in self.threads:

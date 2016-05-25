@@ -94,26 +94,26 @@ class Main_Menu():
 
                                         if self.connected:
                                             self.socket.send("LOG:" + message)
-                                            modifiedMessage = self.socket.receive()
+                                    #        modifiedMessage = self.socket.receive()
                                                     
-                                            modifiedMessage = modifiedMessage.split(":")
+                                    #        modifiedMessage = modifiedMessage.split(":")
 
-                                            self.loginStatus = ""
-                                            if modifiedMessage[0] == "Invalid Password":
-                                                self.loginStatus = "Invalid Password"
-                                                self.state = "Login"
+                                    #        self.loginStatus = ""
+                                    #        if modifiedMessage[0] == "Invalid Password":
+                                    #            self.loginStatus = "Invalid Password"
+                                    #            self.state = "Login"
 
-                                            elif modifiedMessage[0] == "Success":
-                                                self.connected = False
-                                                self.state = "Lobby"
+                                    #        elif modifiedMessage[0] == "Success":
+                                    #            self.connected = False
+                                    #            self.state = "Lobby"
 
-                                            elif modifiedMessage[0] == "":
-                                                self.loginStatus = "Waiting"
-                                                self.state = "Login"
+                                    #        elif modifiedMessage[0] == "":
+                                    #            self.loginStatus = "Waiting"
+                                    #            self.state = "Login"
 
-                                    else:
-                                        self.state = "Login"
-                                        self.loginStatus = "Missing Field(s)"
+                                    #else:
+                                    #    self.state = "Login"
+                                    #    self.loginStatus = "Missing Field(s)"
                                 else:
                                     self.loginStatus = ""
                                     #self.loginPressed = False                  

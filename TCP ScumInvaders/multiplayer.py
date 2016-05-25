@@ -154,40 +154,41 @@ class multiGame:
             #    data = json.loads(modifiedMessage[10:])
             #    self.readGrid(data)
 
-            modifiedMessage = message.split(":")
-            #print(modifiedMessage)
-            if message[:4] == "GRID":
-                self.serverGridInfo = json.loads(message[5:])
-                self.setGrid()
-                print("GOTGRID")
+            if message != None:
+                modifiedMessage = message.split(":")
+                #print(modifiedMessage)
+                if message[:4] == "GRID":
+                    self.serverGridInfo = json.loads(message[5:])
+                    self.setGrid()
+                    print("GOTGRID")
 
-            if modifiedMessage[0] == "GAMESTART":
-                self.serverReady = True
-                self.nextLevel()
-                print("GAMESTART")
+                if modifiedMessage[0] == "GAMESTART":
+                    self.serverReady = True
+                    self.nextLevel()
+                    print("GAMESTART")
 
-            elif modifiedMessage[0]  == "MOV":
-                if int(modifiedMessage[1]) != self.clientPlayerNum:
-                    self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
+                elif modifiedMessage[0]  == "MOV":
+                    if int(modifiedMessage[1]) != self.clientPlayerNum:
+                        self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
 
-            elif modifiedMessage[0] == "DEATH":
-                self.playerList[int(modifiedMessage[1])].alive = False
-
-
-            elif modifiedMessage[0] == "SHOOT":
-                if int(modifiedMessage[3]) != self.clientPlayerNum:
-                    self.missiles.append(Missile(int(modifiedMessage[3]), self.playerList[int(modifiedMessage[3])].missileImage, (int(modifiedMessage[1]) + self.playerList[int(modifiedMessage[3])].imagew - 18, int(modifiedMessage[2]) - self.playerList[int(modifiedMessage[3])].imageh),8, 32)) #(self.playerList[int(modifiedMessage[3])].posx + (self.playerList[int(modifiedMessage[3])].imagew - 18), self.playerList[int(modifiedMessage[3])].posy - (self.playerList[int(modifiedMessage[3])].imageh)), 8, 32))
+                elif modifiedMessage[0] == "DEATH":
+                    self.playerList[int(modifiedMessage[1])].alive = False
 
 
-            elif modifiedMessage[0] == "HIT":
-                if modifiedMessage[1] == "ENEMY":
-                    #print(modifiedMessage)
-                    self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health -= 1
-                    if self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health == 0 and not self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead:
-                        self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead = True
-                        #self.socket.send("DEATH:" + self.hostName + ":" + "ENEMY:" + str(row) + ":" + str(column))
-                        self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
-                        self.enemyCount -= 1
+                elif modifiedMessage[0] == "SHOOT":
+                    if int(modifiedMessage[3]) != self.clientPlayerNum:
+                        self.missiles.append(Missile(int(modifiedMessage[3]), self.playerList[int(modifiedMessage[3])].missileImage, (int(modifiedMessage[1]) + self.playerList[int(modifiedMessage[3])].imagew - 18, int(modifiedMessage[2]) - self.playerList[int(modifiedMessage[3])].imageh),8, 32)) #(self.playerList[int(modifiedMessage[3])].posx + (self.playerList[int(modifiedMessage[3])].imagew - 18), self.playerList[int(modifiedMessage[3])].posy - (self.playerList[int(modifiedMessage[3])].imageh)), 8, 32))
+
+
+                elif modifiedMessage[0] == "HIT":
+                    if modifiedMessage[1] == "ENEMY":
+                        #print(modifiedMessage)
+                        self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health -= 1
+                        if self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].health == 0 and not self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead:
+                            self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].dead = True
+                            #self.socket.send("DEATH:" + self.hostName + ":" + "ENEMY:" + str(row) + ":" + str(column))
+                            self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].anim = Animate(self.sprites.getSprite(self.enemyGrid[int(modifiedMessage[2])][int(modifiedMessage[3])].type[:6] + "DeathSpriteSheet"), 3, 3, 32, 32, 2, False)
+                            self.enemyCount -= 1
 
         #elif modifiedMessage[0] == "NEXTLEVEL":
         #    self.serverGridInfo = json.loads(message[5:])

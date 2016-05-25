@@ -26,14 +26,13 @@ class Connect:
             if modifiedMessage[0] == "SIZE":
                 self.bufferSize = int(modifiedMessage[1][:-modifiedMessage[1].count("~")])
             
-            message = self.clientSocket.recv(self.bufferSize).decode()
-            self.bufferSize = 9
-            #print(message)
-            modifiedMessage = message.split(":")
-            if modifiedMessage[0] == "STOP":
-                self.clientSocket.close()
+            else:
+                self.bufferSize = 9
+                #print(message)
+                if modifiedMessage[0] == "STOP":
+                    self.clientSocket.close()
 
-            return message
+                return message
 
         except Exception as error:
             return ""

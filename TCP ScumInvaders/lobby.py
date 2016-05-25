@@ -40,6 +40,7 @@ class Lobby:
             self.mouseDelay = 50
             self.mouseNext = pygame.time.get_ticks()
             self.host = False
+            self.socket.send("REFRESH")
 
         def draw(self):
             if self.state == "Lobby":
@@ -78,12 +79,11 @@ class Lobby:
 
         def update(self):
             self.mouseUpdate()
-            if self.state == "Lobby":
-                self.socket.send("REFRESH")
-                    
+            if self.state == "Lobby":                    
                 modifiedMessage = self.socket.receive()
 
-                if modifiedMessage != "":
+                if modifiedMessage != "" and modifiedMessage != None:
+                    self.socket.send("REFRESH")
                     if modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
 
@@ -113,34 +113,35 @@ class Lobby:
 
             elif self.state == "Room":
                 #try:
-                self.socket.send("REFRESH")
-                    
+                   
                 modifiedMessage = self.socket.receive()
 
-                if modifiedMessage.split(":")[0] == "START":
-                    players = json.loads(modifiedMessage.split(":")[1])
-                    return "multiGame" + str(len(players)) + str(players.index(self.username.input))
+                if modifiedMessage != "" and modifiedMessage != None:
+                    self.socket.send("REFRESH")
+                    if modifiedMessage.split(":")[0] == "START":
+                        players = json.loads(modifiedMessage.split(":")[1])
+                        return "multiGame" + str(len(players)) + str(players.index(self.username.input))
                     
-                elif modifiedMessage == "":
-                    pass
+                    #elif modifiedMessage == "":
+                    #    pass
 
-                elif modifiedMessage[:5] == "Lobby":
-                    self.rooms = json.loads(modifiedMessage[6:])
-                    #print(self.rooms)
+                    elif modifiedMessage[:5] == "Lobby":
+                        self.rooms = json.loads(modifiedMessage[6:])
+                        #print(self.rooms)
 
-                    if self.host:
-                        statuses = list(self.rooms[self.currentRoom].values())
-                        if [False, "Room"] in statuses or [False, "Game"] in statuses or [True, "Game"] in statuses:
-                            self.roomButtons[-1].disabled = True
-                            self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
-                            self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
-                            self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+                        if self.host:
+                            statuses = list(self.rooms[self.currentRoom].values())
+                            if [False, "Room"] in statuses or [False, "Game"] in statuses or [True, "Game"] in statuses:
+                                self.roomButtons[-1].disabled = True
+                                self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
+                                self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
+                                self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
 
-                        else:
-                            self.roomButtons[-1].disabled = False
-                            self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
-                            self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
-                            self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
+                            else:
+                                self.roomButtons[-1].disabled = False
+                                self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
+                                self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
+                                self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
                                                                                 
                 #except Exception as error:
                 #    print(error)
