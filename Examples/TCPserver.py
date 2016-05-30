@@ -23,6 +23,8 @@ class TCP_Server:
         self.connectSocket = None
         self.clientAddresses = {}
         self.threads = []
+        self.connection = None
+        self.c = None
 
     def run(self):
         #self.setUp()
@@ -42,9 +44,11 @@ class clientChannel(threading.Thread):
         self.client = client
         self.address = address
         self.size = 1024
+        self.username = ''
+        self.running = True
     def run(self):
         try:
-            while True:
+            while self.running:
                 data = self.client.recv(200)
                 if not data: break
                 read = data.decode().split(":")
@@ -53,21 +57,34 @@ class clientChannel(threading.Thread):
                     self.checkLog(read[1], read[2])
                 elif read[0] == "TALK":
                     self.client.send(read[1].encode())
+                elif read[0] == "INPUT":
+                    self.insertScore(read[1])
+                    self.client.send("Score recorded".encode())
                 elif read[0] == "STOP":
                     self.client.send(read[0].encode())
-                    break
+                    self.running = False
                 else:
                     self.client.send("Send again".encode())
         finally:
             self.client.close()
+        self.client.close()
+    def insertScore(self, score):
+        self.connection.execute('''UPDATE logins SET score=? WHERE user=?''', (score, self.username))
+        self.connection.commit()
+        self.c.execute('SELECT * FROM logins')
+        data = self.c.fetchall()
+        print("The data:")
+        print(data)
+        
     def checkLog(self,username, password):
         connected = None
-        connection = sqlite3.connect("testData.db")
-        c = connection.cursor()
-        connection.execute('''CREATE TABLE IF NOT EXISTS logins (user TEXT, pass TEXT)''')
+        self.connection = sqlite3.connect("newData.db")
+        self.c = self.connection.cursor()
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS logins (user TEXT, pass TEXT, score TEXT)''')
+        self.username = username
         tups = [(username, password)]
-        c.execute('SELECT * FROM logins')
-        data = c.fetchall()
+        self.c.execute('SELECT * FROM logins')
+        data = self.c.fetchall()
         print("This is the data:")
         print(data)
         un = ""
@@ -89,12 +106,12 @@ class clientChannel(threading.Thread):
             hashed.update((salt + password).encode())
             hashedPassword = str(hashed.hexdigest())
             tups = (username, hashedPassword)
-            c.execute("INSERT INTO logins VALUES (?,?)", (username, hashedPassword))
+            self.c.execute("INSERT INTO logins VALUES (?,?, '0')", (username, hashedPassword))
             self.client.send("Username created.".encode())
             print("Created username.")
-            connection.commit()
-        c.execute('SELECT * FROM logins')
-        data = c.fetchall()
+            self.connection.commit()
+        self.connection.execute('SELECT * FROM logins')
+        data = self.c.fetchall()
         print(data)
 if __name__ == "__main__":
     socket = TCP_Server("", 9000)
