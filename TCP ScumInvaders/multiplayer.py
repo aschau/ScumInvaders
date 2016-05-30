@@ -432,22 +432,26 @@ class multiGame:
         
         if (self.currentBG1Height >= self.bgHeight):
             self.currentBG1Height = -self.bgHeight
-            rnum = random.randint(1,3)
+            rnum = random.randint(1,4)
         
             if rnum == 1:
                 self.background = "GameBackground"
             elif rnum == 2:
                 self.background = "GameBackground2"
+            elif rnum == 3:
+                self.background = "GameBackground2Centered"
             else:
                 self.background = "GameBackground3"
         elif (self.currentBG2Height >= self.bgHeight):
             self.currentBG2Height = -self.bgHeight
 
-            rnum = random.randint(1,3)
+            rnum = random.randint(1,4)
         
             if rnum == 1:
                 self.background2 = "GameBackground"
             elif rnum == 2:
                 self.background2 = "GameBackground2"
+            elif rnum == 3:
+                self.background = "GameBackground2Centered"
             else:
                 self.background2 = "GameBackground3"
