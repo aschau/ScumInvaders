@@ -214,6 +214,8 @@ class Lobby:
 
                                 elif self.state == "Lobby":
                                     self.socket.send("LEAVE ROOM")
+                                    self.chatroom = console(self.screen, (636, 11), 367, 514, 20, 20)
+                                    self.chatbox = console(self.screen, (636, 537), 367, 174, 20, 6, True)
                                     self.currentRoom = None
                                     self.host = False
 
