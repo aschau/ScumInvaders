@@ -79,13 +79,15 @@ class TCP_Server:
                                     del self.rooms[self.threads[numThreads].room]
                                     self.rooms[room[0][0]] = dict(room)
 
+
                                     for thread in self.threads:
-                                        if thread.room == self.threads[numThreads].room:
+                                        if thread.room == self.threads[numThreads].room and thread.username != self.threads[numThreads].username:
                                             thread.room = room[0][0]
                                             thread.send("ROOM:" + room[0][0])
+
+                                    self.threads[numThreads].room = None
                                     
                                 
-                            self.threads[numThreads].room = None
                             
                         elif output[0] == "READY":
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0] = not self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0]
