@@ -40,15 +40,15 @@ class multiGame:
         self.screenh = screenh
         self.soundManager = soundManager
         self.playerList = []
-        self.playerList.append(Player(0, "ship1", "missile1", (300, 700), 32, 32))
+        self.playerList.append(Player(0, "ship1", "missile1", (300, 700), 32, 32, Animate(self.sprites.getSprite("ship1"), 1, 1, 32, 32, 10)))
         if numPlayers > 1:
-            self.playerList.append(Player(1, "ship2", "missile2", (400, 700), 32, 32))
+            self.playerList.append(Player(1, "ship2", "missile2", (400, 700), 32, 32, Animate(self.sprites.getSprite("ship2"), 1, 1, 32, 32, 10)))
 
         if numPlayers > 2:
-            self.playerList.append(Player(2, "ship3", "missile3", (500, 700), 32, 32))
+            self.playerList.append(Player(2, "ship3", "missile3", (500, 700), 32, 32, Animate(self.sprites.getSprite("ship3"), 1, 1, 32, 32, 10)))
 
         if numPlayers > 3:
-            self.playerList.append(Player(3, "ship4", "missile4", (600, 700), 32, 32))
+            self.playerList.append(Player(3, "ship4", "missile4", (600, 700), 32, 32, Animate(self.sprites.getSprite("ship4"), 1, 1, 32, 32, 10)))
         
         self.paused = False
         self.start = True
@@ -125,7 +125,11 @@ class multiGame:
         self.screen.blit(self.sprites.getSprite(self.background2), (0, self.currentBG2Height))
         for player in self.playerList:
             if player.alive == True:
-                self.screen.blit(self.sprites.getSprite(player.image), player.getPos())
+                player.anim.draw(self.screen, player.getPos())
+            #else:
+             #   player.anim.draw(self.screen, player.getPos())
+
+                #self.screen.blit(self.sprites.getSprite(player.image), player.getPos())
         
         for missile in self.missiles:
             self.screen.blit(self.sprites.getSprite(missile.image), missile.getPos())
@@ -172,6 +176,7 @@ class multiGame:
                         self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
 
                 elif modifiedMessage[0] == "DEATH":
+                    self.playerList[self.clientPlayerNum].anim = Animate(self.sprites.getSprite("shipexplode"), 3, 3, 32, 32, 2, False)
                     self.playerList[int(modifiedMessage[1])].alive = False
 
 
@@ -207,10 +212,20 @@ class multiGame:
                 return self.state
             self.checkEnemyCount()
 
+        for player in self.playerList:
+            if player.alive:
+                player.anim.update()
+
+        for player in self.playerList:
+            if player.alive:
+                if player.anim.done:
+                    player.anim = Animate(self.sprites.getSprite(self.playerList[self.clientPlayerNum].image), 1, 1, 32, 32, 2, False)
+
         self.keyUpdate()
         self.backgroundUpdate()
         self.checkMissiles()
         self.state = self.checkPlayerLives()
+
 
         if self.checkState():
             return self.state
@@ -260,13 +275,15 @@ class multiGame:
                 self.soundManager.playSound("LevelUp.ogg", 2)
 
                 for player in range(len(self.playerList)):
-                    self.playerList[player].image = "ship" + str(player+1) + "upgrade2"    
-
+                    self.playerList[player].image = "ship" + str(player+1) + "upgrade2" 
+                    player.anim = Animate(self.sprites.getSprite(player.image), 1, 1, 32, 32, 2)
+   
             elif self.level == 10:
                 self.soundManager.playSound("LevelUp.ogg", 2)
             
                 for player in range(len(self.playerList)):
                     self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
+                    player.anim = Animate(self.sprites.getSprite(player.image), 1, 1, 32, 32, 2)
             
             if self.level %2 == 1:
                 self.playerList[self.clientPlayerNum].missileCap += 1 
@@ -370,6 +387,7 @@ class multiGame:
             elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.playerList[self.clientPlayerNum].collider)):
                     self.playerList[self.clientPlayerNum].lives -= 1
+                    self.playerList[self.clientPlayerNum].anim = Animate(self.sprites.getSprite(self.playerList[self.clientPlayerNum].image + "blink"), 6, 6, 32, 32, 2, False)
                     #self.socket.send("HIT:" + str(self.clientPlayerNum))
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
@@ -432,22 +450,26 @@ class multiGame:
         
         if (self.currentBG1Height >= self.bgHeight):
             self.currentBG1Height = -self.bgHeight
-            rnum = random.randint(1,3)
+            rnum = random.randint(1,4)
         
             if rnum == 1:
                 self.background = "GameBackground"
             elif rnum == 2:
                 self.background = "GameBackground2"
+            elif rnum == 3:
+                self.background = "GameBackground2Centered"
             else:
                 self.background = "GameBackground3"
         elif (self.currentBG2Height >= self.bgHeight):
             self.currentBG2Height = -self.bgHeight
 
-            rnum = random.randint(1,3)
+            rnum = random.randint(1,4)
         
             if rnum == 1:
                 self.background2 = "GameBackground"
             elif rnum == 2:
                 self.background2 = "GameBackground2"
+            elif rnum == 3:
+                self.background2 = "GameBackground2Centered"
             else:
                 self.background2 = "GameBackground3"

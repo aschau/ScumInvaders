@@ -1,4 +1,4 @@
-import os, sys
+﻿import os, sys
 import pygame
 
 #Class to load spritesheet or parts of the spritesheet

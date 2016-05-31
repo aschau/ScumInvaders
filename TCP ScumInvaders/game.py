@@ -31,7 +31,7 @@ class game:
         self.screenw = screenw 
         self.screenh = screenh
         self.soundManager = soundManager
-        self.player = Player(1, "ship1", "missile1", (500, 700), 32, 32)
+        self.player = Player(1, "ship1", "missile1", (500, 700), 32, 32, Animate(self.sprites.getSprite("ship1"), 1, 1, 32, 32, 10))
         #self.player = Player(player, "ship" + str(player), "missile"+ str(player + 1), (200 * player,700), 32, 32)
         self.paused = False
         self.start = True
@@ -79,7 +79,7 @@ class game:
         self.startTime = None
 
     def reset(self):
-        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32)
+        self.player = Player(1, "ship1", "missile2", (500, 700), 32, 32, Animate(self.sprites.getSprite("ship1"), 1, 1, 32, 32, 10))
         self.enemyGrid = []
         self.missiles = []
         self.enemyCount = 50
@@ -112,7 +112,8 @@ class game:
     def draw(self):
         self.screen.blit(self.sprites.getSprite(self.background), (0, self.currentBG1Height))
         self.screen.blit(self.sprites.getSprite(self.background2), (0, self.currentBG2Height))
-        self.screen.blit(self.sprites.getSprite(self.player.image), self.player.getPos())
+        #self.screen.blit(self.sprites.getSprite(self.player.image), self.player.getPos())
+        self.player.anim.draw(self.screen, self.player.getPos())
         
         for missile in self.missiles:
             self.screen.blit(self.sprites.getSprite(missile.image), missile.getPos())
@@ -142,6 +143,9 @@ class game:
         self.keyUpdate()
         if not self.paused:
             self.backgroundUpdate()
+            self.player.anim.update()
+            if self.player.anim.done:
+                self.player.anim = Animate(self.sprites.getSprite(self.player.image), 1, 1, 32, 32, 2)
             self.state = self.enemyUpdate()
 
             if self.checkState():
@@ -168,6 +172,7 @@ class game:
 
     def checkPlayerLives(self):
         if (self.player.lives <= 0):
+            self.player.anim = Animate(self.sprites.getSprite("shipexplode"), 3, 3, 32, 32, 2, False)
             return "Menu"
         return "Game"
 
@@ -184,10 +189,13 @@ class game:
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
             self.player.image = "ship1upgrade2"    
+            self.player.anim = Animate(self.sprites.getSprite(self.player.image), 1, 1, 32, 32, 2)
 
         elif self.level == 10:
             self.soundManager.playSound("LevelUp.ogg")
             self.player.image = "ship1upgrade3"
+            self.player.anim = Animate(self.sprites.getSprite(self.player.image), 1, 1, 32, 32, 2)
+
 
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
@@ -289,6 +297,7 @@ class game:
             elif attacker == -1:
                 if (self.missiles[numMissiles].collider.colliderect(self.player.collider)):
                     self.player.lives -= 1
+                    self.player.anim = Animate(self.sprites.getSprite(self.player.image + "blink"), 6, 6, 32, 32, 2, False)
                     enemyGridPos = self.missiles.pop(numMissiles).getEnemyPos()
                     self.enemyGrid[enemyGridPos[0]][enemyGridPos[1]].missileCount -= 1
 
@@ -371,22 +380,26 @@ class game:
         
         if (self.currentBG1Height >= self.bgHeight):
             self.currentBG1Height = -self.bgHeight
-            rnum = random.randint(1,3)
+            rnum = random.randint(1,4)
         
             if rnum == 1:
                 self.background = "GameBackground"
             elif rnum == 2:
                 self.background = "GameBackground2"
+            elif rnum == 3:
+                self.background = "GameBackground2Centered"
             else:
                 self.background = "GameBackground3"
         elif (self.currentBG2Height >= self.bgHeight):
             self.currentBG2Height = -self.bgHeight
 
-            rnum = random.randint(1,3)
+            rnum = random.randint(1,4)
         
             if rnum == 1:
                 self.background2 = "GameBackground"
             elif rnum == 2:
                 self.background2 = "GameBackground2"
+            elif rnum == 3:
+                self.background2 = "GameBackground2Centered"
             else:
                 self.background2 = "GameBackground3"
