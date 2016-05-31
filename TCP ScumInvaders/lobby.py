@@ -1,6 +1,7 @@
 import pygame, os
 from Button import Button
 import json
+from console import console
 
 class Lobby:
         def __init__(self, screen, screenw, screenh, spriteList, soundManager, username, socket):
@@ -33,6 +34,8 @@ class Lobby:
             self.rooms = {}
             self.currentRoom = None
 
+            self.chatroom = console(self.screen, (636, 11), 381, 514, 20)
+
             self.score = 0
             self.scoreButtons = []
             self.scoreButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Room", '', soundManager))
@@ -56,6 +59,8 @@ class Lobby:
 
             elif self.state == "Room":
                 self.screen.blit(self.sprites.getSprite("GameRoomBackground"), (0, 0))
+                self.chatroom.draw()
+
                 for button in self.roomButtons:
                     button.draw()
 
@@ -130,6 +135,9 @@ class Lobby:
                         if splitMessage[1] == self.username.input:
                             self.host = True
 
+                    elif splitMessage[0] == "CHAT":
+                        self.chatroom.addMessage(modifiedMessage[5:])
+
                     elif modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
                         if self.currentRoom in self.rooms:
@@ -155,6 +163,8 @@ class Lobby:
 
                 for button in self.roomButtons:
                     button.checkHover(pygame.mouse.get_pos())
+
+                self.chatroom.update()
 
                 return "Lobby"
 
