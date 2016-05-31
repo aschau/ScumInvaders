@@ -17,6 +17,7 @@ class console:
         if self.canEdit:
             self.collider = pygame.Rect(pos[0], pos[1], boxw, boxh)
             self.selected = False
+            self.input = ""
             self.messageList.append("")
 
         self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontSize)
@@ -74,28 +75,40 @@ class console:
                 if pygame.time.get_ticks() > self.nextKey:
                     if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
                         self.messageList[-1] = self.messageList[-1][:-1]
+                        self.input = self.input[:-1]
                         if self.messageList[-1] == "" and len(self.messageList) > 1:
                             self.messageList.pop(-1)
 
+                        self.nextKey = pygame.time.get_ticks() + self.keyDelay
+
+                    elif pygame.key.get_pressed()[pygame.K_RETURN]:
+                        if self.input != "":
+                            output = self.input
+                            self.input = ""
+                            self.messageList = [""]
+                            return output
+                        
                         self.nextKey = pygame.time.get_ticks() + self.keyDelay
             
                 pygame.event.pump() 
                 event = pygame.event.poll()
                 if event.type == pygame.KEYDOWN:
-                    if (len(self.messageList) < self.maxLines):
+                    if (len(self.messageList) <= self.maxLines):
                         if event.unicode.isprintable():
+                            self.input += event.unicode
                             if self.font.size(self.messageList[-1] + event.unicode)[0] < self.boxw:
                                 self.messageList[-1] += event.unicode
 
                             else:
-                                if event.unicode != " ":
-                                    temp = self.messageList[-1]
-                                    if temp.rfind(" ") != -1:
-                                        self.messageList[-1] = temp[:temp.rfind(" ")]
-                                        self.messageList.append(temp[temp.rfind(" ")+1:] + event.unicode)
+                                if len(self.messageList) != self.maxLines:
+                                    if event.unicode != " ":
+                                        temp = self.messageList[-1]
+                                        if temp.rfind(" ") != -1:
+                                            self.messageList[-1] = temp[:temp.rfind(" ")]
+                                            self.messageList.append(temp[temp.rfind(" ")+1:] + event.unicode)
 
-                                else:
-                                    self.messageList.append(event.unicode)
+                                    else:
+                                        self.messageList.append(event.unicode)
 
     def addMessage(self, message):
         if self.font.size(message)[0] < self.boxw:

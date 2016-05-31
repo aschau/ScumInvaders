@@ -34,7 +34,7 @@ class Lobby:
             self.rooms = {}
             self.currentRoom = None
 
-            self.chatroom = console(self.screen, (636, 11), 381, 514, 20, 20)
+            self.chatroom = console(self.screen, (636, 11), 367, 514, 20, 20)
             self.chatbox = console(self.screen, (636, 537), 367, 174, 20, 6, True)
 
             self.score = 0
@@ -167,7 +167,10 @@ class Lobby:
                     button.checkHover(pygame.mouse.get_pos())
 
                 self.chatroom.update()
-                self.chatbox.update()
+                output = self.chatbox.update()
+                if output != None:
+                    self.chatroom.addMessage(self.username.input + ": " + output)
+                    self.socket.send("CHAT:" + self.username.input + ": " + output)
 
                 return "Lobby"
 
