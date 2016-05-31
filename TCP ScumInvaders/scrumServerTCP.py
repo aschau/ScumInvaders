@@ -119,6 +119,9 @@ class TCP_Server:
                         elif output[0] == "RETURN":
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][1] = "Room"
 
+                        elif output[0] == "STOP":
+                            self.threads.pop(numThreads)
+                        
                         else:
                             for thread in self.threads:
                                 if thread.username != self.threads[numThreads].username and thread.room == self.threads[numThreads].room:

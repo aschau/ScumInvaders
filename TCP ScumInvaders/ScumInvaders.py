@@ -87,6 +87,7 @@ class ScumInvaders:
                     if output == "Menu":
                         self.mainMenu.socket.send("STOP")
                         self.mainMenu.state = "Login"
+                        self.mainMenu.connected = False
                         self.mainMenu.loginPressed = False
                         self.mainMenu.loginStatus = ""
 
@@ -124,7 +125,12 @@ class ScumInvaders:
             pygame.display.update()
             self.clock.tick(60)
         
-        pygame.quit()
+        try:
+            self.mainMenu.socket.send("STOP")
+            pygame.quit()
+
+        except:
+            pass
 
 if __name__ == "__main__":
     MainWindow = ScumInvaders()
