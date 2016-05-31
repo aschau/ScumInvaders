@@ -135,7 +135,7 @@ class TCP_Server:
                         elif output[0] == "REFRESH":
                             data = json.dumps(self.rooms)
                             self.threads[numThreads].send("Lobby:"+data)
-                            self.threads[numThreads].send("CHAT:Server: "+str(random.randint(1, 100)))
+##                            self.threads[numThreads].send("CHAT:Server: "+str(random.randint(1, 100)))
 
                         elif output[0] == "RETURN":
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][1] = "Room"

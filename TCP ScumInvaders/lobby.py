@@ -34,7 +34,8 @@ class Lobby:
             self.rooms = {}
             self.currentRoom = None
 
-            self.chatroom = console(self.screen, (636, 11), 381, 514, 20)
+            self.chatroom = console(self.screen, (636, 11), 381, 514, 20, 20)
+            self.chatbox = console(self.screen, (636, 537), 367, 174, 20, 6, True)
 
             self.score = 0
             self.scoreButtons = []
@@ -60,6 +61,7 @@ class Lobby:
             elif self.state == "Room":
                 self.screen.blit(self.sprites.getSprite("GameRoomBackground"), (0, 0))
                 self.chatroom.draw()
+                self.chatbox.draw()
 
                 for button in self.roomButtons:
                     button.draw()
@@ -165,6 +167,7 @@ class Lobby:
                     button.checkHover(pygame.mouse.get_pos())
 
                 self.chatroom.update()
+                self.chatbox.update()
 
                 return "Lobby"
 
@@ -215,4 +218,6 @@ class Lobby:
                                     self.socket.send("START")
                                     self.state = "Room"
                                     
+                        self.chatbox.checkClicked(pygame.mouse.get_pos())
+
                     self.mouseNext = pygame.time.get_ticks() + self.mouseDelay
