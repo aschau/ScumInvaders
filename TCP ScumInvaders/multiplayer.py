@@ -203,7 +203,7 @@ class multiGame:
                 if pygame.time.get_ticks() >= self.startTime + 100:
                     self.soundManager.playSound("Enemy_entrance.ogg")
                     pygame.time.delay(2000)
-                    self.soundManager.playNewMusic("ScumInvadersTheme(Final).ogg", .2)
+                    self.soundManager.playNewMusic("ScumInvaders.ogg")
                     self.start = False
 
             self.state = self.enemyUpdate()

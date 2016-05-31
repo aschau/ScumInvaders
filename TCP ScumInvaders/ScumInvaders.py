@@ -69,7 +69,7 @@ class ScumInvaders:
                 elif self.state == "Lobby":
                     self.mainMenu.state = "Login"
                     self.lobby = Lobby(self.screen, self.width, self.height, self.AllSprites, self.sounds, self.mainMenu.username, self.mainMenu.socket)
-                    self.sounds.playNewMusic('lobby (Final).ogg')
+                    self.sounds.playNewMusic('newlobby.ogg')
 
 
                 elif self.state == "Game":
@@ -121,7 +121,7 @@ class ScumInvaders:
                     
                 elif self.state == "Lobby":
                     self.lobby.state = "Room"
-                    self.sounds.playNewMusic('lobby (Final).ogg')
+                    self.sounds.playNewMusic('newlobby.ogg')
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
