@@ -10,7 +10,7 @@ Functions:
     self.getPos()
 '''
 class Player:
-    def __init__(self, playerNum, image, missileImage, pos, imagew, imageh):
+    def __init__(self, playerNum, image, missileImage, pos, imagew, imageh, animation):
         self.image = image
         self.imagew = imagew
         self.imageh = imageh
@@ -25,6 +25,7 @@ class Player:
         self.missileCap = 3
         self.lives = 3
         self.alive = True
+        self.anim = animation
 
     def moveLeft(self):
         self.posx -= self.speed
