@@ -58,18 +58,19 @@ class Lobby:
                 for button in self.roomButtons:
                     button.draw()
 
-                playerNumber = 0
-                for player, status in self.rooms[self.currentRoom].items():
-                    if player != "HOST":
-                        self.screen.blit(self.sprites.getSprite("RoomNameBox"), (20, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
-                        self.screen.blit(self.roomFont.render(player, True, pygame.Color(0,0,0)),(40, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
-                        if status[0] == False or status[1] == "Game":
-                            self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
+                if self.currentRoom in self.rooms:
+                    playerNumber = 0
+                    for player, status in self.rooms[self.currentRoom].items():
+                        if player != "HOST":
+                            self.screen.blit(self.sprites.getSprite("RoomNameBox"), (20, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
+                            self.screen.blit(self.roomFont.render(player, True, pygame.Color(0,0,0)),(40, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber))
+                            if status[0] == False or status[1] == "Game":
+                                self.screen.blit(self.sprites.getSprite("notreadysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
                         
-                        else:
-                            self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
+                            else:
+                                self.screen.blit(self.sprites.getSprite("readysign"), (self.screenw/2.2, 100 * (playerNumber + 1) + self.roomFontSize * playerNumber + 10))
 
-                        playerNumber += 1
+                            playerNumber += 1
                         
             elif self.state == "Score":
                 self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
@@ -130,21 +131,23 @@ class Lobby:
 
                     elif modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
+                        if self.currentRoom in self.rooms:
+
                         #print(self.rooms)
 
-                        if self.host:
-                            statuses = list(self.rooms[self.currentRoom].values())
-                            if [False, "Room"] in statuses or [False, "Game"] in statuses or [True, "Game"] in statuses:
-                                self.roomButtons[-1].disabled = True
-                                self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
-                                self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
-                                self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
+                            if self.host:
+                                statuses = list(self.rooms[self.currentRoom].values())
+                                if [False, "Room"] in statuses or [False, "Game"] in statuses or [True, "Game"] in statuses:
+                                    self.roomButtons[-1].disabled = True
+                                    self.roomButtons[-1].current = self.sprites.getSprite("startbuttondisable")
+                                    self.roomButtons[-1].image = self.sprites.getSprite("startbuttondisable")
+                                    self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttondisable")
 
-                            else:
-                                self.roomButtons[-1].disabled = False
-                                self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
-                                self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
-                                self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
+                                else:
+                                    self.roomButtons[-1].disabled = False
+                                    self.roomButtons[-1].current = self.sprites.getSprite("startbutton")
+                                    self.roomButtons[-1].image = self.sprites.getSprite("startbutton")
+                                    self.roomButtons[-1].sImage = self.sprites.getSprite("startbuttonhover")
                                                                                 
                 #except Exception as error:
                 #    print(error)
