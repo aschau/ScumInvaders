@@ -114,11 +114,10 @@ class Main_Menu():
                                     #            self.loginStatus = "Waiting"
                                     #            self.state = "Login"
 
-                                    #else:
-                                    #    self.state = "Login"
-                                    #    self.loginStatus = "Missing Field(s)"
-                                        else:
-                                            self.loginStatus = ""
+                                    else:
+                                        self.state = "Login"
+                                        self.loginStatus = "Missing Field(s)"
+                                        
                         
                         self.ip.checkClicked(pygame.mouse.get_pos())
                         self.port.checkClicked(pygame.mouse.get_pos())
