@@ -47,8 +47,9 @@ class Lobby:
                 self.screen.fill((0, 0, 0))
                 self.screen.blit(self.sprites.getSprite("LobbyRoomBackgroundOutline"), (5, 33))
                 for button in self.lobbyRoomButtons:
-                    button.draw()
-                    self.screen.blit(self.font.render(button.function + "'s Room " + str(len(self.rooms[button.function])) + "/4", True, pygame.Color(89, 89, 89)), (button.posx + 25, button.posy + 10))
+                    if button.function in self.rooms:
+                        button.draw()
+                        self.screen.blit(self.font.render(button.function + "'s Room " + str(len(self.rooms[button.function])) + "/4", True, pygame.Color(89, 89, 89)), (button.posx + 25, button.posy + 10))
 
                 for button in self.lobbyButtons:
                     button.draw()
@@ -131,7 +132,6 @@ class Lobby:
 
                     elif modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
-                        #print(self.rooms)
                         if self.currentRoom in self.rooms:
 
                         #print(self.rooms)
