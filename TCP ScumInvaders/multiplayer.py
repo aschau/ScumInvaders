@@ -249,6 +249,7 @@ class multiGame:
             self.socket.send("SCORE:" + str(self.playerList[self.clientPlayerNum].score))
             self.socket.send("DEATH:" + str(self.clientPlayerNum))
             self.socket.send("RETURN")
+            self.socket.send("REFRESH")
             return "Score"
         return "multiGame"
 
@@ -330,6 +331,7 @@ class multiGame:
                 for button in self.pauseButtons:
                     if button.checkClicked(pygame.mouse.get_pos()):
                         self.socket.send("RETURN")
+                        self.socket.send("REFRESH")
                         return button.click()
                                     
                 self.mouseNext = pygame.time.get_ticks() + self.mouseDelay

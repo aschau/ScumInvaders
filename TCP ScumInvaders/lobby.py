@@ -131,6 +131,7 @@ class Lobby:
 
                     elif modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])
+                        #print(self.rooms)
                         if self.currentRoom in self.rooms:
 
                         #print(self.rooms)
