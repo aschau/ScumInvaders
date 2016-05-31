@@ -129,10 +129,11 @@ class ScumInvaders:
         
         try:
             self.mainMenu.socket.send("STOP")
-            pygame.quit()
 
         except:
             pass
+
+        pygame.quit()
 
 if __name__ == "__main__":
     MainWindow = ScumInvaders()
