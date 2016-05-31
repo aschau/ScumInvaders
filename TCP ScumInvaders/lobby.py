@@ -118,12 +118,15 @@ class Lobby:
 
                 if modifiedMessage != "" and modifiedMessage != None:
                     self.socket.send("REFRESH")
-                    if modifiedMessage.split(":")[0] == "START":
+                    splitMessage = modifiedMessage.split(":")
+                    if splitMessage[0] == "START":
                         players = json.loads(modifiedMessage.split(":")[1])
                         return "multiGame" + str(len(players)) + str(players.index(self.username.input))
-                    
-                    #elif modifiedMessage == "":
-                    #    pass
+
+                    elif splitMessage[0] == "ROOM":
+                        self.currentRoom = splitMessage[1]
+                        if splitMessage[1] == self.username.input:
+                            self.host = True
 
                     elif modifiedMessage[:5] == "Lobby":
                         self.rooms = json.loads(modifiedMessage[6:])

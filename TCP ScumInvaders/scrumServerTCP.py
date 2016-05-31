@@ -67,6 +67,26 @@ class TCP_Server:
                         elif output[0] == "JOIN":
                             self.rooms[output[1]][self.threads[numThreads].username] = [False, "Room"]
 
+                        elif output[0] == "LEAVE ROOM":
+                            del self.rooms[self.threads[numThreads].room][self.threads[numThreads].username]
+                            
+                            if len(self.rooms[self.threads[numThreads].room]) == 0:
+                                del self.rooms[self.threads[numThreads].room]
+
+                            else:
+                                if self.threads[numThreads].username in self.rooms:
+                                    room = list(self.rooms[self.threads[numThreads].room].items())
+                                    del self.rooms[self.threads[numThreads].room]
+                                    self.rooms[room[0][0]] = dict(room)
+
+                                    for thread in self.threads:
+                                        if thread.room == self.threads[numThreads].room:
+                                            thread.room = room[0][0]
+                                            thread.send("ROOM:" + room[0][0])
+                                    
+                                
+                            self.threads[numThreads].room = None
+                            
                         elif output[0] == "READY":
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0] = not self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0]
 
