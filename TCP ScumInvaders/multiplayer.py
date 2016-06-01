@@ -251,10 +251,14 @@ class multiGame:
             self.socket.send("DEATH:" + str(self.clientPlayerNum))
             self.socket.send("RETURN")
             self.socket.send("REFRESH")
-            #return self.mouseUpdate()
-            return "Score"
+            
+        death = 0
+        for player in self.playerList: 
+            if player.alive == False:
+                death += 1
+            if death  >= len(self.playerList):
+                return "Score"
         return "multiGame"
-
     def checkEnemyCount(self):
         if self.enemyCount == 0:
             self.enemyCount = 50
