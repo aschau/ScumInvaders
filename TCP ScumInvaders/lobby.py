@@ -86,6 +86,7 @@ class Lobby:
                 self.screen.blit(self.roomFont.render(str(self.score), True, pygame.Color(255,255,255)),(400,self.screenh/2 - 120))
                 if self.highScore:
                     self.screen.blit(self.roomFont.render("HIGH SCORE!", True, pygame.Color(255,255,255)),(350,self.screenh/2 - 200))
+                    self.highScore = False
                 for button in self.scoreButtons:
                     button.draw()
 
