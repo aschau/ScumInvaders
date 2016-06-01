@@ -251,6 +251,7 @@ class multiGame:
             self.socket.send("DEATH:" + str(self.clientPlayerNum))
             self.socket.send("RETURN")
             self.socket.send("REFRESH")
+            #return self.mouseUpdate()
             return "Score"
         return "multiGame"
 

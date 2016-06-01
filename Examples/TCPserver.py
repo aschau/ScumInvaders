@@ -59,7 +59,7 @@ class clientChannel(threading.Thread):
                     self.client.send(read[1].encode())
                 elif read[0] == "INPUT":
                     self.insertScore(read[1])
-                    self.client.send("Score recorded".encode())
+                    #self.client.send("Score recorded".encode())
                 elif read[0] == "STOP":
                     self.client.send(read[0].encode())
                     self.running = False
@@ -69,9 +69,20 @@ class clientChannel(threading.Thread):
             self.client.close()
         self.client.close()
     def insertScore(self, score):
-        self.connection.execute('''UPDATE logins SET score=? WHERE user=?''', (score, self.username))
+        highScore = False
+        self.c.execute('SELECT * FROM logins')
+        data = self.c.fetchall()
+        for i in data:
+            if i[0] == self.username:
+                if i[2] < score:
+                    highScore = True
+                    self.connection.execute('''UPDATE logins SET score=? WHERE user=?''', (score, self.username))
         self.connection.commit()
         self.c.execute('SELECT * FROM logins')
+        if highScore == True:
+            self.client.send("High Score!".encode())
+        else:
+            self.client.send("No new score.".encode())
         data = self.c.fetchall()
         print("The data:")
         print(data)

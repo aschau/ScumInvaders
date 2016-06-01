@@ -1,4 +1,4 @@
-from socket import *
+﻿from socket import *
 import sqlite3
 import hashlib
 import os
@@ -185,6 +185,8 @@ class clientChannel(threading.Thread):
                 elif readList[0] == "CREATE":
                         self.room = self.username
                         return readList[0]
+                elif readList[0] == "SCORE":
+                        self.checkScore(readList[1])
 
                 elif readList[0] == "JOIN":
                         self.room = readList[1]
@@ -210,11 +212,38 @@ class clientChannel(threading.Thread):
         except:
             pass
 
+    def checkScore(self, score):
+        highScore = False
+        connection = sqlite3.connect("gameData.db")
+        print("registered data")
+        c = connection.cursor()
+        c.execute('SELECT * FROM logins')
+        data = c.fetchall()
+        print("This is the data:")
+        print(data)
+        for i in data:
+            if i[0] == self.username:
+                print("There is username match.")
+                if i[2] < int(score):
+                    highScore = True
+                    print("There is a high score.")
+                    connection.execute('''UPDATE logins SET score=? WHERE user=?''', (int(score), self.username))
+                    print("It updated, but not commited.")
+        connection.commit()
+        print("is it commiting?")
+        c.execute('SELECT * FROM logins')
+        if highScore == True:
+            print("Attempted to send high score")
+            self.client.send("HIGHSCORE".encode())
+        data = c.fetchall()
+        print("The data:")
+        print(data)
+
     def checkLog(self,username, password):
         connected = None
-        connection = sqlite3.connect("testData.db")
+        connection = sqlite3.connect("gameData.db")
         c = connection.cursor()
-        connection.execute('''CREATE TABLE IF NOT EXISTS logins (user TEXT, pass TEXT)''')
+        connection.execute('''CREATE TABLE IF NOT EXISTS logins (user TEXT, pass TEXT, score TEXT)''')
         tups = [(username, password)]
         c.execute('SELECT * FROM logins')
         data = c.fetchall()
@@ -240,11 +269,12 @@ class clientChannel(threading.Thread):
         '''hashing password'''
         if un == "":
             print("Creating username.")
+            self.username = username
             hashed = hashlib.md5()
             hashed.update((salt + password).encode())
             hashedPassword = str(hashed.hexdigest())
             tups = (username, hashedPassword)
-            c.execute("INSERT INTO logins VALUES (?,?)", (username, hashedPassword))
+            c.execute("INSERT INTO logins VALUES (?,?, 0)", (username, hashedPassword))
             self.loggedIn = True
             self.send("Success")
             print("Created username.")

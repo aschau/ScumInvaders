@@ -1,4 +1,4 @@
-import pygame, os
+﻿import pygame, os
 from Button import Button
 import json
 from console import console
@@ -38,6 +38,7 @@ class Lobby:
             self.chatbox = console(self.screen, (636, 537), 367, 174, 20, 6, True)
 
             self.score = 0
+            self.highScore = False
             self.scoreButtons = []
             self.scoreButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Room", '', soundManager))
             
@@ -82,7 +83,9 @@ class Lobby:
                         
             elif self.state == "Score":
                 self.screen.blit(self.sprites.getSprite("titlescreenbg"), (0,0))
-                self.screen.blit(self.font.render(str(self.score), True, pygame.Color(255,255,255)),(300,self.screenh/2 - 100))
+                self.screen.blit(self.roomFont.render(str(self.score), True, pygame.Color(255,255,255)),(400,self.screenh/2 - 120))
+                if self.highScore:
+                    self.screen.blit(self.roomFont.render("HIGH SCORE!", True, pygame.Color(255,255,255)),(350,self.screenh/2 - 200))
                 for button in self.scoreButtons:
                     button.draw()
 
@@ -120,6 +123,12 @@ class Lobby:
             elif self.state == "Score":
                 for button in self.scoreButtons:
                     button.checkHover(pygame.mouse.get_pos())
+                modifiedMessage = self.socket.receive()
+
+                if modifiedMessage != "" and modifiedMessage != None:
+                    splitMessage = modifiedMessage.split(":")
+                    if splitMessage[0] == "HIGHSCORE":
+                        self.highScore = True
 
                 return "Lobby"
 
