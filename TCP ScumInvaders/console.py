@@ -22,8 +22,7 @@ class console:
 
         self.font = pygame.font.Font(os.path.join('Fonts', 'nasalization-rg.ttf'), self.fontSize)
         self.color = pygame.Color(0, 0, 0)
-        
-        
+        self.titleColor = pygame.Color(125, 125, 125)
 
         self.keyDelay = 100
         self.nextKey = pygame.time.get_ticks()

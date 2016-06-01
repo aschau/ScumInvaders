@@ -221,6 +221,7 @@ class Lobby:
 
                                 elif self.state == "multiGame":
                                     self.socket.send("START")
+                                    self.chatbox.selected = False
                                     self.state = "Room"
                                     
                         self.chatbox.checkClicked(pygame.mouse.get_pos())
