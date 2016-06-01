@@ -94,7 +94,10 @@ class Lobby:
                 if modifiedMessage != "" and modifiedMessage != None:
                     self.socket.send("REFRESH")
                     if modifiedMessage[:5] == "Lobby":
-                        self.rooms = json.loads(modifiedMessage[6:])
+                        try:
+                            self.rooms = json.loads(modifiedMessage[6:])
+                        except:
+                            pass
 
                         if self.currentRoom in self.rooms.keys():
                             self.state = "Room"
@@ -141,7 +144,10 @@ class Lobby:
                         self.chatroom.addMessage(modifiedMessage[5:])
 
                     elif modifiedMessage[:5] == "Lobby":
-                        self.rooms = json.loads(modifiedMessage[6:])
+                        try:
+                            self.rooms = json.loads(modifiedMessage[6:])
+                        except:
+                            pass
                         if self.currentRoom in self.rooms:
 
                         #print(self.rooms)
