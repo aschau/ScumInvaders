@@ -86,7 +86,6 @@ class Lobby:
                 self.screen.blit(self.roomFont.render(str(self.score), True, pygame.Color(255,255,255)),(400,self.screenh/2 - 120))
                 if self.highScore:
                     self.screen.blit(self.roomFont.render("HIGH SCORE!", True, pygame.Color(255,255,255)),(350,self.screenh/2 - 200))
-                    self.highScore = False
                 for button in self.scoreButtons:
                     button.draw()
 
@@ -234,11 +233,13 @@ class Lobby:
                                     self.chatbox = console(self.screen, (636, 537), 367, 174, 20, 6, True)
                                     self.currentRoom = None
                                     self.host = False
+                                    self.highScore = False
 
                                 elif self.state == "multiGame":
                                     self.socket.send("START")
                                     self.chatbox.selected = False
                                     self.state = "Room"
+                                    self.highScore = False
                                     
                         self.chatbox.checkClicked(pygame.mouse.get_pos())
 
