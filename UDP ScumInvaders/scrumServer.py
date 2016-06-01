@@ -3,6 +3,8 @@ import sqlite3
 import json
 import random
 from datetime import datetime
+import time
+
 
 class Socket:
         def __init__(self, host, port):
@@ -17,6 +19,10 @@ class Socket:
                 self.gameUpdates = {}
                 self.gameGridTypes = {}
                 self.gameGrids = {}
+                self.offsets = {} # username:[serverclientoffset, clientserveroffset]
+                self.serversentcheck = False #maybe loss of packets, keep sending
+                self.clientoffsetcheck = False
+                self.serverreceivecheck = False
                 random.seed(datetime.now())
                 #serverSocket.listen(4) #denotes the number of clients can queue
                 #it binds the serverSocket to port number specified in serverPort variable.
@@ -32,13 +38,30 @@ class Socket:
                                 #Also the client IP and port will be extracted and stored in variable clientAddress.
                                 #recvfrom is specific to D_GRAMS foor UDP
                                 #decodes the message
-                                
+                                if clientID not in self.offsets: #appends clientID as key if not in dictionary already
+                                        self.offsets[clientID] = [] #empty list
+        
+                                serverreceivetime = time.time() #for offset calculation
                                 modMessage = message.decode()
 ##                                print(modMessage)
                                 read = modMessage.split(":")
         ##                        if read[0] == "TALK":
         ##                                for i in self.clientAddress.values():
         ##                                        self.serverSocket.sendto((read[1] + ": " + read[2]).encode(), i)
+                                if 'serverclientoffset' in read:
+                                        self.serversentcheck = True
+                                        self.clientoffsetcheck = True
+                                        print('server received message')
+                                        if len(self.offsets[clientID]) == 0: #if values has empty list
+                                                self.offsets[clientID] = [read[read.index('serverclientoffset') + 1]]
+                                        #finds the index (+1) of where the the offset value is in the message
+                                if 'clientsendtime' in read:
+                                        if len(self.offsets[clientID]) == 1: #has s->c offset in value list
+                                                self.serverreceivecheck = True
+                                                clientsendtime = read[read.index('clientsendtime') + 1] #don't assume timestamp is last
+                                                clientserveroffset = abs(double(serverreceivetime) - double(clientsendtime)) #in case it's the otherway and is negative
+                                                self.offsets[clientID].append(clientserveroffset) #sets second value of tuple client to server offset
+                                
                                 if read[0] == "LOG":
                                         self.checkLog(read[1], read[2], clientID)
 
@@ -149,6 +172,23 @@ class Socket:
                                     #if self.players <= 0:
                                         #self.serverSocket.sendto("SCORE:sendScore".encode(), client)
 
+
+                                print('serversend: '+self.serversendcheck) #did not even print...
+                                print('serversend: '+self.clientoffsetcheck)
+                                print('serversend: '+self.serverreceivecheck)
+                                self.serverSocket.sendto(("serversendtime: " + str(time.time())).encode(), clientAddress) #send serversend time
+                                print('server sent message: ' + str(time.time()))
+
+
+##                                #testing
+##                                if bool(self.offsets) == True: #if the dictionary is not empty
+##                                        print('Offsets dictionary: ')
+##                                        print(self.offsets.items())
+##                                        print('keys: ')
+##                                        print(self.offsets.keys())
+##                                        print('values: ')
+##                                        print(self.offsets.values())
+
                         except:
                                 for room in self.gameUpdates.keys():
                                     if len(self.gameUpdates[room]) > 0:
@@ -205,12 +245,23 @@ class Socket:
                         connection.commit()
                 #commits the action to the database?
                 
-                if connected == 0: #Successfully logged in 
+                if connected == 0: #Successfully logged in
+                        print('IS THIS WORKING?!') #testing, works
                         self.serverSocket.sendto("Success".encode(), clientAddress)
+                        print('HOW ABOUT NOW?!') #testing two, works
+##                        while self.serversentcheck == False: #keep sending until received
+                        print('ARE WE HERE?!') #wth
+                        self.serverSocket.sendto(("serversendtime: " + str(time.time())).encode(), clientAddress) #send serversend time
+                                #it does send but refuses to print out the statement after....
+                                #if commented out, it's stuck in a loop
+                                #so apparently it's been sending and catching maybe...?
+                                #print('Sending?!?') #does not get here.... and not looping
+                        print('server sent message: ' + str(time.time()))
                 if connected == 1: #Password is invalid 
                         self.serverSocket.sendto("Invalid Password".encode(), clientAddress)
-                #sends the moddifiedMessage to client with IP and port stored in clientAddress 
+                #sends the modifiedMessage to client with IP and port stored in clientAddress 
                 
+
             
 if __name__ == "__main__":
         socket = Socket('0.0.0.0', 12000)

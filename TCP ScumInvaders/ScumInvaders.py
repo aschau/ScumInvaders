@@ -69,6 +69,8 @@ class ScumInvaders:
                 elif self.state == "Lobby":
                     self.mainMenu.state = "Login"
                     self.lobby = Lobby(self.screen, self.width, self.height, self.AllSprites, self.sounds, self.mainMenu.username, self.mainMenu.socket)
+                    self.sounds.playNewMusic('newlobby.ogg')
+
 
                 elif self.state == "Game":
                     self.game.reset()
@@ -76,7 +78,6 @@ class ScumInvaders:
             elif (self.state == "Lobby"):
                 self.lobby.draw()
                 output = self.lobby.update()
-
                 if "multiGame" in output:
                     self.screen.blit(self.AllSprites.getSprite("Loading"), (0, 0))
                     self.state = "multiGame"
@@ -85,8 +86,10 @@ class ScumInvaders:
 
                 else:
                     if output == "Menu":
+                        self.sounds.playNewMusic('mainMenu.ogg')
                         self.mainMenu.socket.send("STOP")
                         self.mainMenu.state = "Login"
+                        self.mainMenu.connected = False
                         self.mainMenu.loginPressed = False
                         self.mainMenu.loginStatus = ""
 
@@ -118,12 +121,18 @@ class ScumInvaders:
                     
                 elif self.state == "Lobby":
                     self.lobby.state = "Room"
-                    self.sounds.playNewMusic('mainMenu.ogg')
+                    self.sounds.playNewMusic('newlobby.ogg')
 
             self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, pygame.Color(255,255,255)), (0, 0))	
             pygame.display.update()
             self.clock.tick(60)
         
+        try:
+            self.mainMenu.socket.send("STOP")
+
+        except:
+            pass
+
         pygame.quit()
 
 if __name__ == "__main__":

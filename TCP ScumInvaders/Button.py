@@ -52,7 +52,8 @@ class Button():
     def click(self):
         if not self.disabled:
             pygame.time.delay(500)
-            self.soundManager.playSound(self.sound)
+            if self.sound != "":
+                self.soundManager.playSound(self.sound)
             return self.function
 
     def draw(self):

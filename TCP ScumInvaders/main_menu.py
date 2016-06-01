@@ -76,9 +76,10 @@ class Main_Menu():
                         for button in self.loginButtons:
                             if button.checkClicked(pygame.mouse.get_pos()):
                                 self.state = button.click()
-                                if self.state == "Menu":
-                                    self.connected = False
-                                    self.socket.send("STOP")
+                                if self.state == "Main":
+                                    if self.connected:
+                                        self.connected = False
+                                        self.socket.send("STOP")
 
                                 if self.state == "Lobby":
                                     if self.ip.input != "" and self.port.input != "" and self.username.input != "" and self.password.input != "":
@@ -94,6 +95,8 @@ class Main_Menu():
 
                                         if self.connected:
                                             self.socket.send("LOG:" + message)
+                                            self.state = "Login"
+                                            self.loginStatus = "Waiting"
                                     #        modifiedMessage = self.socket.receive()
                                                     
                                     #        modifiedMessage = modifiedMessage.split(":")
@@ -111,12 +114,10 @@ class Main_Menu():
                                     #            self.loginStatus = "Waiting"
                                     #            self.state = "Login"
 
-                                    #else:
-                                    #    self.state = "Login"
-                                    #    self.loginStatus = "Missing Field(s)"
-                                else:
-                                    self.loginStatus = ""
-                                    #self.loginPressed = False                  
+                                    else:
+                                        self.state = "Login"
+                                        self.loginStatus = "Missing Field(s)"
+                                        
                         
                         self.ip.checkClicked(pygame.mouse.get_pos())
                         self.port.checkClicked(pygame.mouse.get_pos())
@@ -134,25 +135,26 @@ class Main_Menu():
                 return "Menu"
 
             elif self.state == "Login":
-                if self.connected and self.loginStatus == "Waiting":
-                    self.socket.send("CHECKLOG")
-                        
-                    modifiedMessage = self.socket.receive()
+                if self.connected:
 
-                    modifiedMessage = modifiedMessage.split(":")
-
-                    if modifiedMessage[0] == "Invalid Password":
-                        self.loginStatus = "Invalid Password"
-                        self.state = "Login"
+                    message = None
+                    while message != "":
+                        message = self.socket.receive()
+                        if message != None:
+                            modifiedMessage = message.split(":")
+                            if modifiedMessage[0] == "Invalid Password":
+                                self.loginStatus = "Invalid Password"
+                                self.state = "Login"
                     
-                    elif modifiedMessage[0] == "Success":
-                        self.loginStatus = ""
-                        self.connected = False
-                        self.state = "Lobby"
+                            elif modifiedMessage[0] == "Success":
+                                self.loginStatus = ""
+                                self.connected = False
+                                self.state = "Lobby"
 
-                    elif modifiedMessage[0] == "":
-                        self.loginStatus = "Waiting"
-                        self.state = "Login"
+                        else:
+                            if self.loginStatus == "Waiting":
+                                #self.state = "Login"
+                                self.socket.send("CHECKLOG")
 
                 for button in self.loginButtons:
                     button.checkHover(pygame.mouse.get_pos())

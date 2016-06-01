@@ -67,6 +67,26 @@ class TCP_Server:
                         elif output[0] == "JOIN":
                             self.rooms[output[1]][self.threads[numThreads].username] = [False, "Room"]
 
+                        elif output[0] == "LEAVE ROOM":
+                            del self.rooms[self.threads[numThreads].room][self.threads[numThreads].username]
+                            
+                            if len(self.rooms[self.threads[numThreads].room]) == 0:
+                                del self.rooms[self.threads[numThreads].room]
+
+                            else:
+                                if self.threads[numThreads].username in self.rooms:
+                                    room = list(self.rooms[self.threads[numThreads].room].items())
+                                    del self.rooms[self.threads[numThreads].room]
+                                    self.rooms[room[0][0]] = dict(room)
+##                                    print(room[0][0])
+
+                                    for thread in self.threads:
+                                        if thread.room == self.threads[numThreads].room and thread.username != self.threads[numThreads].username:
+                                            thread.room = room[0][0]
+                                            thread.send("ROOM:" + room[0][0])
+
+                                    self.threads[numThreads].room = None                                    
+                            
                         elif output[0] == "READY":
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0] = not self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][0]
 
@@ -115,10 +135,14 @@ class TCP_Server:
                         elif output[0] == "REFRESH":
                             data = json.dumps(self.rooms)
                             self.threads[numThreads].send("Lobby:"+data)
-
+##                            self.threads[numThreads].send("CHAT:Server: "+str(random.randint(1, 100)))
+                        
                         elif output[0] == "RETURN":
                             self.rooms[self.threads[numThreads].room][self.threads[numThreads].username][1] = "Room"
 
+                        elif output[0] == "STOP":
+                            self.threads.pop(numThreads)
+                        
                         else:
                             for thread in self.threads:
                                 if thread.username != self.threads[numThreads].username and thread.room == self.threads[numThreads].room:
@@ -180,8 +204,11 @@ class clientChannel(threading.Thread):
             pass
 
     def send(self, message):
-        self.client.send(("SIZE:" + str(len(message)) + ("~" * (4 - len(str(len(message)))))).encode())
-        self.client.send(message.encode())
+        try:
+            self.client.send(("SIZE:" + str(len(message)) + ("~" * (4 - len(str(len(message)))))).encode())
+            self.client.send(message.encode())
+        except:
+            pass
 
     def checkLog(self,username, password):
         connected = None
@@ -191,8 +218,8 @@ class clientChannel(threading.Thread):
         tups = [(username, password)]
         c.execute('SELECT * FROM logins')
         data = c.fetchall()
-        print("This is the data:")
-        print(data)
+##        print("This is the data:")
+##        print(data)
         un = ""
         salt = "thisissalty" #for hashing
         for i in data:
@@ -224,7 +251,7 @@ class clientChannel(threading.Thread):
             connection.commit()
         c.execute('SELECT * FROM logins')
         data = c.fetchall()
-        print(data)
+##        print(data)
 if __name__ == "__main__":
     port = input("Port #: ")
     socket = TCP_Server("", int(port))

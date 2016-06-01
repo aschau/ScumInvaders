@@ -10,6 +10,7 @@ from socket import *
 from Connect import Connect
 from missile import Missile
 import json
+import time
 import sqlite3
 
 '''
@@ -45,9 +46,11 @@ class multiGame:
             self.playerList.append(Player(1, "ship2", "missile2", (400, 700), 32, 32))
 
         if numPlayers > 2:
+            
             self.playerList.append(Player(2, "ship3", "missile3", (500, 700), 32, 32))
 
         if numPlayers > 3:
+            
             self.playerList.append(Player(3, "ship4", "missile4", (600, 700), 32, 32))
         
         self.paused = False
@@ -94,13 +97,16 @@ class multiGame:
         random.seed(datetime.now())
 
         #for server
+##        self.clientsentcheck = False #keep sending client time/offset in case packet loss
         self.socket = socket
         if self.clientPlayerNum == 0:
+
             self.socket.send("SETGRID:" + self.hostName + ":" + str(self.enemyRowCount) + ":" + str(self.enemyColumnCount))     
 
         tryGrid = True
         while tryGrid:
             try:
+
 
                 self.socket.send("GETGRIDTYPES:" + self.hostName)
                 message, address = self.socket.clientSocket.recvfrom(2048)
@@ -120,7 +126,9 @@ class multiGame:
         tryGameReady = True
         while tryGameReady:
             try:
-                self.socket.send("GAMEREADY:" + self.hostName)
+
+                clienttime = str(time.time())
+                self.socket.send("GAMEREADY:" + self.hostName + ":" + clienttime) #append client time to message for server
                 message, address = self.socket.clientSocket.recvfrom(2048)
                 modifiedMessage = message.decode().split(":")
                 if modifiedMessage[0] == "GAMEREADY":
@@ -129,7 +137,6 @@ class multiGame:
                 tryGameReady = True
 
 
-    def sendGrid(self):
         grid = []
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
@@ -137,7 +144,13 @@ class multiGame:
         data = json.dumps(grid)
         self.socket.send("ENEMYGRID:" + self.hostName + ":" + data)
 
+    #    if numPlayers > 2:
 
+    #        self.playerList.append(Player(3, "ship3", "missile3", (500, 700), 32, 32))
+
+    #    if numPlayers > 3:
+
+    #        self.playerList.append(Player(4, "ship4", "missile4", (600, 700), 32, 32))
 
     def readGrid(self, gridData):
         print(gridData)
@@ -188,6 +201,7 @@ class multiGame:
     def update(self):
         try:
             if self.serverReady:
+                
 
                 pass
                 #if self.clientPlayerNum == 0:
@@ -199,12 +213,26 @@ class multiGame:
 
             message, serverAddress = self.socket.clientSocket.recvfrom(2048)
 
+
             modifiedMessage = message.decode()
             #if "ENEMYGRID" in modifiedMessage:
             #    data = json.loads(modifiedMessage[10:])
             #    self.readGrid(data)
 
             modifiedMessage = modifiedMessage.split(":")
+            #rather than print, maybe write to a file to check what's going on since dunno where prints are printing out...
+            print('right before offset code stuff for test')
+            if 'serversendtime' in modifiedMessage: #okay, server sent message but it does not detect
+                print('client received message')
+                #calculate offset
+                clientreceivetime = time.time()
+                serverclientoffset = abs(double(clientreceivetime) - modifiedMessage[modifiedMessage.index('serversendtime')+1])
+                #send info back to server to store
+                self.socket.send('serverclientoffset: ' + str(serverclientoffset) + ' clientsendtime: ' + str(time.time()))
+                print('client sent message')
+
+
+
             #print(modifiedMessage)
             if modifiedMessage[0] == "GAMESTART":
                 self.serverReady = True
@@ -214,9 +242,11 @@ class multiGame:
                     self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
 
 
+
             if modifiedMessage[0] == "SHOOT":
                 if int(modifiedMessage[3]) != self.clientPlayerNum:
                     self.missiles.append(Missile(int(modifiedMessage[3]), self.playerList[int(modifiedMessage[3])].missileImage, (int(modifiedMessage[1]) + self.playerList[int(modifiedMessage[3])].imagew - 18, int(modifiedMessage[2]) - self.playerList[int(modifiedMessage[3])].imageh),8, 32)) #(self.playerList[int(modifiedMessage[3])].posx + (self.playerList[int(modifiedMessage[3])].imagew - 18), self.playerList[int(modifiedMessage[3])].posy - (self.playerList[int(modifiedMessage[3])].imageh)), 8, 32))
+
 
 
             if modifiedMessage[0] == "HIT":
@@ -241,19 +271,22 @@ class multiGame:
                     pygame.time.delay(2000)
                     self.soundManager.playNewMusic("ScumInvadersTheme(Final).ogg", .2)
                     self.start = False
-
             self.state = self.enemyUpdate()
 
             if self.checkState():
                 return self.state
+
             self.checkEnemyCount()
 
 
+
         
+
         self.keyUpdate()
         self.backgroundUpdate()
         self.checkMissiles()
         self.state = self.checkPlayerLives()
+
 
         if self.checkState():
             return self.state
@@ -293,10 +326,12 @@ class multiGame:
         while tryGrid:
             try:
 
+
                 self.socket.send("GETGRIDTYPES:" + self.hostName)
                 message, address = self.socket.clientSocket.recvfrom(2048)
                 modifiedMessage = message.decode().split(":")
                 if modifiedMessage[0] == "GRID":
+
                     self.setGrid(modifiedMessage[1:])
                     tryGrid = False
             except:
@@ -306,6 +341,7 @@ class multiGame:
         if self.level == 5:
             self.soundManager.playSound("LevelUp.ogg")
 
+
             for player in range(len(self.playerList)):
                 self.playerList[player].image = "ship" + str(player+1) + "upgrade2"    
 
@@ -314,6 +350,7 @@ class multiGame:
             
             for player in range(len(self.playerList)):
                 self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
+
 
         if self.level % 2 == 0:
             if self.enemyFireChance > 20:
@@ -338,13 +375,13 @@ class multiGame:
             if keys[pygame.K_a]:
                 if not ((self.playerList[self.clientPlayerNum].posx - self.playerList[self.clientPlayerNum].speed) <= 0):
                     self.playerList[self.clientPlayerNum].moveLeft()
-
                     self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
 
 
             if keys[pygame.K_d]:
                 if not ((self.playerList[self.clientPlayerNum].posx + self.playerList[self.clientPlayerNum].speed + self.playerList[self.clientPlayerNum].imagew) >= self.screenw):
                     self.playerList[self.clientPlayerNum].moveRight()
+
 
                     self.socket.send("MOV:" + self.hostName + ":" + str(self.clientPlayerNum) + ":" + str(self.playerList[self.clientPlayerNum].posx))
 
@@ -376,9 +413,11 @@ class multiGame:
         for row in range(self.enemyRowCount):
             for column in range(self.enemyColumnCount):
 
+
                 if self.enemyGrid[row][column].health > 0:
                     if self.enemyGrid[row][column].collider.colliderect(self.missiles[numMissiles].collider):
                         attacker = self.missiles.pop(numMissiles).owner
+
                         if attacker == self.clientPlayerNum:
                             self.enemyGrid[row][column].health -= 1
                             self.socket.send("HIT:" + self.hostName + ":" + "ENEMY:" + str(row) + ":" + str(column))
@@ -398,7 +437,6 @@ class multiGame:
                                     self.playerList[self.clientPlayerNum].score += 100 * self.level
                             return
                         
-
     #Handles the effects of the missiles from both players(1) and enemies(-1)
     def checkMissiles(self):
         numMissiles = 0
@@ -448,6 +486,7 @@ class multiGame:
                     
                     rNum2 = random.randint(1,self.enemyFireChance)
                     if rNum2 == 1:
+
 
                         if (self.enemyGrid[row][column].health > 0 and self.enemyGrid[row][column].missileCount < self.enemyGrid[row][column].missileCap):
                             #self.socket.send("SHOOT:" + "ENEMY:" + str(row) + ":" + str(column))
