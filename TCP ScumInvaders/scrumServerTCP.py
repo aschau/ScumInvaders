@@ -204,8 +204,11 @@ class clientChannel(threading.Thread):
             pass
 
     def send(self, message):
-        self.client.send(("SIZE:" + str(len(message)) + ("~" * (4 - len(str(len(message)))))).encode())
-        self.client.send(message.encode())
+        try:
+            self.client.send(("SIZE:" + str(len(message)) + ("~" * (4 - len(str(len(message)))))).encode())
+            self.client.send(message.encode())
+        except:
+            pass
 
     def checkLog(self,username, password):
         connected = None
