@@ -37,8 +37,11 @@ class Lobby:
             self.chatroom = console(self.screen, (636, 11), 367, 514, 20, 20)
             self.chatbox = console(self.screen, (636, 537), 367, 174, 20, 6, True)
 
+            self.players = None
+
             self.score = 0
             self.highScore = False
+            self.winner = None
             self.scoreButtons = []
             self.scoreButtons.append(Button(self.screen, self.sprites.getSprite("exit"), self.sprites.getSprite("exitHighlighted"), 368, 534, 281, 68, "Room", '', soundManager))
             
@@ -86,6 +89,8 @@ class Lobby:
                 self.screen.blit(self.roomFont.render(str(self.score), True, pygame.Color(255,255,255)),(400,self.screenh/2 - 120))
                 if self.highScore:
                     self.screen.blit(self.roomFont.render("HIGH SCORE!", True, pygame.Color(255,255,255)),(350,self.screenh/2 - 200))
+                if self.winner != None:
+                    self.screen.blit(self.roomFont.render("WINNER: " + self.winner, True, pygame.Color(255,255,255)),(300,self.screenh/2 - 300))
                 for button in self.scoreButtons:
                     button.draw()
 
@@ -123,12 +128,18 @@ class Lobby:
             elif self.state == "Score":
                 for button in self.scoreButtons:
                     button.checkHover(pygame.mouse.get_pos())
-                modifiedMessage = self.socket.receive()
+                message = None
+                while message != "":
+                    message = self.socket.receive()
+                    #print(message)
 
-                if modifiedMessage != "" and modifiedMessage != None:
-                    splitMessage = modifiedMessage.split(":")
-                    if splitMessage[0] == "HIGHSCORE":
-                        self.highScore = True
+                    if message != None and message != "":
+                        splitMessage = message.split(":")
+                        if splitMessage[0] == "HIGHSCORE":
+                            self.highScore = True
+                        if splitMessage[0] == "SCORE":
+                            if splitMessage[1] == "WINNER":
+                                self.winner = self.players[int(splitMessage[2])]
 
                 return "Lobby"
 
@@ -141,8 +152,8 @@ class Lobby:
                     self.socket.send("REFRESH")
                     splitMessage = modifiedMessage.split(":")
                     if splitMessage[0] == "START":
-                        players = json.loads(modifiedMessage.split(":")[1])
-                        return "multiGame" + str(len(players)) + str(players.index(self.username.input))
+                        self.players = json.loads(modifiedMessage.split(":")[1])
+                        return "multiGame" + str(len(self.players)) + str(self.players.index(self.username.input))
 
                     elif splitMessage[0] == "ROOM":
                         self.currentRoom = splitMessage[1]

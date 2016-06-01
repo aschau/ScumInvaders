@@ -247,20 +247,27 @@ class multiGame:
         #if (self.playerList[self.clientPlayerNum].lives <= 0):
         #    return "Room"
         #return "multiGame"
-        if (aliveButDead):
+        if (self.aliveButDead):
             if (self.playerList[self.clientPlayerNum].lives <= 0):
                 self.playerList[self.clientPlayerNum].alive = False
                 self.socket.send("SCORE:" + str(self.playerList[self.clientPlayerNum].score))
                 self.socket.send("DEATH:" + str(self.clientPlayerNum))
                 self.socket.send("RETURN")
                 self.socket.send("REFRESH")
-                aliveButDead = False
+                self.aliveButDead = False
             
         death = 0
         for player in self.playerList: 
             if player.alive == False:
                 death += 1
             if death  >= len(self.playerList):
+                highestScore = 0
+                for player in self.playerList:
+                    if highestScore < player.score:
+                        highestScore = player.score
+                for player in self.playerList:
+                    if player.score == highestScore:
+                        self.socket.send("SCORE:WINNER:" + str(self.playerList.index(player)))
                 return "Score"
         return "multiGame"
     def checkEnemyCount(self):

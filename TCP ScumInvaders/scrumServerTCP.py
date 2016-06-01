@@ -142,7 +142,11 @@ class TCP_Server:
 
                         elif output[0] == "STOP":
                             self.threads.pop(numThreads)
-                        
+                        elif output[0] == "SCORE":
+                            if output[1] == "WINNER":
+                                for thread in self.threads:
+                                    if thread.room == self.threads[numThreads].room:
+                                        thread.send(message)
                         else:
                             for thread in self.threads:
                                 if thread.username != self.threads[numThreads].username and thread.room == self.threads[numThreads].room:
@@ -186,7 +190,9 @@ class clientChannel(threading.Thread):
                         self.room = self.username
                         return readList[0]
                 elif readList[0] == "SCORE":
-                        self.checkScore(readList[1])
+                        if readList[1] != "WINNER":
+                            self.checkScore(readList[1])
+                        return read
 
                 elif readList[0] == "JOIN":
                         self.room = readList[1]
