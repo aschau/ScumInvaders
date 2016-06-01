@@ -177,7 +177,7 @@ class multiGame:
                         self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
 
                 elif modifiedMessage[0] == "DEATH":
-                    self.playerList[self.clientPlayerNum].anim = Animate(self.sprites.getSprite("shipexplode"), 3, 3, 32, 32, 10, False)
+                    self.playerList[int(modifiedMessage[1])].anim = Animate(self.sprites.getSprite("shipexplode"), 3, 3, 32, 32, 10, False)
                     self.playerList[int(modifiedMessage[1])].alive = False
 
 
