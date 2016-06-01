@@ -139,7 +139,7 @@ class Lobby:
                             self.highScore = True
                         if splitMessage[0] == "SCORE":
                             if splitMessage[1] == "WINNER":
-                                self.winner = self.players[int(splitMessage[2])]
+                                self.winner = self.players[int(splitMessage[2])+1]
 
                 return "Lobby"
 
