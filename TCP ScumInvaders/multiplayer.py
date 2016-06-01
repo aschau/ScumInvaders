@@ -172,11 +172,12 @@ class multiGame:
                     print("GAMESTART")
 
                 elif modifiedMessage[0]  == "MOV":
+                    #print(modifiedMessage)
                     if int(modifiedMessage[1]) != self.clientPlayerNum:
                         self.playerList[int(modifiedMessage[1])].posx = int(modifiedMessage[2])
 
                 elif modifiedMessage[0] == "DEATH":
-                    self.playerList[self.clientPlayerNum].anim = Animate(self.sprites.getSprite("shipexplode"), 3, 3, 32, 32, 2, False)
+                    self.playerList[self.clientPlayerNum].anim = Animate(self.sprites.getSprite("shipexplode"), 3, 3, 32, 32, 10, False)
                     self.playerList[int(modifiedMessage[1])].alive = False
 
 
@@ -277,14 +278,14 @@ class multiGame:
 
                 for player in range(len(self.playerList)):
                     self.playerList[player].image = "ship" + str(player+1) + "upgrade2" 
-                    player.anim = Animate(self.sprites.getSprite(player.image), 1, 1, 32, 32, 2)
+                    self.playerList[player].anim = Animate(self.sprites.getSprite(self.playerList[player].image), 1, 1, 32, 32, 2)
    
             elif self.level == 10:
                 self.soundManager.playSound("LevelUp.ogg", 2)
             
                 for player in range(len(self.playerList)):
                     self.playerList[player].image = "ship" + str(player+1) + "upgrade3"
-                    player.anim = Animate(self.sprites.getSprite(player.image), 1, 1, 32, 32, 2)
+                    self.playerList[player].anim = Animate(self.sprites.getSprite(self.playerList[player].image), 1, 1, 32, 32, 2)
             
             if self.level %2 == 1:
                 self.playerList[self.clientPlayerNum].missileCap += 1 
