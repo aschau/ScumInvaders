@@ -59,6 +59,7 @@ class multiGame:
         self.enemyGrid = []
         self.serverGridInfo = {}
         self.enemyRowCount = 5
+        self.aliveButDead = True
 
         self.enemyColumnCount = 10
         self.enemyCount = 50
@@ -246,11 +247,14 @@ class multiGame:
         #if (self.playerList[self.clientPlayerNum].lives <= 0):
         #    return "Room"
         #return "multiGame"
-        if (self.playerList[self.clientPlayerNum].lives <= 0):
-            self.socket.send("SCORE:" + str(self.playerList[self.clientPlayerNum].score))
-            self.socket.send("DEATH:" + str(self.clientPlayerNum))
-            self.socket.send("RETURN")
-            self.socket.send("REFRESH")
+        if (aliveButDead):
+            if (self.playerList[self.clientPlayerNum].lives <= 0):
+                self.playerList[self.clientPlayerNum].alive = False
+                self.socket.send("SCORE:" + str(self.playerList[self.clientPlayerNum].score))
+                self.socket.send("DEATH:" + str(self.clientPlayerNum))
+                self.socket.send("RETURN")
+                self.socket.send("REFRESH")
+                aliveButDead = False
             
         death = 0
         for player in self.playerList: 
